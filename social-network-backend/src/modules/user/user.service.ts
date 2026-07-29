@@ -44,4 +44,30 @@ export class UserService {
 
         return { user, token };
     }
+
+    async login(email: string, password: string) {
+    // ۱. پیدا کردن کاربر با ایمیل
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new Error('کاربری با این ایمیل یافت نشد.');
+    }
+
+    // ۲. بررسی رمز عبور
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('رمز عبور اشتباه است.');
+    }
+
+    // ۳. تولید توکن JWT
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '7d' }
+    );
+
+    return { user, token };
+  }
 }

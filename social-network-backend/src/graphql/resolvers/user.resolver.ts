@@ -39,5 +39,33 @@ export const userResolvers = {
                 };
             }
         },
+
+        login: async (_: any, args: { email: string; password: string }) => {
+            try {
+                const result = await userService.login(args.email, args.password);
+                return {
+                    success: true,
+                    message: 'ورود با موفقیت انجام شد.',
+                    user: {
+                        id: result.user.id,
+                        email: result.user.email,
+                        username: result.user.username,
+                        fullName: result.user.fullName,
+                        bio: result.user.bio,
+                        avatar: result.user.avatar,
+                        createdAt: result.user.createdAt.toISOString(), // ✅ تبدیل به ISO String
+                        updatedAt: result.user.updatedAt.toISOString(), // ✅ تبدیل به ISO String
+                    },
+                    token: result.token,
+                };
+            } catch (error: any) {
+                return {
+                    success: false,
+                    message: error.message,
+                    user: null,
+                    token: null,
+                };
+            }
+        },
     },
 };

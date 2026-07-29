@@ -24,5 +24,10 @@ export const userTypeDefs = `
       password: String!
       fullName: String!
     ): AuthPayload!
+
+    login(
+      email: String!
+      password: String!
+    ): AuthPayload!
   }
 `;
