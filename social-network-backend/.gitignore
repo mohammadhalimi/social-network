@@ -1,0 +1,25 @@
+# ========== Node.js ==========
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# ========== TypeScript ==========
+*.tsbuildinfo
+dist/
+build/
+*.js.map
+*.d.ts.map
+
+# ========== Environment Variables ==========
+.env
+.env.*
+!.env.example
+
+# ========== Prisma ==========
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/*.sql  
