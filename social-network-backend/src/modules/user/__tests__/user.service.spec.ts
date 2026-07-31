@@ -1,4 +1,4 @@
-import { UserService } from './user.service';
+import { UserService } from '../user.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -20,7 +20,7 @@ jest.mock('../../lib/prisma', () => ({
 }));
 
 // ✅ ۳. import کردن prisma بعد از mock، و گرفتن یک reference تایپ‌دار برایش
-import prisma from '../../lib/prisma';
+import prisma from '../../../lib/prisma';
 const mockPrisma = prisma as unknown as {
   user: {
     findUnique: jest.Mock;

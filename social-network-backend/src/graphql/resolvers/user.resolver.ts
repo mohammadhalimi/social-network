@@ -4,16 +4,21 @@ const userService = new UserService();
 
 export const userResolvers = {
     Mutation: {
-        register: async (_: any, args: { email: string; username: string; password: string; fullName: string }) => {
+        register: async (
+            _: any,
+            args: { email: string; username: string; password: string; fullName: string },
+            context: any // 👈 اینجا جدا از args
+        ) => {
             try {
-                console.log('📝 شروع ثبت‌نام با:', args); // لاگ ورودی
+                console.log('📝 شروع ثبت‌نام با:', args);
                 const result = await userService.register(
                     args.email,
                     args.username,
                     args.password,
-                    args.fullName
+                    args.fullName,
+                    context.res // 👈 اینجا هم اصلاح شد
                 );
-                console.log('✅ نتیجه:', result); // لاگ خروجی
+                console.log('✅ نتیجه:', result);
                 return {
                     success: true,
                     message: 'ثبت‌نام با موفقیت انجام شد.',
@@ -24,8 +29,8 @@ export const userResolvers = {
                         fullName: result.user.fullName,
                         bio: result.user.bio,
                         avatar: result.user.avatar,
-                        createdAt: result.user.createdAt.toISOString(), // 👈 مهم
-                        updatedAt: result.user.updatedAt.toISOString(), // 👈 مهم
+                        createdAt: result.user.createdAt.toISOString(),
+                        updatedAt: result.user.updatedAt.toISOString(),
                     },
                     token: result.token,
                 };
@@ -40,9 +45,13 @@ export const userResolvers = {
             }
         },
 
-        login: async (_: any, args: { email: string; password: string }) => {
+        login: async (
+            _: any,
+            args: { email: string; password: string },
+            context: any // 👈 همینجوری اینجا هم
+        ) => {
             try {
-                const result = await userService.login(args.email, args.password);
+                const result = await userService.login(args.email, args.password, context.res);
                 return {
                     success: true,
                     message: 'ورود با موفقیت انجام شد.',
@@ -53,8 +62,8 @@ export const userResolvers = {
                         fullName: result.user.fullName,
                         bio: result.user.bio,
                         avatar: result.user.avatar,
-                        createdAt: result.user.createdAt.toISOString(), // ✅ تبدیل به ISO String
-                        updatedAt: result.user.updatedAt.toISOString(), // ✅ تبدیل به ISO String
+                        createdAt: result.user.createdAt.toISOString(),
+                        updatedAt: result.user.updatedAt.toISOString(),
                     },
                     token: result.token,
                 };
