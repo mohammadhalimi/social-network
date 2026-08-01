@@ -1,17 +1,158 @@
 @import "tailwindcss";
 
-body {
-  background-color: #fafafa;
-  color: #262626;
+/* ✅ تنظیمات تم لایت */
+@layer base {
+  body {
+    background-color: #F8F9FE;
+    color: #1A1A2E;
+  }
+
+  /* اسکرول‌بار */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F0F0F5;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #FF6B6B;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #FF8E53;
+  }
 }
 
-::-webkit-scrollbar {
-  width: 4px;
+/* ✅ کلاس‌های کاربردی (بدون @apply) */
+.card {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s ease;
 }
-::-webkit-scrollbar-thumb {
-  background: #dbdbdb;
-  border-radius: 9999px;
+
+.card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+  border-color: rgba(255, 107, 107, 0.2);
 }
-::-webkit-scrollbar-track {
+
+.input-light {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #1A1A2E;
+  transition: all 0.3s ease;
+}
+
+.input-light::placeholder {
+  color: #6B7280;
+}
+
+.input-light:focus {
+  outline: none;
+  border-color: #FF6B6B;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 0 30px -5px rgba(255, 107, 107, 0.3);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #4ECDC4 0%, #44B39D 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 0 30px -5px rgba(78, 205, 196, 0.3);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
+}
+
+.btn-outline {
+  border: 2px solid #FF6B6B;
+  color: #FF6B6B;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
   background: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 107, 107, 0.05);
+  border-color: #FF8E53;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background: rgba(255, 107, 107, 0.1);
+  color: #FF6B6B;
+}
+
+.badge-secondary {
+  background: rgba(78, 205, 196, 0.1);
+  color: #4ECDC4;
+}
+
+.badge-accent {
+  background: rgba(255, 230, 109, 0.2);
+  color: #B45309;
+}
+
+@theme {
+  /* ✅ رنگ‌های اصلی */
+  --color-primary: #FF6B6B;
+  --color-secondary: #4ECDC4;
+  --color-accent1: #FFE66D;
+  --color-accent2: #A8E6CF;
+  --color-background: #F8F9FE;
+  --color-card: #FFFFFF;
+  --color-border: #E5E7EB;
+
+  /* ✅ رنگ‌های متن — این‌ها کلاس text-text-primary / text-text-secondary می‌سازن */
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #6B7280;
+
+  /* ✅ فونت */
+  --font-sans: 'Inter', sans-serif;
+
+  /* ✅ سایه‌ها */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.10);
+  --shadow-glow-primary: 0 0 30px -5px rgba(255, 107, 107, 0.3);
+  --shadow-glow-secondary: 0 0 30px -5px rgba(78, 205, 196, 0.3);
 }

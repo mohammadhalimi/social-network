@@ -1,14 +1,15 @@
-import './env'; // 👈 اولین import
-import express, { Request, Response } from 'express';
+import './env';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { ruruHTML } from 'ruru/server';
+import cookieParser from 'cookie-parser';
+import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { ruruHTML } from 'ruru/server';
-import dotenv from 'dotenv';
-import { userTypeDefs } from './graphql/schema/user.schema';
 import { userResolvers } from './graphql/resolvers/user.resolver';
-import cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
+
 dotenv.config();
 
 const app = express();
