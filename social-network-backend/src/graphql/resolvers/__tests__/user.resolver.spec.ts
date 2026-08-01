@@ -18,9 +18,16 @@ jest.mock('../../../modules/user/user.service', () => {
 // ✅ ۲. import کردن resolver بعد از mock (تا از instance مشترک استفاده کنه)
 import { userResolvers } from '../user.resolver';
 
+// ✅ ۳. یک mock ساده برای Response اکسپرس داخل context
+const createMockRes = () => ({
+    cookie: jest.fn(),
+    clearCookie: jest.fn(),
+});
+
 describe('UserResolver', () => {
     let mockUserService: jest.Mocked<UserService>;
-    
+    let mockContext: { res: ReturnType<typeof createMockRes>; req: any; user: any };
+
     beforeAll(() => {
         jest.spyOn(console, 'log').mockImplementation(() => { });
         jest.spyOn(console, 'error').mockImplementation(() => { });
@@ -34,6 +41,14 @@ describe('UserResolver', () => {
         // instance مشترک رو برمی‌گردونه، این خط همون object ای رو می‌گیره
         // که resolver واقعی هم استفاده می‌کنه.
         mockUserService = new UserService() as jest.Mocked<UserService>;
+
+        // ✅ context تازه برای هر تست، چون resolver الان بهش وابسته‌ست
+        mockContext = {
+            req: {},
+            res: createMockRes(),
+            user: null,
+        };
+
         jest.clearAllMocks();
     });
 
@@ -68,7 +83,8 @@ describe('UserResolver', () => {
             // ✅ Act
             const result = await userResolvers.Mutation.register(
                 null as any,
-                mockArgs
+                mockArgs,
+                mockContext // 👈 آرگومان سوم اضافه شد
             );
 
             // ✅ Assert
@@ -76,7 +92,8 @@ describe('UserResolver', () => {
                 mockArgs.email,
                 mockArgs.username,
                 mockArgs.password,
-                mockArgs.fullName
+                mockArgs.fullName,
+                mockContext.res // 👈 اضافه شد، چون resolver الان context.res رو پاس می‌ده
             );
             expect(result).toEqual({
                 success: true,
@@ -103,7 +120,8 @@ describe('UserResolver', () => {
             // ✅ Act
             const result = await userResolvers.Mutation.register(
                 null as any,
-                mockArgs
+                mockArgs,
+                mockContext // 👈 اضافه شد
             );
 
             // ✅ Assert
@@ -148,13 +166,15 @@ describe('UserResolver', () => {
             // ✅ Act
             const result = await userResolvers.Mutation.login(
                 null as any,
-                mockArgs
+                mockArgs,
+                mockContext // 👈 اضافه شد
             );
 
             // ✅ Assert
             expect(mockUserService.login).toHaveBeenCalledWith(
                 mockArgs.email,
-                mockArgs.password
+                mockArgs.password,
+                mockContext.res // 👈 اضافه شد
             );
             expect(result).toEqual({
                 success: true,
@@ -181,7 +201,8 @@ describe('UserResolver', () => {
             // ✅ Act
             const result = await userResolvers.Mutation.login(
                 null as any,
-                mockArgs
+                mockArgs,
+                mockContext // 👈 اضافه شد
             );
 
             // ✅ Assert

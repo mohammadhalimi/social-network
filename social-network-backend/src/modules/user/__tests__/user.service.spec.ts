@@ -1,14 +1,14 @@
 import { UserService } from '../user.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
+import { Response } from 'express';
+import prisma from '../../../lib/prisma';
 // ✅ ۱. Mock کردن bcrypt و jwt
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
-// ✅ ۲. Mock کردن پرزیما — mock object باید مستقیماً داخل factory ساخته بشه
-//    تا مشکل hoisting (TDZ) پیش نیاد
-jest.mock('../../lib/prisma', () => ({
+// ✅ ۲. Mock کردن پرزیما — مسیر باید دقیقاً با import زیر یکی باشه
+jest.mock('../../../lib/prisma', () => ({
   __esModule: true,
   default: {
     user: {
@@ -19,8 +19,8 @@ jest.mock('../../lib/prisma', () => ({
   },
 }));
 
-// ✅ ۳. import کردن prisma بعد از mock، و گرفتن یک reference تایپ‌دار برایش
-import prisma from '../../../lib/prisma';
+// ✅ ۳. import کردن prisma بعد از mock — مسیر با بالا یکی شد
+
 const mockPrisma = prisma as unknown as {
   user: {
     findUnique: jest.Mock;
@@ -29,11 +29,21 @@ const mockPrisma = prisma as unknown as {
   };
 };
 
+// ✅ ۴. یک mock ساده برای Response اکسپرس
+const createMockRes = () => {
+  return {
+    cookie: jest.fn(),
+    clearCookie: jest.fn(),
+  } as unknown as Response;
+};
+
 describe('UserService', () => {
   let userService: UserService;
+  let mockRes: Response;
 
   beforeEach(() => {
     userService = new UserService();
+    mockRes = createMockRes(); // 👈 هر تست یک res تازه می‌گیره
     jest.clearAllMocks();
   });
 
@@ -64,7 +74,8 @@ describe('UserService', () => {
         mockUserData.email,
         mockUserData.username,
         mockUserData.password,
-        mockUserData.fullName
+        mockUserData.fullName,
+        mockRes // 👈 اضافه شد
       );
 
       expect(result).toHaveProperty('user');
@@ -79,6 +90,16 @@ describe('UserService', () => {
       expect(mockPrisma.user.create).toHaveBeenCalledTimes(1);
       expect(bcrypt.hash).toHaveBeenCalledWith(mockUserData.password, 10);
       expect(jwt.sign).toHaveBeenCalledTimes(1);
+
+      // ✅ تست جدید: چک کردن که کوکی درست ست شده
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'token',
+        'fake-jwt-token',
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+        })
+      );
     });
 
     it('should throw error if user already exists', async () => {
@@ -92,9 +113,13 @@ describe('UserService', () => {
           mockUserData.email,
           mockUserData.username,
           mockUserData.password,
-          mockUserData.fullName
+          mockUserData.fullName,
+          mockRes // 👈 اضافه شد
         )
       ).rejects.toThrow('ایمیل یا نام کاربری قبلاً ثبت شده است.');
+
+      // ✅ اگه یوزر تکراریه، نباید کوکی ست بشه
+      expect(mockRes.cookie).not.toHaveBeenCalled();
     });
   });
 
@@ -119,7 +144,7 @@ describe('UserService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       (jwt.sign as jest.Mock).mockReturnValue('fake-jwt-token');
 
-      const result = await userService.login('test@example.com', '123456');
+      const result = await userService.login('test@example.com', '123456', mockRes); // 👈 اضافه شد
 
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('token');
@@ -130,14 +155,23 @@ describe('UserService', () => {
         where: { email: 'test@example.com' },
       });
       expect(bcrypt.compare).toHaveBeenCalledWith('123456', mockUser.password);
+
+      // ✅ تست جدید
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'token',
+        'fake-jwt-token',
+        expect.objectContaining({ httpOnly: true })
+      );
     });
 
     it('should throw error if user not found', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
       await expect(
-        userService.login('notfound@example.com', '123456')
+        userService.login('notfound@example.com', '123456', mockRes) // 👈 اضافه شد
       ).rejects.toThrow('کاربری با این ایمیل یافت نشد.');
+
+      expect(mockRes.cookie).not.toHaveBeenCalled();
     });
 
     it('should throw error if password is incorrect', async () => {
@@ -145,8 +179,25 @@ describe('UserService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        userService.login('test@example.com', 'wrongpassword')
+        userService.login('test@example.com', 'wrongpassword', mockRes) // 👈 اضافه شد
       ).rejects.toThrow('رمز عبور اشتباه است.');
+
+      expect(mockRes.cookie).not.toHaveBeenCalled();
+    });
+  });
+
+  // =============================================
+  //  تست‌های logout (جدید — چون متد جدید اضافه کردید)
+  // =============================================
+  describe('logout', () => {
+    it('should clear the token cookie', async () => {
+      const result = await userService.logout(mockRes);
+
+      expect(mockRes.clearCookie).toHaveBeenCalledWith(
+        'token',
+        expect.objectContaining({ httpOnly: true, sameSite: 'lax' })
+      );
+      expect(result).toEqual({ success: true });
     });
   });
 });
