@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RegisterPage from '@/app/auth/register/page';
 
@@ -30,7 +30,7 @@ const mockRegisterMutation = jest.fn().mockResolvedValue({
   data: {
     register: {
       success: true,
-      message: 'ثبت‌نام موفق',
+      message: 'ثبت‌ نام موفق',
       user: { id: '1', email: 'test@example.com', username: 'testuser', fullName: 'کاربر تست' },
     },
   },

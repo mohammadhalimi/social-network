@@ -44,7 +44,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-// ✅ ۱. تابع context با استفاده از `any` برای رفع مشکل TypeScript
 
 // ✅ ۳. استفاده از context در createHandler
 app.use('/graphql', (req, res, next) => {
