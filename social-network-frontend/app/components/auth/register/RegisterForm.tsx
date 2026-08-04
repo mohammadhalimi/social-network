@@ -73,7 +73,9 @@ export function RegisterForm() {
     };
 
     return (
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+        className="space-y-5"
+        onSubmit={handleSubmit(onSubmit)}>
             {error && (
                 <div
                     className="
