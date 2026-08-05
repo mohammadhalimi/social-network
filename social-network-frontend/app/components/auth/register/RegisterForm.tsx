@@ -34,14 +34,6 @@ export function RegisterForm() {
     const [registerMutation] = useMutation(REGISTER);
 
     const onSubmit = async (data: RegisterFormData) => {
-        // ✅ اعتبارسنجی با TypeScript
-        const validationError = validateRegisterForm(data);
-        if (validationError) {
-            setError(validationError);
-            toast.error(`❌ ${validationError}`);
-            return;
-        }
-
         try {
             setError(null);
             dispatch(authStart());
@@ -50,19 +42,36 @@ export function RegisterForm() {
                 variables: data,
             });
 
-            const { success, message, user } = result.data?.register || {};
+            if (result.data?.register) {
+                const { success, message, user, token } = result.data.register;
 
-            if (success && user) {
-                dispatch(loginSuccess({ user }));
-                toast.success('✅ ثبت‌نام شما با موفقیت انجام شد!');
-                setTimeout(() => {
-                    router.push('/auth/login');
-                }, 3000);
+                if (success && user && token) {
+                    // ✅ ذخیره اطلاعات کاربر و توکن در Redux
+                    dispatch(loginSuccess({
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            username: user.username,
+                            fullName: user.fullName,
+                            bio: user.bio || null,
+                            avatar: user.avatar || null,
+                            createdAt: user.createdAt,
+                            updatedAt: user.updatedAt,
+                        },
+                        token,
+                    }));
+                    toast.success('✅ ثبت‌نام شما با موفقیت انجام شد!');
+                    setTimeout(() => {
+                        router.push('/auth/login');
+                    }, 3000);
+                } else {
+                    const errMsg = message || 'خطا در ثبت‌نام';
+                    dispatch(authFailure(errMsg));
+                    setError(errMsg);
+                    toast.error(`❌ ${errMsg}`);
+                }
             } else {
-                const errMsg = message || 'خطا در ثبت‌نام';
-                dispatch(authFailure(errMsg));
-                setError(errMsg);
-                toast.error(`❌ ${errMsg}`);
+                throw new Error('پاسخی از سرور دریافت نشد.');
             }
         } catch (err: any) {
             const errorMsg = err.message || 'خطا در ثبت‌نام';
@@ -74,8 +83,8 @@ export function RegisterForm() {
 
     return (
         <form
-        className="space-y-5"
-        onSubmit={handleSubmit(onSubmit)}>
+            className="space-y-5"
+            onSubmit={handleSubmit(onSubmit)}>
             {error && (
                 <div
                     className="

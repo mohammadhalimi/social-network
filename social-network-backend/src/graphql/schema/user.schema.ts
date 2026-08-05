@@ -17,6 +17,12 @@ export const userTypeDefs = `
     token: String
   }
 
+  type UpdateProfilePayload {
+    success: Boolean!
+    message: String!
+    user: User
+  }
+
   type Mutation {
     register(
       email: String!
@@ -29,5 +35,32 @@ export const userTypeDefs = `
       email: String!
       password: String!
     ): AuthPayload!
+
+    logout: LogoutPayload!
+
+    # ✅ Mutation جدید برای ویرایش پروفایل
+    updateProfile(
+      username: String
+      fullName: String
+      email: String
+      bio: String
+      avatar: String
+    ): UpdateProfilePayload!
+
+    # ✅ Mutation جدید برای تغییر رمز عبور
+    changePassword(
+      oldPassword: String!
+      newPassword: String!
+    ): UpdateProfilePayload!
+  }
+
+  type LogoutPayload {
+    success: Boolean!
+    message: String!
+  }
+    
+  type Query {
+  _empty: String
+  me: User   # ✅ اضافه کردن
   }
 `;

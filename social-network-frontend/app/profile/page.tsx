@@ -1,106 +1,99 @@
-// app/profile/page.tsx
-
 'use client';
 
-import { useAppSelector } from '@/app/redux/hooks';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Sidebar } from '../components/profile/Sidebar';
+import { logout } from '@/app/redux/features/authSlice';
+import { MobileMenu } from '../components/profile/MobileMenu';
+import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
+import { ProfileHeader } from '../components/profile/ProfileHeader';
+import { ProfileContent } from '../components/profile/ProfileContent';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { user, loading } = useAppSelector((state) => state.auth);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/auth/login');
-    }
-  }, [isAuthenticated, router]);
+    setIsMobileMenuOpen(false);
+  }, [activeTab]);
 
-  if (!user) {
-    return null;
-  }
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push('/auth/login');
+  };
+
+  const getAvatarUrl = (avatar: string | null | undefined) => {
+    if (!avatar) return null;
+    if (avatar.startsWith('http')) return avatar;
+    if (avatar.startsWith('/uploads/')) return `http://localhost:4000${avatar}`;
+    return `http://localhost:4000/uploads/${avatar}`;
+  };
+
+  const avatarUrl = user ? getAvatarUrl(user.avatar) : null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* ✅ پس‌زمینه */}
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-teal-50">
-        <motion.div
-          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-primary/20 to-accent1/20 blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
+    <div
+      className="
+    min-h-screen
+    bg-gradient-to-br
+    from-gray-50/80
+    via-white
+    to-gray-50/60
+    ">
+      <div
+        className="
+      max-w-7xl
+      mx-auto
+      px-4
+      sm:px-6
+      lg:px-8
+      py-6
+      lg:py-10
+      ">
+        <ProfileHeader
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+          handleLogout={handleLogout}
         />
-        <motion.div
-          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-secondary/20 to-accent2/20 blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-      </div>
-
-      {/* ✅ کارت پروفایل */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        <div className="card shadow-xl">
-          {/* ✅ آواتار */}
-          <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow-primary">
-              <span className="text-4xl font-bold text-white">
-                {user.fullName?.[0] || '👤'}
-              </span>
-            </div>
-          </div>
-
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-text-primary">{user.fullName}</h2>
-            <p className="text-text-secondary">@{user.username}</p>
-          </div>
-
-          {/* ✅ اطلاعات کاربر */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <span className="text-text-secondary">ایمیل</span>
-              <span className="text-text-primary font-medium">{user.email}</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <span className="text-text-secondary">نام کاربری</span>
-              <span className="text-text-primary font-medium">{user.username}</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <span className="text-text-secondary">نام کامل</span>
-              <span className="text-text-primary font-medium">{user.fullName}</span>
-            </div>
-          </div>
-
-          {/* ✅ دکمه بازگشت */}
-          <div className="mt-8">
-            <Link
-              href="/"
-              className="btn-secondary w-full text-center block"
-            >
-              بازگشت به خانه 🏠
-            </Link>
-          </div>
+        <div
+          className="
+        flex
+        flex-col
+        lg:flex-row
+        gap-6
+        lg:gap-8
+        ">
+          <Sidebar
+            user={user}
+            avatarUrl={avatarUrl}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            handleLogout={handleLogout}
+          />
+          <MobileMenu
+            user={user}
+            avatarUrl={avatarUrl}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            handleLogout={handleLogout}
+            isOpen={isMobileMenuOpen}
+          />
+          <main
+            className="
+          flex-1
+          min-w-0
+          ">
+            <ProfileContent
+              user={user}
+              loading={loading}
+              activeTab={activeTab}
+            />
+          </main>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

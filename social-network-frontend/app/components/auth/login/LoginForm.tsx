@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import  { FormInput }  from './FormInput';
+import { FormInput } from './FormInput';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { SubmitButton } from './SubmitButton';
 import { useMutation } from '@apollo/client/react';
 import { useAppDispatch } from '@/app/redux/hooks';
-import { LoginFormData, validateLoginForm } from './LoginSchema';
+import { LoginFormData } from './LoginSchema';
 import { LOGIN, LoginResponse, LoginVariables } from '@/app/graphql/auth.queries';
 import { authStart, loginSuccess, authFailure } from '@/app/redux/features/authSlice';
 
@@ -33,13 +33,6 @@ export default function LoginForm() {
   const [loginMutation] = useMutation<LoginResponse, LoginVariables>(LOGIN);
 
   const onSubmit = async (data: LoginFormData) => {
-    const validationError = validateLoginForm(data);
-    if (validationError) {
-      setError(validationError);
-      toast.error(`❌ ${validationError}`);
-      return;
-    }
-
     try {
       setError(null);
       dispatch(authStart());
@@ -48,30 +41,41 @@ export default function LoginForm() {
         variables: data,
       });
 
-      const { success, message, user } = result.data?.login || {};
+      // ✅ بررسی وجود data و login
+      if (result.data?.login) {
+        const { success, message, user, token } = result.data.login;
 
-      if (success && user) {
-        dispatch(loginSuccess({ user }));
-        toast.success(`✅ خوش آمدید ${user.fullName}!`);
-        router.push('/profile');
+        if (success && user && token) {
+          // ✅ ارسال token به Redux
+          dispatch(loginSuccess({
+            user: {
+              id: user.id,
+              email: user.email,
+              username: user.username,
+              fullName: user.fullName,
+              bio: user.bio || null,
+              avatar: user.avatar || null,
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
+            },
+            token,
+          }));
+          toast.success(`✅ خوش آمدید ${user.fullName}!`);
+          router.push('/profile');
+        } else {
+          const errMsg = message || 'خطا در ورود';
+          dispatch(authFailure(errMsg));
+          setError(errMsg);
+          toast.error(`❌ ${errMsg}`);
+        }
       } else {
-        const errMsg = message || 'خطا در ورود';
-        dispatch(authFailure(errMsg));
-        setError(errMsg);
-        toast.error(`❌ ${errMsg}`);
+        throw new Error('پاسخی از سرور دریافت نشد.');
       }
     } catch (err: any) {
       const errorMsg = err.message || 'خطا در ورود';
-
-      // بررسی خطای کاربر ثبت‌نام نشده
-      if (errorMsg.includes('کاربری با این ایمیل یافت نشد')) {
-        toast.error('❌ کاربری با این ایمیل ثبت‌نام نکرده است. لطفاً ابتدا ثبت‌نام کنید.');
-      } else {
-        toast.error(`❌ ${errorMsg}`);
-      }
-
       dispatch(authFailure(errorMsg));
       setError(errorMsg);
+      toast.error(`❌ ${errorMsg}`);
     }
   };
 

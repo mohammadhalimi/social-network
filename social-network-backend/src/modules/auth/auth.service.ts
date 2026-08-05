@@ -1,10 +1,16 @@
-import { Response } from 'express'
-import prisma from '../../lib/prisma'; // مسیر رو با ساختار پروژه‌ت تنظیم کن
+import { Response } from 'express';
+import prisma from '../../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-export class UserService {
-  async register(email: string, username: string, password: string, fullName: string, res: Response) {
+export class AuthService {
+  async register(
+    email: string,
+    username: string,
+    password: string,
+    fullName: string,
+    res: Response
+  ) {
     const existingUser = await prisma.user.findFirst({
       where: { OR: [{ email }, { username }] },
     });
@@ -25,10 +31,10 @@ export class UserService {
     );
 
     res.cookie('token', token, {
-      httpOnly: true,   // ✅ فقط از طریق HTTP قابل دسترس (امن در برابر XSS)
-      secure: process.env.NODE_ENV === 'production', // ✅ فقط در HTTPS
-      sameSite: 'lax',  // ✅ محافظت در برابر CSRF
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 روز
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return { user, token };
@@ -57,11 +63,12 @@ export class UserService {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     });
 
     return { user, token };
   }
-  
+
   async logout(res: Response) {
     res.clearCookie('token', {
       httpOnly: true,

@@ -2,21 +2,21 @@
 
 import { ApolloProvider } from '@apollo/client/react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { Toaster } from 'react-hot-toast'; // ✅ اضافه کردن
+import { Toaster } from 'react-hot-toast';
 import { client } from './lib/apollo-client';
 import { store } from './redux/store';
+import AuthChecker from './components/auth/AuthChecker';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReduxProvider store={store}>
       <ApolloProvider client={client}>
+        <AuthChecker />
         {children}
         <Toaster
           position="top-center"
           reverseOrder={false}
           gutter={8}
-          containerClassName=""
-          containerStyle={{}}
           toastOptions={{
             duration: 4000,
             style: {

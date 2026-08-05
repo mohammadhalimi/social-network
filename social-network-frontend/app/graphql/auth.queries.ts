@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
-// ✅ ۱. تعریف نوع‌ها
+// ✅ نوع‌های Register
 export interface RegisterResponse {
   register: {
     success: boolean;
@@ -11,7 +11,12 @@ export interface RegisterResponse {
       email: string;
       username: string;
       fullName: string;
+      bio: string | null;
+      avatar: string | null;
+      createdAt: string;
+      updatedAt: string;
     } | null;
+    token: string; // ✅ اضافه کردن token
   };
 }
 
@@ -22,6 +27,7 @@ export interface RegisterVariables {
   fullName: string;
 }
 
+// ✅ نوع‌های Login
 export interface LoginResponse {
   login: {
     success: boolean;
@@ -31,7 +37,12 @@ export interface LoginResponse {
       email: string;
       username: string;
       fullName: string;
+      bio: string | null;
+      avatar: string | null;
+      createdAt: string;
+      updatedAt: string;
     } | null;
+    token: string; // ✅ اضافه کردن token
   };
 }
 
@@ -40,7 +51,15 @@ export interface LoginVariables {
   password: string;
 }
 
-// ✅ ۲. تعریف Mutationها با نوع
+// ✅ نوع‌های Logout
+export interface LogoutResponse {
+  logout: {
+    success: boolean;
+    message: string;
+  };
+}
+
+// ✅ Mutation ثبت‌نام
 export const REGISTER: TypedDocumentNode<RegisterResponse, RegisterVariables> = gql`
   mutation Register($email: String!, $username: String!, $password: String!, $fullName: String!) {
     register(email: $email, username: $username, password: $password, fullName: $fullName) {
@@ -51,11 +70,17 @@ export const REGISTER: TypedDocumentNode<RegisterResponse, RegisterVariables> = 
         email
         username
         fullName
+        bio
+        avatar
+        createdAt
+        updatedAt
       }
+      token
     }
   }
 `;
 
+// ✅ Mutation ورود
 export const LOGIN: TypedDocumentNode<LoginResponse, LoginVariables> = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -66,7 +91,12 @@ export const LOGIN: TypedDocumentNode<LoginResponse, LoginVariables> = gql`
         email
         username
         fullName
+        bio
+        avatar
+        createdAt
+        updatedAt
       }
+      token
     }
   }
 `;
