@@ -2,6 +2,13 @@
 
 import Image from 'next/image';
 import { User } from '@/app/redux/features/authSlice';
+import {
+  User as UserIcon,
+  AtSign,
+  Mail,
+  FileText,
+  Calendar,
+} from 'lucide-react';
 
 interface ProfileInfoProps {
   user: User | null;
@@ -11,15 +18,15 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
   if (!user) {
     return (
       <div
-        className="card
+        className="
+      card
       text-center
       py-12
       ">
         <p
           className="
-        text-text-secondary
-        ">
-          اطلاعاتی برای نمایش وجود ندارد.
+        text-secondary
+        ">اطلاعاتی برای نمایش وجود ندارد.
         </p>
       </div>
     );
@@ -35,20 +42,22 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
   const avatarUrl = getAvatarUrl(user.avatar);
 
   const fields = [
-    { label: 'نام کامل', value: user.fullName },
-    { label: 'نام کاربری', value: `@${user.username}` },
-    { label: 'ایمیل', value: user.email },
+    { label: 'نام کامل', value: user.fullName, icon: UserIcon },
+    { label: 'نام کاربری', value: `@${user.username}`, icon: AtSign },
+    { label: 'ایمیل', value: user.email, icon: Mail },
     {
       label: 'بیوگرافی',
       value: user.bio || 'هنوز بیوگرافی وارد نشده است',
+      icon: FileText,
       muted: !user.bio,
     },
   ];
 
   return (
     <div
-      className="card"
-    >
+      className="
+    card
+    ">
       <div
         className="
       flex
@@ -96,11 +105,14 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
               }}
             />
           ) : null}
-          <span className={`text-3xl font-bold text-white ${avatarUrl ? 'hidden' : ''} fallback`}>
+          <span className={`
+            text-3xl
+            font-bold
+            text-white
+            ${avatarUrl ? 'hidden' : ''} fallback`}>
             {user.fullName?.[0] || '👤'}
           </span>
         </div>
-
         <div
           className="
         text-center
@@ -112,22 +124,39 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
           text-xl
           font-bold
           text-text-primary
-          truncate">
+          truncate
+          ">
             {user.fullName}
           </h1>
           <p
             className="
-          text-text-secondary
+          text-secondary
           text-sm truncate
           ">
             @{user.username}
           </p>
           <p
-            className="text-xs
-          text-text-secondary
+            className="
+          text-xs
+          text-secondary
           mt-1.5
+          flex
+          items-center
+          justify-center
+          sm:justify-start
+          gap-1.5
           ">
-            عضویت از {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fa-IR') : 'نامشخص'}
+            <Calendar
+              className="
+            w-3.5
+            h-3.5"
+            />
+            عضویت از {user.createdAt
+              ?
+              new
+                Date(user.createdAt).toLocaleDateString('fa-IR')
+              :
+              'نامشخص'}
           </p>
         </div>
       </div>
@@ -136,43 +165,53 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
       divide-y
       divide-gray-100
       ">
-        {fields.map((field) => (
-          <div
-            key={field.label}
-            className="
-            grid
-            grid-cols-1
-            sm:grid-cols-4
-            gap-1
-            sm:gap-4
-            py-4
-            first:pt-0
-            last:pb-0
-            ">
-            <dt
+        {fields.map((field) => {
+          const Icon = field.icon;
+          return (
+            <div
+              key={field.label}
               className="
-            text-sm
-            text-text-secondary
-            sm:col-span-1
-            ">
-              {field.label}
-            </dt>
-            <dd
-              className={`
-                text-sm
-                sm:col-span-3
-                font-medium
-                ${field.muted
-                  ?
-                  'text-text-secondary italic'
-                  :
-                  'text-text-primary'
-                }`}
-            >
-              {field.value}
-            </dd>
-          </div>
-        ))}
+              grid
+              grid-cols-1
+              sm:grid-cols-4
+              gap-1
+              sm:gap-4
+              py-4
+              first:pt-0
+              last:pb-0
+              ">
+              <dt
+                className="
+              flex
+              items-center
+              gap-2
+              text-sm
+              text-secondary
+              sm:col-span-1
+              ">
+                <Icon
+                  className="
+                w-4
+                h-4
+                text-primary/60"
+                />
+                {field.label}
+              </dt>
+              <dd
+                className={`
+                  text-sm
+                  sm:col-span-3
+                  font-medium
+                  ${field.muted
+                    ?
+                    'text-secondary italic' : 'text-text-primary'}
+                `}
+              >
+                {field.value}
+              </dd>
+            </div>
+          );
+        })}
       </dl>
     </div>
   );

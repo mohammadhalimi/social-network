@@ -52,7 +52,11 @@ export const Sidebar = ({
                     <SidebarUserCard user={user} avatarUrl={avatarUrl} />
 
                     <nav
-                        className="space-y-1.5">
+                        className="
+                        flex-1
+                        space-y-1.5
+                         mt-4
+                        ">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
                             const active = isActive(item.id);

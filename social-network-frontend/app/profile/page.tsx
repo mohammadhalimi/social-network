@@ -35,65 +35,43 @@ export default function ProfilePage() {
   const avatarUrl = user ? getAvatarUrl(user.avatar) : null;
 
   return (
-    <div
-      className="
-    min-h-screen
-    bg-gradient-to-br
-    from-gray-50/80
-    via-white
-    to-gray-50/60
-    ">
-      <div
-        className="
-      max-w-7xl
-      mx-auto
-      px-4
-      sm:px-6
-      lg:px-8
-      py-6
-      lg:py-10
-      ">
-        <ProfileHeader
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
+    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      {/* هدر */}
+      <ProfileHeader
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        handleLogout={handleLogout}
+        user={user}
+      />
+
+      {/* سایدبار و محتوای اصلی در یک div */}
+      <div className="flex flex-1 bg-gray">
+        <Sidebar
+          user={user}
+          avatarUrl={avatarUrl}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
           handleLogout={handleLogout}
         />
-        <div
-          className="
-        flex
-        flex-col
-        lg:flex-row
-        gap-6
-        lg:gap-8
-        ">
-          <Sidebar
+
+        <main className="flex-1 min-w-0 p-6 lg:pt-3 ">
+          <ProfileContent
             user={user}
-            avatarUrl={avatarUrl}
+            loading={loading}
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            handleLogout={handleLogout}
           />
-          <MobileMenu
-            user={user}
-            avatarUrl={avatarUrl}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            handleLogout={handleLogout}
-            isOpen={isMobileMenuOpen}
-          />
-          <main
-            className="
-          flex-1
-          min-w-0
-          ">
-            <ProfileContent
-              user={user}
-              loading={loading}
-              activeTab={activeTab}
-            />
-          </main>
-        </div>
+        </main>
       </div>
+
+      {/* منوی موبایل */}
+      <MobileMenu
+        user={user}
+        avatarUrl={avatarUrl}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        handleLogout={handleLogout}
+        isOpen={isMobileMenuOpen}
+      />
     </div>
   );
 }
