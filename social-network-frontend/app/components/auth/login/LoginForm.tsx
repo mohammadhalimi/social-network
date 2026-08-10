@@ -8,11 +8,19 @@ import { FormInput } from './FormInput';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { SubmitButton } from './SubmitButton';
+import { LoginFormData } from './LoginSchema';
 import { useMutation } from '@apollo/client/react';
 import { useAppDispatch } from '@/app/redux/hooks';
-import { LoginFormData } from './LoginSchema';
-import { LOGIN, LoginResponse, LoginVariables } from '@/app/graphql/auth.queries';
-import { authStart, loginSuccess, authFailure } from '@/app/redux/features/authSlice';
+import {
+  LOGIN,
+  LoginResponse,
+  LoginVariables
+} from '@/app/graphql/auth.queries';
+import {
+  authStart,
+  loginSuccess,
+  authFailure
+} from '@/app/redux/features/authSlice';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -41,12 +49,10 @@ export default function LoginForm() {
         variables: data,
       });
 
-      // ✅ بررسی وجود data و login
       if (result.data?.login) {
         const { success, message, user, token } = result.data.login;
 
         if (success && user && token) {
-          // ✅ ارسال token به Redux
           dispatch(loginSuccess({
             user: {
               id: user.id,
@@ -100,8 +106,7 @@ export default function LoginForm() {
           px-4
           py-3
           rounded-xl
-          text-sm
-          ">
+          text-sm">
           {error}
         </motion.div>
       )}
@@ -142,15 +147,15 @@ export default function LoginForm() {
           href="/auth/register"
           className="
           text-sm
-          text-text-secondary
+          text-secondary
           hover:text-primary
           transition-colors
           ">
-          حساب ندارید؟ <span className="
-          text-primary
-          font-semibold
-          ">
-            ثبت‌نام کنید
+          حساب ندارید؟ <span
+            className="
+            text-primary
+            font-semibold
+            ">ثبت‌نام کنید
           </span>
         </Link>
       </motion.div>

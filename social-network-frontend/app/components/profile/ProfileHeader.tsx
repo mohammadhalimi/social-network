@@ -1,6 +1,10 @@
 'use client';
 
-import { Menu, X, LogOut } from 'lucide-react';
+import {
+Menu,
+X,
+LogOut
+} from 'lucide-react';
 import { User } from '@/app/redux/features/authSlice';
 
 interface ProfileHeaderProps {
@@ -14,26 +18,26 @@ export const ProfileHeader = ({
     isMobileMenuOpen,
     setIsMobileMenuOpen,
     handleLogout,
-    user
+    user,
 }: ProfileHeaderProps) => (
     <header
         className="
-    bg-white
-    border-b
-    border-gray-200/80
-    px-6
-    lg:px-8
-    py-4
-    flex
-    items-center
-    justify-between
-    sticky
-    top-0
-    z-40
-    ">
+        bg-card
+        border-b
+        border-border
+        px-6
+        lg:px-8
+        py-4
+        flex
+        items-center
+        justify-between
+        sticky
+        top-0
+        z-40
+        ">
         <div>
             <h1
-                className="
+            className="
             text-xl
             lg:text-2xl
             font-bold
@@ -46,42 +50,45 @@ export const ProfileHeader = ({
                 پنل کاربری
             </h1>
             <p
-                className="
+            className="
             text-sm
-            text-primary
+            text-secondary
             hidden
-            sm:block">
-                خوش آمدید {user?.fullName || 'کاربر عزیز'}
+            sm:block
+            ">
+                خوش آمدید {user?.fullName || 'کاربر عزیز'} 👋
             </p>
         </div>
+
         <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="
             lg:hidden
             p-2
             rounded-xl
-            bg-gray-100
-            hover:bg-gray-200
+            bg-background
+            hover:bg-border
             transition-all
             duration-200"
             aria-label="Toggle menu"
         >
             {isMobileMenuOpen ? (
                 <X
-                    className="
+                className="
                 w-5
                 h-5
-                text-primary"
-                />
+                text-primary
+                "/>
             ) : (
                 <Menu
-                    className="
+                className="
                 w-5
                 h-5
-                text-primary"
-                />
+                text-primary
+                "/>
             )}
         </button>
+
         <button
             onClick={handleLogout}
             className="
@@ -99,7 +106,11 @@ export const ProfileHeader = ({
             rounded-xl
             hover:bg-red-50
             ">
-            <LogOut className="w-4 h-4" />
+            <LogOut
+            className="
+            w-4
+            h-4
+            "/>
             خروج
         </button>
     </header>

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 export const FormInput = ({
     label,
@@ -15,7 +15,7 @@ export const FormInput = ({
     error?: string;
     delay?: number;
 }) => {
-   const id = register.name;
+    const id = register.name;
 
     return (
         <motion.div
@@ -26,11 +26,12 @@ export const FormInput = ({
             <label
                 htmlFor={id}
                 className="
-      block
-      text-sm
-      font-medium
-      mb-1
-      ">
+                block
+                text-sm
+                font-medium
+                text-primary
+                mb-1
+            ">
                 {label}
             </label>
 
@@ -38,19 +39,19 @@ export const FormInput = ({
                 id={id}
                 {...register}
                 type={type}
-                className="
-                input-light
-                "
+                className="input-light"
                 placeholder={placeholder}
             />
 
-            {error && <p
-                className="
-            text-red-500
-            text-sm mt-1
-            ">
-                {error}
-            </p>}
+            {error && (
+                <p
+                    className="
+                    text-red-500
+                    text-sm mt-1
+                ">
+                    {error}
+                </p>
+            )}
         </motion.div>
     );
 };

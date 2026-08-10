@@ -17,23 +17,23 @@ export const FormInput = ({
     helpText?: string;
     showPasswordHint?: boolean;
 }) => {
-    const inputId = register.name; 
+    const inputId = register.name;
 
     return (
         <div>
             <label
-                htmlFor={inputId} 
+                htmlFor={inputId}
                 className="
-            block
-            text-sm
-            font-medium
-            text-text-primary
-            mb-1
+                block
+                text-sm
+                font-medium
+                text-primary
+                mb-1
             ">
                 {label}
             </label>
             <input
-                id={inputId} // 👈 اضافه شد
+                id={inputId}
                 {...register}
                 type={type}
                 className="input-light"
@@ -42,17 +42,19 @@ export const FormInput = ({
             {error && (
                 <p
                     className="
-                text-red-500
-                text-sm
-                mt-1"
-                >{error}</p>
+                    text-red-500
+                    text-sm
+                    mt-1
+                ">
+                    {error}
+                </p>
             )}
             {helpText && !error && (
                 <p
                     className="
-                text-text-secondary
-                text-xs
-                mt-1
+                    text-secondary
+                    text-xs
+                    mt-1
                 ">
                     {helpText}
                 </p>
@@ -60,17 +62,22 @@ export const FormInput = ({
             {showPasswordHint && !error && (
                 <p
                     className="
-                text-text-secondary
-                text-xs
-                mt-1
+                    text-secondary
+                    text-xs
+                    mt-1
                 ">
-                    کاراکترهای خاص مجاز: <span
+                    کاراکترهای خاص مجاز:{" "}
+                    <span
                         className="
-                    font-mono
-                    bg-gray-100
-                    px-1
-                    rounded
-                    ">{SPECIAL_CHARS}
+                        font-mono
+                        bg-card
+                        border
+                        border-border
+                        px-1
+                        rounded
+                        text-primary
+                    ">
+                        {SPECIAL_CHARS}
                     </span>
                 </p>
             )}

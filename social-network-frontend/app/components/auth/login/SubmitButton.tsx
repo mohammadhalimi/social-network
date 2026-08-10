@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
-import { motion } from "framer-motion";
-import { Rocket } from "./svg/rocket";
+import { Rocket } from './svg/rocket';
+import { motion } from 'framer-motion';
+
 export const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => (
   <motion.button
     type="submit"
@@ -10,8 +11,7 @@ export const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => (
     btn-primary
     w-full
     text-center
-    flex
-    items-center
+    flex items-center
     justify-center
     gap-2"
     whileHover={{ scale: 1.02 }}

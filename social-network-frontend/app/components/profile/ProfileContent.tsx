@@ -1,9 +1,11 @@
 'use client';
 
+import Settings from './settings';
 import { motion } from 'framer-motion';
 import ProfileInfo from './ProfileInfo';
 import ChangePassword from './ChangePassword';
 import { EditProfileForm } from './EditProfile/EditProfile';
+
 
 interface ProfileContentProps {
     user: any;
@@ -16,29 +18,32 @@ export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps
         return (
             <div
                 className="
-            flex
-            items-center
-            justify-center
-            min-h-[300px]">
+                flex
+                items-center
+                justify-center
+                min-h-[300px]
+                ">
                 <div
-                    className="text-center">
+                    className="
+                    text-center
+                    ">
                     <div
                         className="
-                    w-10
-                    h-10
-                    border-4
-                border-primary
-                border-t-transparent
-                rounded-full
-                animate-spin
-                mx-auto"
+                        w-10
+                        h-10
+                        border-4
+                        border-primary
+                        border-t-transparent
+                        rounded-full
+                        animate-spin
+                        mx-auto"
                     />
                     <p
                         className="
-                     mt-4
-                    text-sm
-                    text-text-secondary
-          ">در حال بارگذاری...
+                        mt-4
+                        text-sm
+                        text-secondary
+                        ">در حال بارگذاری...
                     </p>
                 </div>
             </div>
@@ -49,17 +54,19 @@ export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps
         return (
             <div
                 className="
-            flex
-            items-center
-            justify-center
-            min-h-[300px]
-            ">
+                flex
+                items-center
+                justify-center
+                min-h-[300px]
+                ">
                 <div
-                    className="text-center">
+                    className="
+                    text-center
+                    ">
                     <p
                         className="
-                    text-text-secondary
-          ">لطفاً وارد حساب خود شوید.
+                        text-secondary
+                        ">لطفاً وارد حساب خود شوید.
                     </p>
                     <button
                         onClick={() => window.location.href = '/auth/login'}
@@ -85,6 +92,8 @@ export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps
                 return <EditProfileForm user={user} />;
             case 'change-password':
                 return <ChangePassword />;
+            case 'settings':
+                return <Settings />;
             default:
                 return <ProfileInfo user={user} />;
         }

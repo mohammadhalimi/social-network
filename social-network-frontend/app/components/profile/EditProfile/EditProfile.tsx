@@ -12,10 +12,7 @@ import { User } from '@/app/redux/features/authSlice';
 import { updateUser } from '@/app/redux/features/authSlice';
 import {
   UPDATE_PROFILE,
-  UpdateProfileResponse,
-  UpdateProfileVariables
 } from '@/app/graphql/profile.queries';
-import { div } from 'framer-motion/client';
 
 interface EditProfileFormData {
   username: string;
@@ -50,9 +47,8 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
     },
   });
 
-  const [updateProfile] = useMutation<UpdateProfileResponse, UpdateProfileVariables>(UPDATE_PROFILE);
+  const [updateProfile] = useMutation(UPDATE_PROFILE);
 
-  // ========== آپلود عکس ==========
   const handleFileChange = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.error('حجم عکس باید کمتر از ۵ مگابایت باشد.');
@@ -98,7 +94,6 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
     setValue('avatar', '');
   };
 
-  // ========== ارسال فرم ==========
   const onSubmit = async (data: EditProfileFormData) => {
     try {
       setIsLoading(true);
@@ -120,8 +115,20 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
   };
 
   return (
-    <div className="card">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <div
+      className="
+      bg-card
+      border
+      border-border
+      rounded-2xl
+      p-6
+      shadow-soft
+      ">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="
+        space-y-6
+        ">
         <AvatarUpload
           previewAvatar={previewAvatar}
           isUploading={isUploading}
@@ -131,15 +138,12 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
         />
         <div
           className="
-      grid
-      grid-cols-1
-      sm:grid-cols-2
-      gap-5
-      ">
-          <FormField
-            label="نام کامل"
-            error={errors.fullName?.message}
-          >
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          gap-5
+          ">
+          <FormField label="نام کامل" error={errors.fullName?.message}>
             <input
               {...register('fullName', { required: 'نام کامل الزامی است' })}
               type="text"
@@ -147,10 +151,7 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
               placeholder="نام و نام خانوادگی"
             />
           </FormField>
-
-          <FormField
-            label="نام کاربری"
-            error={errors.username?.message}>
+          <FormField label="نام کاربری" error={errors.username?.message}>
             <input
               {...register('username', { required: 'نام کاربری الزامی است' })}
               type="text"
@@ -173,23 +174,15 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
             placeholder="example@email.com"
           />
         </FormField>
-        <FormField
-          label="بیوگرافی"
-          optional
-        >
+        <FormField label="بیوگرافی" optional>
           <textarea
             {...register('bio')}
             rows={4}
-            className="
-        input-light
-        resize-none"
+            className="input-light resize-none"
             placeholder="درباره خودت بنویس..."
           />
         </FormField>
-        <SubmitButton
-          isLoading={isLoading}
-          isUploading={isUploading}
-        />
+        <SubmitButton isLoading={isLoading} isUploading={isUploading} />
       </form>
     </div>
   );

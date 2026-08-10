@@ -10,8 +10,12 @@ import { SubmitButton } from './SubmitButton';
 import { useMutation } from '@apollo/client/react';
 import { useAppDispatch } from '@/app/redux/hooks';
 import { REGISTER } from '@/app/graphql/auth.queries';
-import { RegisterFormData, validateRegisterForm } from './RegisterSchema';
-import { authStart, loginSuccess, authFailure } from '@/app/redux/features/authSlice';
+import { RegisterFormData } from './RegisterSchema';
+import {
+    authStart,
+    loginSuccess,
+    authFailure
+} from '@/app/redux/features/authSlice';
 
 export function RegisterForm() {
     const router = useRouter();
@@ -46,7 +50,6 @@ export function RegisterForm() {
                 const { success, message, user, token } = result.data.register;
 
                 if (success && user && token) {
-                    // ✅ ذخیره اطلاعات کاربر و توکن در Redux
                     dispatch(loginSuccess({
                         user: {
                             id: user.id,
@@ -83,19 +86,21 @@ export function RegisterForm() {
 
     return (
         <form
-            className="space-y-5"
-            onSubmit={handleSubmit(onSubmit)}>
+            className="
+            space-y-5"
+            onSubmit={handleSubmit(onSubmit)}
+        >
             {error && (
                 <div
                     className="
-                bg-red-50
-                border
-                border-red-400
-                text-red-700
-                px-4
-                py-3
-                rounded-lg
-                text-s
+                    bg-red-50
+                    border
+                    border-red-200
+                    text-red-700
+                    px-4
+                    py-3
+                    rounded-lg
+                    text-sm
                 ">
                     {error}
                 </div>
@@ -142,23 +147,25 @@ export function RegisterForm() {
 
             <SubmitButton isSubmitting={isSubmitting} />
 
-            <div className="text-center">
+            <div
+                className="
+                text-center
+            ">
                 <Link
                     href="/auth/login"
                     className="
-                text-sm
-                text-text-secondary
-                hover:text-primary
-                transition-colors
+                    text-sm
+                    text-secondary
+                    hover:text-primary
+                    transition-colors
                 ">
                     قبلاً حساب دارید؟
                     <span
                         className="
-                    text-primary
-                    font-semibold
+                        text-primary
+                        font-semibold
                     ">
-                        وارد شوید
-                    </span>
+                        وارد شوید</span>
                 </Link>
             </div>
         </form>

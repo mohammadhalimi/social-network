@@ -1,43 +1,53 @@
+'use client';
+
 import {
     OpenEyes,
     ClosedEyes
-} from "./svg/PasswordEye";
+} from './svg/PasswordEye';
+
+interface PasswordFieldProps {
+    register: any;
+    placeholder: string;
+    visible: boolean;
+    onToggle: () => void;
+}
 
 export default function PasswordField({
     register,
     placeholder,
     visible,
-    onToggle }: any) {
+    onToggle,
+}: PasswordFieldProps) {
     return (
         <div
-            className="relative">
+            className="
+            relative
+            ">
             <input
                 {...register}
                 type={visible ? 'text' : 'password'}
                 className="
                 input-light
-                pl-10"
+                pl-10
+                "
                 placeholder={placeholder}
             />
             <button
                 type="button"
                 onClick={onToggle}
                 tabIndex={-1}
-                className="
-                absolute
+                className="absolute
                 left-3
                 top-1/2
                 -translate-y-1/2
-                text-text-secondary
-                hover:text-text-primary
-                focus:outline-none"
+                text-secondary
+                hover:text-primary
+                focus:outline-none
+                transition-colors
+                duration-200"
                 aria-label={visible ? 'پنهان کردن رمز' : 'نمایش رمز'}
             >
-                {visible ? (
-                    <OpenEyes />
-                ) : (
-                    <ClosedEyes />
-                )}
+                {visible ? <OpenEyes /> : <ClosedEyes />}
             </button>
         </div>
     );

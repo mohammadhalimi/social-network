@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -11,7 +10,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // ==========================================================
-// Mock: authSlice -> فقط action creator رو نیاز داریم
+// Mock: authSlice
 // ==========================================================
 jest.mock('@/app/redux/features/authSlice', () => ({
     logout: jest.fn(() => ({ type: 'auth/logout' })),
@@ -19,20 +18,34 @@ jest.mock('@/app/redux/features/authSlice', () => ({
 import { logout } from '@/app/redux/features/authSlice';
 
 // ==========================================================
+// Mock: themeSlice
+// ==========================================================
+jest.mock('@/app/redux/features/themeSlice', () => ({
+    toggleTheme: jest.fn(() => ({ type: 'theme/toggle' })),
+}));
+import { toggleTheme } from '@/app/redux/features/themeSlice';
+
+// ==========================================================
 // Mock: redux hooks
 // ==========================================================
 const mockDispatch = jest.fn();
 let mockAuthState: { user: any; loading: boolean } = { user: null, loading: true };
+let mockThemeState: { theme: 'light' | 'dark' } = { theme: 'light' };
 
 jest.mock('@/app/redux/hooks', () => ({
     useAppDispatch: () => mockDispatch,
-    useAppSelector: (selector: any) => selector({ auth: mockAuthState }),
+    useAppSelector: (selector: any) => {
+        // بررسی می‌کنیم که selector مربوط به theme است
+        const state = {
+            auth: mockAuthState,
+            theme: mockThemeState,
+        };
+        return selector(state);
+    },
 }));
 
 // ==========================================================
 // Mock: کامپوننت‌های فرزند
-// فقط پراپ‌های مهم رو به شکل قابل‌مشاهده رندر می‌کنیم، پیاده‌سازی
-// داخلی هرکدوم باید تو فایل تست خودشون بررسی بشه، نه اینجا.
 // ==========================================================
 jest.mock('../../components/profile/ProfileHeader', () => ({
     ProfileHeader: ({ isMobileMenuOpen, setIsMobileMenuOpen, handleLogout }: any) => (
@@ -65,17 +78,31 @@ jest.mock('../../components/profile/MobileMenu', () => ({
     ),
 }));
 
+// ✅ Import کردن Settings واقعی
+import Settings from '../../components/profile/settings';
+
 jest.mock('../../components/profile/ProfileContent', () => ({
-    ProfileContent: ({ user, loading, activeTab }: any) => (
-        <div data-testid="profile-content">
-            <span data-testid="content-loading">{String(loading)}</span>
-            <span data-testid="content-active-tab">{activeTab}</span>
-            <span data-testid="content-user-id">{user?.id ?? 'none'}</span>
-        </div>
-    ),
+    ProfileContent: ({ user, loading, activeTab }: any) => {
+        if (activeTab === 'settings') {
+            return (
+                <div data-testid="profile-content">
+                    <span data-testid="content-loading">{String(loading)}</span>
+                    <span data-testid="content-active-tab">{activeTab}</span>
+                    <span data-testid="content-user-id">{user?.id ?? 'none'}</span>
+                    <Settings />
+                </div>
+            );
+        }
+        return (
+            <div data-testid="profile-content">
+                <span data-testid="content-loading">{String(loading)}</span>
+                <span data-testid="content-active-tab">{activeTab}</span>
+                <span data-testid="content-user-id">{user?.id ?? 'none'}</span>
+            </div>
+        );
+    },
 }));
 
-// باید بعد از jest.mock ها import بشه
 import ProfilePage from '../../profile/page';
 
 const mockUser = {
@@ -91,6 +118,7 @@ describe('ProfilePage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockAuthState = { user: null, loading: true };
+        mockThemeState = { theme: 'light' };
     });
 
     it('renders all child sections and passes loading/user state down', () => {
@@ -203,16 +231,77 @@ describe('ProfilePage', () => {
             mockAuthState = { user: mockUser, loading: false };
             render(<ProfilePage />);
 
-            // باز کردن منو از طریق هدر
             fireEvent.click(screen.getByText('open-menu'));
             expect(screen.getByTestId('mobile-menu-open')).toHaveTextContent('true');
 
-            // تغییر تب از طریق سایدبار
             fireEvent.click(screen.getByText('sidebar-set-tab'));
 
             expect(screen.getByTestId('mobile-menu-open')).toHaveTextContent('false');
             expect(screen.getByTestId('sidebar-active-tab')).toHaveTextContent('settings');
             expect(screen.getByTestId('content-active-tab')).toHaveTextContent('settings');
+        });
+    });
+
+    // ==========================================================
+    //  تست‌های جدید: تنظیمات (Settings)
+    // ==========================================================
+    describe('settings tab', () => {
+        it('should render settings component when settings tab is active', () => {
+            mockAuthState = { user: mockUser, loading: false };
+            render(<ProfilePage />);
+
+            fireEvent.click(screen.getByText('sidebar-set-tab'));
+
+            expect(screen.getByText('⚙️ تنظیمات')).toBeInTheDocument();
+            expect(screen.getByText('تم')).toBeInTheDocument();
+        });
+
+        it('should toggle theme when theme button is clicked in settings', () => {
+            mockAuthState = { user: mockUser, loading: false };
+            render(<ProfilePage />);
+
+            fireEvent.click(screen.getByText('sidebar-set-tab'));
+
+            const themeToggle = screen.getByLabelText('تغییر تم');
+            fireEvent.click(themeToggle);
+
+            expect(toggleTheme).toHaveBeenCalled();
+        });
+
+        it('should show dark theme state in settings', () => {
+            // ✅ تنظیم تم روی دارک
+            mockThemeState = { theme: 'dark' };
+            mockAuthState = { user: mockUser, loading: false };
+            
+            render(<ProfilePage />);
+
+            // ابتدا به تب settings بروید
+            fireEvent.click(screen.getByText('sidebar-set-tab'));
+
+            // ✅ بررسی اینکه تم دارک نمایش داده شده است
+            expect(screen.getByText('تم تاریک')).toBeInTheDocument();
+            
+            // ✅ بررسی اینکه آیکون ماه وجود دارد (در حالت دارک)
+            const moonIcon = document.querySelector('.lucide-moon');
+            expect(moonIcon).toBeInTheDocument();
+        });
+
+        it('should show light theme state in settings', () => {
+            // ✅ تنظیم تم روی لایت
+            mockThemeState = { theme: 'light' };
+            mockAuthState = { user: mockUser, loading: false };
+            
+            render(<ProfilePage />);
+
+            // ابتدا به تب settings بروید
+            fireEvent.click(screen.getByText('sidebar-set-tab'));
+
+            // ✅ بررسی اینکه تم روشن نمایش داده شده است
+            expect(screen.getByText('تم روشن')).toBeInTheDocument();
+            
+            // ✅ بررسی اینکه آیکون خورشید وجود دارد (در حالت لایت)
+            const sunIcon = document.querySelector('.lucide-sun');
+            expect(sunIcon).toBeInTheDocument();
         });
     });
 });

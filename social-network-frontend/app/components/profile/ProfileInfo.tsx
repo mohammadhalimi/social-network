@@ -19,14 +19,19 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
     return (
       <div
         className="
-      card
-      text-center
-      py-12
-      ">
+        bg-card
+        border
+        border-border
+        rounded-2xl
+        p-6
+        shadow-soft
+        text-center
+        py-12
+        ">
         <p
           className="
-        text-secondary
-        ">اطلاعاتی برای نمایش وجود ندارد.
+          text-secondary
+          ">اطلاعاتی برای نمایش وجود ندارد.
         </p>
       </div>
     );
@@ -56,37 +61,42 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
   return (
     <div
       className="
-    card
-    ">
+      bg-card
+      border
+      border-border
+      rounded-2xl
+      p-6
+      shadow-soft
+      ">
       <div
         className="
-      flex
-      flex-col
-      sm:flex-row
-      sm:items-center
-      gap-5
-      pb-6
-      mb-6
-      border-b
-      border-gray-100
-      ">
+        flex
+        flex-col
+        sm:flex-row
+        sm:items-center
+        gap-5
+        pb-6
+        mb-6
+        border-b
+        border-border
+        ">
         <div
           className="
-        w-20
-        h-20
-        sm:w-24
-        sm:h-24
-        rounded-full
-        bg-gradient-primary
-        flex
-        items-center
-        justify-center
-        shadow-glow-primary
-        overflow-hidden
-        flex-shrink-0
-        mx-auto
-        sm:mx-0
-        ">
+          w-20
+          h-20
+          sm:w-24
+          sm:h-24
+          rounded-full
+          bg-gradient-primary
+          flex
+          items-center
+          justify-center
+          shadow-glow-primary
+          overflow-hidden
+          flex-shrink-0
+          mx-auto
+          sm:mx-0
+          ">
           {avatarUrl ? (
             <Image
               src={avatarUrl}
@@ -105,7 +115,8 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
               }}
             />
           ) : null}
-          <span className={`
+          <span
+            className={`
             text-3xl
             font-bold
             text-white
@@ -113,58 +124,55 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
             {user.fullName?.[0] || '👤'}
           </span>
         </div>
+
         <div
           className="
-        text-center
-        sm:text-right
-        min-w-0
-        ">
+          text-center
+          sm:text-right
+          min-w-0
+          ">
           <h1
             className="
-          text-xl
-          font-bold
-          text-text-primary
-          truncate
-          ">
+            text-xl
+            font-bold
+            text-primary
+            truncate
+            ">
             {user.fullName}
           </h1>
           <p
             className="
-          text-secondary
-          text-sm truncate
-          ">
+            text-secondary
+            text-sm
+            truncate
+            ">
             @{user.username}
           </p>
           <p
             className="
-          text-xs
-          text-secondary
-          mt-1.5
-          flex
-          items-center
-          justify-center
-          sm:justify-start
-          gap-1.5
-          ">
+            text-xs
+            text-secondary
+            mt-1.5
+            flex
+            items-center
+            justify-center
+            sm:justify-start
+            gap-1.5
+            ">
             <Calendar
               className="
-            w-3.5
-            h-3.5"
+              w-3.
+              h-3.5"
             />
-            عضویت از {user.createdAt
-              ?
-              new
-                Date(user.createdAt).toLocaleDateString('fa-IR')
-              :
-              'نامشخص'}
+            عضویت از {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fa-IR') : 'نامشخص'}
           </p>
         </div>
       </div>
       <dl
         className="
-      divide-y
-      divide-gray-100
-      ">
+        divide-y
+        divide-border
+        ">
         {fields.map((field) => {
           const Icon = field.icon;
           return (
@@ -182,30 +190,28 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
               ">
               <dt
                 className="
-              flex
-              items-center
-              gap-2
-              text-sm
-              text-secondary
-              sm:col-span-1
-              ">
+                flex
+                items-center
+                gap-2
+                text-sm
+                text-secondary
+                sm:col-span-1
+                ">
                 <Icon
                   className="
-                w-4
-                h-4
-                text-primary/60"
-                />
+                  w-4
+                  h-4
+                  text-primary/60"
+                  />
                 {field.label}
               </dt>
               <dd
                 className={`
-                  text-sm
-                  sm:col-span-3
-                  font-medium
-                  ${field.muted
-                    ?
-                    'text-secondary italic' : 'text-text-primary'}
-                `}
+                text-sm
+                sm:col-span-3
+                font-medium
+                ${field.muted ? 'text-text-secondary italic' : 'text-text-primary'}
+              `}
               >
                 {field.value}
               </dd>

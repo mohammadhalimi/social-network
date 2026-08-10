@@ -7,31 +7,28 @@ export default function RegisterPage() {
   return (
     <div
       className="
-    min-h-screen
-    flex
-    items-center
-    justify-center
-    p-4
-    relative
-    overflow-hidden
-    ">
-      {/* ✅ پس‌زمینه */}
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      p-4
+      relative
+      overflow-hidden
+      bg-background
+      ">
       <div
         className="
-      absolute
-      inset-0
-      bg-gradient-to-br
-      from-rose-50
-      via-white
-      to-teal-50
-      ">
+        absolute
+        inset-0
+        bg-background
+        ">
         <motion.div
           className="
           absolute
           top-[-20%]
           right-[-10%]
-          w-[500px]
-          h-[500px]
+          w-lg
+          h-lg
           rounded-full
           bg-gradient-to-br
           from-primary/20
@@ -52,8 +49,8 @@ export default function RegisterPage() {
           absolute
           bottom-[-20%]
           left-[-10%]
-          w-[600px]
-          h-[600px]
+          w-xl
+          h-xl
           rounded-full
           bg-gradient-to-tr
           from-secondary/20
@@ -76,8 +73,8 @@ export default function RegisterPage() {
           left-[50%]
           translate-x-[-50%]
           translate-y-[-50%]
-          w-[300px]
-          h-[300px]
+          w-xs
+          h-xs
           rounded-full
           bg-accent1/10
           blur-3xl"
@@ -92,7 +89,6 @@ export default function RegisterPage() {
         />
       </div>
 
-      {/* ✅ کارت ثبت‌نام */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,58 +97,61 @@ export default function RegisterPage() {
         relative
         z-10
         w-full
-        max-w-md"
-      >
-        <div className="
-        card
-        shadow-xl
+        max-w-md
         ">
-          {/* ✅ لوگو */}
+        <div
+          className="
+          bg-card
+          border
+          border-border
+          rounded-2xl
+          p-8
+          shadow-soft
+          ">
           <div
             className="
-          flex
-          justify-center
-          mb-6
-          ">
+            flex
+            justify-center
+            mb-6
+            ">
             <div
               className="
-            w-20
-            h-20
-            rounded-full
-            bg-gradient-primary
-            flex
-            items-center
-            justify-center
-            shadow-glow-primary
-            ">
+              w-20
+              h-20
+              rounded-full
+              bg-gradient-primary
+              flex
+              items-center
+              justify-center
+              shadow-glow-primary
+              ">
               <span
                 className="
-              text-3xl
-              font-bold
-              text-whit
+                text-3xl
+                font-bold
+                text-white
               ">
                 🚀
               </span>
             </div>
           </div>
-
           <div
             className="
-          text-center
-          mb-8
+            text-center
+            mb-8
           ">
-            <h2 className="text-3xl
-            font-bold
-            text-text-primary
-            ">
-              خوش آمدید! ✨
+            <h2
+              className="
+              text-3xl
+              font-bold
+              text-primary
+            ">خوش آمدید! ✨
             </h2>
             <p
               className="
-            mt-2
-            text-text-secondary
-            ">
-              عضو جدید؟ همین حالا ثبت‌نام کن
+              mt-2
+              text-secondary
+            ">عضو جدید؟ همین حالا ثبت‌نام کن
             </p>
           </div>
           <RegisterForm />

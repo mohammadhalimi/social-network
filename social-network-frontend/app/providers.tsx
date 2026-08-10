@@ -1,17 +1,19 @@
 'use client';
 
-import { ApolloProvider } from '@apollo/client/react';
-import { Provider as ReduxProvider } from 'react-redux';
+import { store } from './redux/store';
 import { Toaster } from 'react-hot-toast';
 import { client } from './lib/apollo-client';
-import { store } from './redux/store';
+import { ApolloProvider } from '@apollo/client/react';
+import { Provider as ReduxProvider } from 'react-redux';
 import AuthChecker from './components/auth/AuthChecker';
+import { ThemeInitializer } from './components/ThemeInitializer';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReduxProvider store={store}>
       <ApolloProvider client={client}>
         <AuthChecker />
+        <ThemeInitializer />
         {children}
         <Toaster
           position="top-center"

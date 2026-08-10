@@ -8,8 +8,8 @@ export interface GetProfileResponse {
     email: string;
     username: string;
     fullName: string;
-    bio: string | null;
-    avatar: string | null;
+    bio: string;
+    avatar: string;
     createdAt: string;
     updatedAt: string;
   } | null;
@@ -18,7 +18,7 @@ export interface GetProfileResponse {
 // =============================================
 // ✅ ۱. کوئری دریافت اطلاعات کاربر (me)
 // =============================================
-export const GET_PROFILE = gql`
+export const GET_PROFILE: TypedDocumentNode<GetProfileResponse> = gql`
   query GetProfile {
     me {
       id

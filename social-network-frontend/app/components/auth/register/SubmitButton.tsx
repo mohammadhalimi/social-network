@@ -12,7 +12,7 @@ export const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => (
         items-center
         justify-center
         gap-2
-        ">
+    ">
         {isSubmitting ? (
             <>
                 <Congrat />
