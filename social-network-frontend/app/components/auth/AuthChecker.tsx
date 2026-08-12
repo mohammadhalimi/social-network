@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { GET_PROFILE, GetProfileResponse } from '@/app/graphql/profile.queries';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { loginSuccess, logout } from '@/app/redux/features/authSlice';
-import { useRouter, usePathname } from 'next/navigation';
+import { GET_PROFILE, GetProfileResponse } from '@/app/graphql/profile.queries';
 
 export default function AuthChecker() {
   const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ export default function AuthChecker() {
 
   const { data, loading, error } = useQuery<GetProfileResponse>(GET_PROFILE, {
     fetchPolicy: 'network-only',
-    // ✅ دیگه skip نمی‌کنیم؛ کوکی httpOnly خودش با درخواست می‌ره
+     skip: !token, // ✅ اگر توکن نباشد، درخواست نده
   });
 
   useEffect(() => {
