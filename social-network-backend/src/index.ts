@@ -14,7 +14,7 @@ import { userResolvers } from './graphql/resolvers/user.resolvers';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ترکیب TypeDefs
@@ -82,8 +82,10 @@ app.get('/', (_req, res) => {
   res.redirect('/playground');
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 سرور در حال اجراست:`);
-  console.log(`📡 GraphQL API: http://localhost:${PORT}/graphql`);
-  console.log(`🎨 محیط تست: http://localhost:${PORT}/playground`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 سرور در حال اجراست:`);
+    console.log(`📡 GraphQL API: http://localhost:${PORT}/graphql`);
+    console.log(`🎨 محیط تست: http://localhost:${PORT}/playground`);
+  });
+}
