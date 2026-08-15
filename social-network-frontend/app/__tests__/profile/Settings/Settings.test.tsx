@@ -1,10 +1,19 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import userEvent from '@testing-library/user-event';
 import Settings from '@/app/components/profile/settings';
-import themeReducer, { toggleTheme } from '@/app/redux/features/themeSlice';
+
+import {
+    render,
+    screen,
+    fireEvent
+} from '@testing-library/react';
+
+import
+themeReducer,
+{ toggleTheme }
+    from '@/app/redux/features/themeSlice';
 
 // ==========================================================
 // Mock: lucide-react
@@ -172,7 +181,7 @@ describe('Settings Component', () => {
         );
 
         expect(screen.getByText('تم روشن')).toBeInTheDocument();
-        
+
         const toggleButton = screen.getByTestId('theme-toggle');
         fireEvent.click(toggleButton);
 
