@@ -16,7 +16,8 @@ model User {
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  resetToken          String?   @unique
+  resetTokenExpiresAt DateTime?
   posts     Post[]
   comments  Comment[]
   likes     Like[]
