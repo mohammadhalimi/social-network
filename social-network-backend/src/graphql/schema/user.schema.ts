@@ -52,6 +52,12 @@ export const userTypeDefs = `
       oldPassword: String!
       newPassword: String!
     ): UpdateProfilePayload!
+
+    # ✅ درخواست بازیابی رمز
+    requestPasswordReset(email: String!): ResetPasswordPayload!
+
+    # ✅ بازنشانی رمز با توکن
+    resetPassword(token: String!, newPassword: String!): ResetPasswordPayload!
   }
 
   type LogoutPayload {
@@ -62,5 +68,10 @@ export const userTypeDefs = `
   type Query {
   _empty: String
   me: User   # ✅ اضافه کردن
+  }
+
+  type ResetPasswordPayload {
+    success: Boolean!
+    message: String!
   }
 `;

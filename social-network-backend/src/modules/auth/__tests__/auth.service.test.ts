@@ -1,8 +1,8 @@
-import { AuthService } from '../auth.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 import prisma from '../../../lib/prisma';
+import { AuthService } from '../auth.service';
 
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');

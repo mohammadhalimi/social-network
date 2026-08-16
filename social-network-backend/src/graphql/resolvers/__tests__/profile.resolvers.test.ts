@@ -26,6 +26,8 @@ describe('profileResolvers', () => {
         password: 'Deadlock_2001#',
         createdAt: new Date(),
         updatedAt: new Date(),
+        resetToken: null,              // ✅ اضافه کن
+        resetTokenExpiresAt: null,
     };
 
     beforeEach(() => {

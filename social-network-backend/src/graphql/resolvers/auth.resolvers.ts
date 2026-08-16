@@ -1,8 +1,7 @@
 // resolvers/auth.resolvers.ts
 // resolverهای مربوط به احراز هویت
-
-import { AuthService } from '../../modules/auth/auth.service';
 import { mapUser } from './helpers/mapUser';
+import { AuthService } from '../../modules/auth/auth.service';
 import { successResponse, withTryCatch } from './helpers/response';
 
 const authService = new AuthService();
@@ -48,5 +47,21 @@ export const authResolvers = {
             return successResponse('خروج با موفقیت انجام شد.');
         },
         'خطا در خروج از حساب'
+    ),
+    // ✅ Resolverهای جدید برای فراموشی رمز عبور
+    requestPasswordReset: withTryCatch(
+        async (_: any, { email }: { email: string }) => {
+            await authService.requestPasswordReset(email);
+            return successResponse('اگر این ایمیل ثبت شده باشد، لینک بازیابی ارسال شده است.');
+        },
+        'خطا در ارسال لینک بازیابی'
+    ),
+
+    resetPassword: withTryCatch(
+        async (_: any, { token, newPassword }: { token: string; newPassword: string }) => {
+            await authService.resetPassword(token, newPassword);
+            return successResponse('رمز عبور با موفقیت تغییر یافت.');
+        },
+        'خطا در بازنشانی رمز عبور'
     ),
 };

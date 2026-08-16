@@ -26,8 +26,8 @@ describe('authResolvers', () => {
     let mockContext: { res: ReturnType<typeof createMockRes>; req: any; user: any };
 
     beforeAll(() => {
-        jest.spyOn(console, 'log').mockImplementation(() => {});
-        jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.spyOn(console, 'log').mockImplementation(() => { });
+        jest.spyOn(console, 'error').mockImplementation(() => { });
     });
 
     afterAll(() => {
@@ -49,6 +49,8 @@ describe('authResolvers', () => {
             username: 'testuser',
             password: '123456',
             fullName: 'کاربر تست',
+            resetToken: null,              // ✅ اضافه کن
+            resetTokenExpiresAt: null,
         };
 
         const mockUser = {
@@ -123,6 +125,8 @@ describe('authResolvers', () => {
             avatar: null,
             createdAt: new Date(),
             updatedAt: new Date(),
+            resetToken: null,              // ✅ اضافه کن
+            resetTokenExpiresAt: null,
         };
 
         const mockToken = 'fake-jwt-token';
