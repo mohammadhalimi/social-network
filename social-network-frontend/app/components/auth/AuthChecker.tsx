@@ -16,7 +16,7 @@ export default function AuthChecker() {
 
   const { data, loading, error } = useQuery<GetProfileResponse>(GET_PROFILE, {
     fetchPolicy: 'network-only',
-     skip: !token, // ✅ اگر توکن نباشد، درخواست نده
+     errorPolicy: 'all',
   });
 
   useEffect(() => {

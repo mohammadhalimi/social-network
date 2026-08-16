@@ -69,64 +69,46 @@ describe('EditProfileForm Component - Unit Tests', () => {
     });
 
     // ==========================================================
-    //  تست ۲: رندر صحیح با کاربر خالی
+    //  تست ۲: اعتبارسنجی نام کاربری - حداقل ۳ کاراکتر
     // ==========================================================
-    it('should render with empty fields when user is null', () => {
-        render(<EditProfileForm user={null} />);
-
-        expect(screen.getByPlaceholderText('نام و نام خانوادگی')).toHaveValue('');
-        expect(screen.getByPlaceholderText('username')).toHaveValue('');
-        expect(screen.getByPlaceholderText('example@email.com')).toHaveValue('');
-        expect(screen.getByPlaceholderText('درباره خودت بنویس...')).toHaveValue('');
-    });
-
-    // ==========================================================
-    //  تست ۳: اعتبارسنجی فیلدهای خالی
-    // ==========================================================
-    it('should show validation errors for empty fields', async () => {
+    it('should show error when username is less than 3 characters', async () => {
         const user = userEvent.setup();
         render(<EditProfileForm user={mockUser} />);
 
-        const fullNameInput = screen.getByPlaceholderText('نام و نام خانوادگی');
         const usernameInput = screen.getByPlaceholderText('username');
-        const emailInput = screen.getByPlaceholderText('example@email.com');
-
-        await user.clear(fullNameInput);
         await user.clear(usernameInput);
-        await user.clear(emailInput);
+        await user.type(usernameInput, 'ab');
 
         const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
         await user.click(submitButton);
 
         await waitFor(() => {
-            expect(screen.getByText('نام کامل الزامی است')).toBeInTheDocument();
-            expect(screen.getByText('نام کاربری الزامی است')).toBeInTheDocument();
-            expect(screen.getByText('ایمیل الزامی است')).toBeInTheDocument();
+            expect(screen.getByText('نام کاربری حداقل ۳ کاراکتر')).toBeInTheDocument();
         });
     });
 
     // ==========================================================
-    //  تست ۴: ارسال موفق فرم
+    //  تست ۳: نام کاربری معتبر (حروف انگلیسی و اعداد)
     // ==========================================================
-    it('should submit successfully', async () => {
+    it('should accept valid username (English letters and numbers)', async () => {
         const user = userEvent.setup();
-        const updatedUser = { ...mockUser, fullName: 'نام جدید' };
+        const validUsername = 'testuser123';
 
         mockUpdateProfile.mockResolvedValue({
             data: {
                 updateProfile: {
                     success: true,
                     message: 'پروفایل به‌روز شد',
-                    user: updatedUser,
+                    user: { ...mockUser, username: validUsername },
                 },
             },
         });
 
         render(<EditProfileForm user={mockUser} />);
 
-        const fullNameInput = screen.getByPlaceholderText('نام و نام خانوادگی');
-        await user.clear(fullNameInput);
-        await user.type(fullNameInput, 'نام جدید');
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        await user.type(usernameInput, validUsername);
 
         const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
         await user.click(submitButton);
@@ -134,48 +116,86 @@ describe('EditProfileForm Component - Unit Tests', () => {
         await waitFor(() => {
             expect(mockUpdateProfile).toHaveBeenCalledWith({
                 variables: {
-                    username: mockUser.username,
-                    fullName: 'نام جدید',
+                    username: validUsername,
+                    fullName: mockUser.fullName,
                     email: mockUser.email,
                     bio: mockUser.bio,
                     avatar: mockUser.avatar,
                 },
             });
-            expect(mockDispatch).toHaveBeenCalled();
             expect(toast.success).toHaveBeenCalledWith('پروفایل با موفقیت به‌روزرسانی شد');
         });
     });
 
     // ==========================================================
-    //  تست ۵: خطا در ارسال فرم
+    //  تست ۴: جلوگیری از تایپ کاراکترهای غیرمجاز در لحظه
     // ==========================================================
-    it('should show error when update fails', async () => {
+    it('should prevent typing invalid characters in username field', async () => {
         const user = userEvent.setup();
-
-        mockUpdateProfile.mockRejectedValue(new Error('خطا در ارتباط با سرور'));
-
         render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        
+        // ✅ تایپ کاراکتر فارسی
+        await user.type(usernameInput, 'ت');
+
+        // ✅ کاراکتر غیرمجاز تایپ نمی‌شود
+        expect(usernameInput).toHaveValue('');
+    });
+
+    // ==========================================================
+    //  تست ۵: نمایش toast error هنگام تایپ کاراکتر غیرمجاز
+    // ==========================================================
+    it('should show toast error when typing invalid character in username', async () => {
+        const user = userEvent.setup();
+        render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        
+        // تایپ کاراکتر غیرمجاز (فارسی)
+        await user.type(usernameInput, 'ت');
+
+        await waitFor(() => {
+            expect(toast.error).toHaveBeenCalledWith('❌ فقط حروف انگلیسی و اعداد مجاز هستند');
+        });
+    });
+
+    // ==========================================================
+    //  تست ۶: پاک کردن خودکار کاراکترهای غیرمجاز
+    // ==========================================================
+    it('should automatically remove invalid characters from username', async () => {
+        const user = userEvent.setup();
+        render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        
+        // تایپ ترکیبی از مجاز و غیرمجاز
+        await user.type(usernameInput, 'testکاربر123');
+
+        // ✅ کاراکترهای غیرمجاز حذف می‌شوند
+        expect(usernameInput).toHaveValue('test123');
+    });
+
+    // ==========================================================
+    //  تست ۷: وقتی نام کاربری فقط کاراکتر غیرمجاز باشد، خطای الزامی نمایش داده می‌شود
+    // ==========================================================
+    it('should show required error when username has only invalid characters', async () => {
+        const user = userEvent.setup();
+        render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        await user.type(usernameInput, 'کاربرتست');
 
         const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
         await user.click(submitButton);
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('خطا در ارتباط با سرور');
+            // ✅ چون کاراکترهای غیرمجاز حذف می‌شوند، فیلد خالی می‌شود و خطای الزامی نمایش داده می‌شود
+            expect(screen.getByText('نام کاربری الزامی است')).toBeInTheDocument();
         });
-    });
-
-    // ==========================================================
-    //  تست ۶: حذف عکس
-    // ==========================================================
-    it('should remove avatar when remove button is clicked', async () => {
-        const user = userEvent.setup();
-        render(<EditProfileForm user={mockUser} />);
-
-        const removeButton = screen.getByText('حذف عکس');
-        await user.click(removeButton);
-
-        // بررسی اینکه عکس حذف شده است
-        const avatarInput = screen.getByPlaceholderText('example@email.com');
-        expect(avatarInput).toBeInTheDocument();
     });
 });

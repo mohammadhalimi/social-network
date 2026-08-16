@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
-import {  usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { render, waitFor } from '@testing-library/react';
-import AuthChecker from '../components/auth/AuthChecker';
+import AuthChecker from '@/app/components/auth/AuthChecker';
 import { loginSuccess, logout } from '@/app/redux/features/authSlice';
 
 // ==========================================================
@@ -66,27 +66,24 @@ describe('AuthChecker', () => {
     });
 
     // ==========================================================
-    //  تست ۲: وقتی توکن وجود ندارد، درخواست ارسال نمی‌شود
+    //  تست ۲: کوئری همیشه اجرا می‌شود (صرف‌نظر از وجود token)
+    //  چون منبع حقیقت، کوکی HttpOnly است نه token داخل Redux
     // ==========================================================
-    it('should skip query when token is missing', () => {
+    it('always runs the query regardless of token presence', () => {
         mockToken = '';
         render(<AuthChecker />);
-        expect(mockUseQuery).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({ skip: true })
-        );
+
+        const callArgs = mockUseQuery.mock.calls[0][1];
+        expect(callArgs.skip).toBeFalsy();
+        expect(callArgs.fetchPolicy).toBe('network-only');
     });
 
-    // ==========================================================
-    //  تست ۳: وقتی توکن وجود دارد، درخواست ارسال می‌شود
-    // ==========================================================
-    it('should not skip query when token exists', () => {
+    it('still runs the query when token exists', () => {
         mockToken = 'fake-token';
         render(<AuthChecker />);
-        expect(mockUseQuery).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({ skip: false })
-        );
+
+        const callArgs = mockUseQuery.mock.calls[0][1];
+        expect(callArgs.skip).toBeFalsy();
     });
 
     // ==========================================================
@@ -201,7 +198,7 @@ describe('AuthChecker', () => {
         });
 
         const { rerender } = render(<AuthChecker />);
-        
+
         await waitFor(() => {
             expect(loginSuccess).toHaveBeenCalledTimes(1);
         });
@@ -211,9 +208,9 @@ describe('AuthChecker', () => {
             loading: false,
             error: null,
         });
-        
+
         rerender(<AuthChecker />);
-        
+
         expect(loginSuccess).toHaveBeenCalledTimes(1);
     });
 

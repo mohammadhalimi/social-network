@@ -1,12 +1,16 @@
 'use client';
 
-import { ReactNode } from 'react';
+import {
+ReactNode,
+KeyboardEvent  
+} from 'react';
 
 interface FormFieldProps {
     label: string;
     error?: string;
     optional?: boolean;
     children: ReactNode;
+    onKeyDown?: (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 export const FormField = ({
@@ -14,6 +18,7 @@ export const FormField = ({
     error,
     optional,
     children,
+    onKeyDown,
 }: FormFieldProps) => (
     <div>
         <div

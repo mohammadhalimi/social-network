@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // ==========================================================
@@ -119,6 +119,18 @@ describe('ProfilePage', () => {
         jest.clearAllMocks();
         mockAuthState = { user: null, loading: true };
         mockThemeState = { theme: 'light' };
+
+        // ✅ Mock کردن fetch برای mutation logout در GraphQL
+        global.fetch = jest.fn().mockResolvedValue({
+            json: async () => ({
+                data: {
+                    logout: {
+                        success: true,
+                        message: 'با موفقیت خارج شدید',
+                    },
+                },
+            }),
+        }) as jest.Mock;
     });
 
     it('renders all child sections and passes loading/user state down', () => {
@@ -201,25 +213,29 @@ describe('ProfilePage', () => {
     //  handleLogout
     // ==========================================================
     describe('logout', () => {
-        it('dispatches logout() and redirects to /auth/login when triggered from the header', () => {
+        it('dispatches logout() and redirects to /auth/login when triggered from the header', async () => {
             mockAuthState = { user: mockUser, loading: false };
             render(<ProfilePage />);
 
             fireEvent.click(screen.getByText('header-logout'));
 
-            expect(logout).toHaveBeenCalledTimes(1);
-            expect(mockDispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
-            expect(mockPush).toHaveBeenCalledWith('/auth/login');
+            await waitFor(() => {
+                expect(logout).toHaveBeenCalledTimes(1);
+                expect(mockDispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
+                expect(mockPush).toHaveBeenCalledWith('/auth/login');
+            });
         });
 
-        it('dispatches logout() and redirects to /auth/login when triggered from the sidebar', () => {
+        it('dispatches logout() and redirects to /auth/login when triggered from the sidebar', async () => {
             mockAuthState = { user: mockUser, loading: false };
             render(<ProfilePage />);
 
             fireEvent.click(screen.getByText('sidebar-logout'));
 
-            expect(mockDispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
-            expect(mockPush).toHaveBeenCalledWith('/auth/login');
+            await waitFor(() => {
+                expect(mockDispatch).toHaveBeenCalledWith({ type: 'auth/logout' });
+                expect(mockPush).toHaveBeenCalledWith('/auth/login');
+            });
         });
     });
 
@@ -272,7 +288,7 @@ describe('ProfilePage', () => {
             // ✅ تنظیم تم روی دارک
             mockThemeState = { theme: 'dark' };
             mockAuthState = { user: mockUser, loading: false };
-            
+
             render(<ProfilePage />);
 
             // ابتدا به تب settings بروید
@@ -280,7 +296,7 @@ describe('ProfilePage', () => {
 
             // ✅ بررسی اینکه تم دارک نمایش داده شده است
             expect(screen.getByText('تم تاریک')).toBeInTheDocument();
-            
+
             // ✅ بررسی اینکه آیکون ماه وجود دارد (در حالت دارک)
             const moonIcon = document.querySelector('.lucide-moon');
             expect(moonIcon).toBeInTheDocument();
@@ -290,7 +306,7 @@ describe('ProfilePage', () => {
             // ✅ تنظیم تم روی لایت
             mockThemeState = { theme: 'light' };
             mockAuthState = { user: mockUser, loading: false };
-            
+
             render(<ProfilePage />);
 
             // ابتدا به تب settings بروید
@@ -298,7 +314,7 @@ describe('ProfilePage', () => {
 
             // ✅ بررسی اینکه تم روشن نمایش داده شده است
             expect(screen.getByText('تم روشن')).toBeInTheDocument();
-            
+
             // ✅ بررسی اینکه آیکون خورشید وجود دارد (در حالت لایت)
             const sunIcon = document.querySelector('.lucide-sun');
             expect(sunIcon).toBeInTheDocument();
