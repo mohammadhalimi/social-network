@@ -11,11 +11,7 @@ import { SubmitButton } from './SubmitButton';
 import { LoginFormData } from './LoginSchema';
 import { useMutation } from '@apollo/client/react';
 import { useAppDispatch } from '@/app/redux/hooks';
-import {
-  LOGIN,
-  LoginResponse,
-  LoginVariables
-} from '@/app/graphql/auth.queries';
+import { LOGIN } from '@/app/graphql/auth.queries';
 import {
   authStart,
   loginSuccess,
@@ -38,7 +34,7 @@ export default function LoginForm() {
     },
   });
 
-  const [loginMutation] = useMutation<LoginResponse, LoginVariables>(LOGIN);
+  const [loginMutation] = useMutation(LOGIN);
 
   const onSubmit = async (data: LoginFormData) => {
     try {

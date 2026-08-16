@@ -58,6 +58,47 @@ export interface LogoutResponse {
     message: string;
   };
 }
+// =============================================
+//  نوع‌های RequestPasswordReset
+// =============================================
+export interface RequestPasswordResetResponse {
+  requestPasswordReset: {
+    success: boolean;
+    message: string;
+  };
+}
+
+export interface RequestPasswordResetVariables {
+  email: string;
+}
+
+// =============================================
+//  نوع‌های ResetPassword
+// =============================================
+export interface ResetPasswordResponse {
+  resetPassword: {
+    success: boolean;
+    message: string;
+  };
+}
+
+export interface ResetPasswordVariables {
+  token: string;
+  newPassword: string;
+}
+
+// =============================================
+//  نوع‌های ValidateResetToken
+// =============================================
+export interface ValidateResetTokenResponse {
+  validateResetToken: {
+    valid: boolean;
+  };
+}
+
+export interface ValidateResetTokenVariables {
+  token: string;
+}
 
 // ✅ Mutation ثبت‌نام
 export const REGISTER: TypedDocumentNode<RegisterResponse, RegisterVariables> = gql`
@@ -106,6 +147,44 @@ export const LOGOUT = gql`
     logout {
       success
       message
+    }
+  }
+`;
+
+// =============================================
+//  Mutations و Queries با نوع
+// =============================================
+export const REQUEST_PASSWORD_RESET: TypedDocumentNode<
+  RequestPasswordResetResponse,
+  RequestPasswordResetVariables
+> = gql`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email) {
+      success
+      message
+    }
+  }
+`;
+
+export const RESET_PASSWORD: TypedDocumentNode<
+  ResetPasswordResponse,
+  ResetPasswordVariables
+> = gql`
+  mutation ResetPassword($token: String!, $newPassword: String!) {
+    resetPassword(token: $token, newPassword: $newPassword) {
+      success
+      message
+    }
+  }
+`;
+
+export const VALIDATE_RESET_TOKEN: TypedDocumentNode<
+  ValidateResetTokenResponse,
+  ValidateResetTokenVariables
+> = gql`
+  query ValidateResetToken($token: String!) {
+    validateResetToken(token: $token) {
+      valid
     }
   }
 `;
