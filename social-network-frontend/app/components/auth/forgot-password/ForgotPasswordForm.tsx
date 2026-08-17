@@ -38,11 +38,13 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
 
     return (
         <form
+            noValidate
             onSubmit={onSubmit}
             className="space-y-6
         ">
             <div>
                 <label
+                    htmlFor="email"
                     className="
                     block
                     text-sm
@@ -53,6 +55,7 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
                     ایمیل
                 </label>
                 <input
+                    id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
