@@ -77,12 +77,14 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
 
     return (
         <form
+            noValidate
             onSubmit={onSubmit}
             className="
             space-y-6
     ">
             <div>
                 <label
+                    htmlFor='email'
                     className="
                     block
                     text-sm
@@ -93,6 +95,7 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
                     رمز عبور جدید
                 </label>
                 <input
+                    id='email'
                     type="password"
                     value={password}
                     onChange={(e) => {
@@ -119,6 +122,7 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
 
             <div>
                 <label
+                    htmlFor='password'
                     className="
                     block
                     text-sm
@@ -129,6 +133,7 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
                     تکرار رمز عبور جدید
                 </label>
                 <input
+                    id='password'
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
