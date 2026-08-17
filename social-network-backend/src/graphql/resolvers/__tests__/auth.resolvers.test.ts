@@ -7,6 +7,8 @@ jest.mock('../../../modules/auth/auth.service', () => {
         register: jest.fn(),
         login: jest.fn(),
         logout: jest.fn(),
+        requestPasswordReset: jest.fn(),
+        resetPassword: jest.fn(),
     };
     return {
         AuthService: jest.fn(() => mockAuthServiceInstance),
@@ -49,7 +51,7 @@ describe('authResolvers', () => {
             username: 'testuser',
             password: '123456',
             fullName: 'کاربر تست',
-            resetToken: null,              // ✅ اضافه کن
+            resetToken: null,              
             resetTokenExpiresAt: null,
         };
 
@@ -194,6 +196,67 @@ describe('authResolvers', () => {
             mockAuthService.logout.mockRejectedValue(new Error(errorMessage));
 
             const result = await authResolvers.logout(null as any, null as any, mockContext);
+
+            expect(result).toEqual({
+                success: false,
+                message: errorMessage,
+            });
+        });
+    });
+    // =============================================
+    //  requestPasswordReset
+    // =============================================
+    describe('requestPasswordReset', () => {
+        const mockArgs = { email: 'test@example.com' };
+
+        it('should request password reset successfully', async () => {
+            mockAuthService.requestPasswordReset.mockResolvedValue(undefined as any);
+
+            const result = await authResolvers.requestPasswordReset(null as any, mockArgs);
+
+            expect(mockAuthService.requestPasswordReset).toHaveBeenCalledWith(mockArgs.email);
+            expect(result).toEqual({
+                success: true,
+                message: 'اگر این ایمیل ثبت شده باشد، لینک بازیابی ارسال شده است.',
+            });
+        });
+
+        it('should handle errors gracefully', async () => {
+            const errorMessage = 'خطا در ارسال ایمیل';
+            mockAuthService.requestPasswordReset.mockRejectedValue(new Error(errorMessage));
+
+            const result = await authResolvers.requestPasswordReset(null as any, mockArgs);
+
+            expect(result).toEqual({
+                success: false,
+                message: errorMessage,
+            });
+        });
+    });
+
+    // =============================================
+    //  resetPassword
+    // =============================================
+    describe('resetPassword', () => {
+        const mockArgs = { token: 'reset-token-123', newPassword: 'newPassword123' };
+
+        it('should reset password successfully', async () => {
+            mockAuthService.resetPassword.mockResolvedValue(undefined as any);
+
+            const result = await authResolvers.resetPassword(null as any, mockArgs);
+
+            expect(mockAuthService.resetPassword).toHaveBeenCalledWith(mockArgs.token, mockArgs.newPassword);
+            expect(result).toEqual({
+                success: true,
+                message: 'رمز عبور با موفقیت تغییر یافت.',
+            });
+        });
+
+        it('should handle errors gracefully', async () => {
+            const errorMessage = 'توکن بازیابی نامعتبر یا منقضی شده است.';
+            mockAuthService.resetPassword.mockRejectedValue(new Error(errorMessage));
+
+            const result = await authResolvers.resetPassword(null as any, mockArgs);
 
             expect(result).toEqual({
                 success: false,
