@@ -49,17 +49,27 @@ jest.mock('react-hot-toast', () => ({
 }));
 import toast from 'react-hot-toast';
 
-// ----------------------
-// Mock: redux dispatch (اکشن‌های واقعی authSlice استفاده می‌شن، فقط dispatch mock می‌شه)
-// ----------------------
+// ✅ اصلاح: Mock redux hooks
 const mockDispatch = jest.fn();
+
+// ✅ افزودن Mock برای useAppSelector (برای AuthGuard)
 jest.mock('@/app/redux/hooks', () => ({
     useAppDispatch: () => mockDispatch,
+    useAppSelector: jest.fn((selector) => {
+        return selector({
+            auth: {
+                isAuthenticated: false,
+                loading: false,
+                user: null,
+                token: null,
+            },
+        });
+    }),
 }));
 
-// ----------------------
-// Helpers
-// ----------------------
+// ==========================================================
+//  Helpers
+// ==========================================================
 const fillAndSubmit = async (email: string, password: string) => {
     const user = userEvent.setup();
     if (email) await user.type(screen.getByPlaceholderText(/example@email.com/i), email);
@@ -112,7 +122,6 @@ describe('LoginPage / LoginForm', () => {
 
     // ----------------------
     // Validation - required fields
-    // (فقط required چک می‌شه؛ فرمت ایمیل هیچ pattern-ای نداره)
     // ----------------------
     describe('validation', () => {
         it('shows required errors when submitting empty fields', async () => {
@@ -135,11 +144,6 @@ describe('LoginPage / LoginForm', () => {
             expect(mockLoginMutation).not.toHaveBeenCalled();
         });
 
-        // ⚠️ نکته: فعلاً هیچ pattern-validation برای فرمت ایمیل وجود نداره
-        // (import شده تو LoginSchema.ts ولی هیچ‌جا صدا زده نمی‌شه)، بنابراین
-        // ایمیل با فرمت اشتباه هم از اعتبارسنجی رد می‌شه و mutation صدا زده می‌شه.
-        // این تست رفتار فعلی رو مستند می‌کنه؛ اگه validation فرمت ایمیل رو اضافه
-        // کردید، این تست باید عوض بشه.
         it('does NOT reject malformed emails yet (documents current gap)', async () => {
             render(<LoginPage />);
 
@@ -174,9 +178,12 @@ describe('LoginPage / LoginForm', () => {
 
             await fillAndSubmit('test@example.com', 'Test@1234');
 
+            // ✅ بررسی dispatch authStart
             await waitFor(() => {
                 expect(mockDispatch).toHaveBeenCalledWith(authStart());
             });
+
+            // ✅ بررسی dispatch loginSuccess
             await waitFor(() => {
                 expect(mockDispatch).toHaveBeenCalledWith(
                     loginSuccess({
@@ -224,9 +231,11 @@ describe('LoginPage / LoginForm', () => {
             render(<LoginPage />);
             await fillAndSubmit('test@example.com', 'Test@1234');
 
+            // ✅ بررسی dispatch authFailure
             await waitFor(() => {
                 expect(mockDispatch).toHaveBeenCalledWith(authFailure('رمز عبور اشتباه است.'));
             });
+
             expect(await screen.findByText('رمز عبور اشتباه است.')).toBeInTheDocument();
             expect(toast.error).toHaveBeenCalledWith('❌ رمز عبور اشتباه است.');
             expect(mockPush).not.toHaveBeenCalled();
@@ -235,8 +244,6 @@ describe('LoginPage / LoginForm', () => {
 
     // ----------------------
     // Mutation throws (network / GraphQL error)
-    // نکته: هیچ mapping برای پیام‌های دوستانه‌تر وجود نداره؛
-    // پیام خام backend عیناً با پیشوند ❌ نشون داده می‌شه.
     // ----------------------
     describe('mutation throws an error', () => {
         it('shows the raw backend error message via toast (no friendly mapping)', async () => {
@@ -251,7 +258,11 @@ describe('LoginPage / LoginForm', () => {
             await waitFor(() => {
                 expect(toast.error).toHaveBeenCalledWith('❌ کاربری با این ایمیل یافت نشد');
             });
-            expect(mockDispatch).toHaveBeenCalledWith(authFailure('کاربری با این ایمیل یافت نشد'));
+
+            // ✅ بررسی dispatch authFailure
+            await waitFor(() => {
+                expect(mockDispatch).toHaveBeenCalledWith(authFailure('کاربری با این ایمیل یافت نشد'));
+            });
         });
 
         it('falls back to a generic message when the error has no message', async () => {
@@ -291,7 +302,7 @@ describe('LoginPage / LoginForm', () => {
     // ----------------------
     it('disables the submit button and shows the loading label while submitting', async () => {
         (useMutation as jest.Mock).mockReturnValue([
-            jest.fn().mockImplementation(() => new Promise(() => {})), // هیچ‌وقت resolve نمی‌شه
+            jest.fn().mockImplementation(() => new Promise(() => { })), // هیچ‌وقت resolve نمی‌شه
             { loading: false },
         ]);
 
