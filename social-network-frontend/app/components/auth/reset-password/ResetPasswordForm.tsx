@@ -3,10 +3,14 @@
 import { z } from 'zod';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FormInput } from '../FormInput';
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client/react';
 import { RESET_PASSWORD } from '@/app/graphql/auth.queries';
 import { ConfirmCircle } from '../../profile/svg/ConfirmCircle';
+
+
 // ✅ اعتبارسنجی رمز عبور
 const passwordSchema = z.string()
     .min(8, 'رمز عبور باید حداقل ۸ کاراکتر باشد')
@@ -15,6 +19,11 @@ const passwordSchema = z.string()
     .regex(/[0-9]/, 'رمز عبور باید حداقل یک عدد داشته باشد')
     .regex(/[^a-zA-Z0-9]/, 'رمز عبور باید حداقل یک کاراکتر خاص داشته باشد');
 
+interface ResetPasswordFormData {
+    password: string;
+    confirmPassword: string;
+}
+
 interface ResetPasswordFormProps {
     token: string;
     onSuccess: () => void;
@@ -22,9 +31,23 @@ interface ResetPasswordFormProps {
 
 export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) => {
     const router = useRouter();
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setError,
+        clearErrors,
+        formState: { errors },
+    } = useForm<ResetPasswordFormData>({
+        defaultValues: {
+            password: '',
+            confirmPassword: '',
+        },
+    });
+
+    const password = watch('password');
 
     const [resetPassword, { loading }] = useMutation(RESET_PASSWORD);
 
@@ -32,33 +55,34 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
         try {
             passwordSchema.parse(value);
             setPasswordError(null);
+            clearErrors('password');
             return true;
         } catch (error: any) {
-            setPasswordError(error.errors[0]?.message || 'رمز عبور معتبر نیست');
+            const errorMessage = error.errors[0]?.message || 'رمز عبور معتبر نیست';
+            setPasswordError(errorMessage);
+            setError('password', { type: 'manual', message: errorMessage });
             return false;
         }
     };
 
-    const onSubmit = async (e: React.SubmitEvent) => {
-        e.preventDefault();
-
+    const onSubmit = async (data: ResetPasswordFormData) => {
         if (!token) {
             toast.error('❌ لینک نامعتبر است.');
             return;
         }
 
-        if (password !== confirmPassword) {
+        if (data.password !== data.confirmPassword) {
             toast.error('❌ رمز عبور با تکرار آن مطابقت ندارد.');
             return;
         }
 
-        if (!validatePassword(password)) {
+        if (!validatePassword(data.password)) {
             return;
         }
 
         try {
             const result = await resetPassword({
-                variables: { token, newPassword: password },
+                variables: { token, newPassword: data.password },
             });
 
             if (result.data?.resetPassword?.success) {
@@ -78,70 +102,36 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
     return (
         <form
             noValidate
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             className="
-            space-y-6
-    ">
-            <div>
-                <label
-                    htmlFor='email'
-                    className="
-                    block
-                    text-sm
-                    font-medium
-                    text-primary
-                    mb-1.5
-                ">
-                    رمز عبور جدید
-                </label>
-                <input
-                    id='email'
-                    type="password"
-                    value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
+        space-y-6
+        ">
+            <FormInput
+                label="رمز عبور جدید"
+                type="password"
+                placeholder="••••••••"
+                register={register('password', {
+                    required: 'رمز عبور جدید الزامی است',
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                         validatePassword(e.target.value);
-                    }}
-                    className="
-                    input-light
-                    w-full"
-                    placeholder="••••••••"
-                    required
-                />
-                {passwordError && (
-                    <p
-                        className="
-                        text-red-500
-                        text-xs
-                        mt-1
-                    ">
-                        {passwordError}
-                    </p>
-                )}
-            </div>
+                    },
+                })}
+                error={passwordError || errors.password?.message}
+                required
+            />
 
-            <div>
-                <label
-                    htmlFor='password'
-                    className="
-                    block
-                    text-sm
-                    font-medium
-                    text-primary
-                    mb-1.5
-                ">
-                    تکرار رمز عبور جدید
-                </label>
-                <input
-                    id='password'
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="input-light w-full"
-                    placeholder="••••••••"
-                    required
-                />
-            </div>
+            <FormInput
+                label="تکرار رمز عبور جدید"
+                type="password"
+                placeholder="••••••••"
+                register={register('confirmPassword', {
+                    required: 'تکرار رمز عبور الزامی است',
+                    validate: (value: string) =>
+                        value === password || 'رمز عبور با تکرار آن مطابقت ندارد',
+                })}
+                error={errors.confirmPassword?.message}
+                required
+            />
 
             <button
                 type="submit"

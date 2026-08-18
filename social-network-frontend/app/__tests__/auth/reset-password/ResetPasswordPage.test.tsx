@@ -166,21 +166,25 @@ describe('ResetPasswordPage', () => {
     // ==========================================================
     //  تست ۶: خطا وقتی رمز عبور با تکرار آن مطابقت ندارد
     // ==========================================================
+    // ... بقیه کد
+
     it('should show error when passwords do not match', async () => {
         const user = userEvent.setup();
         render(<ResetPasswordPage />);
 
-        const passwordInput = screen.getByLabelText('رمز عبور جدید');
-        await user.type(passwordInput, 'Test@1234');
+        const inputs = screen.getAllByPlaceholderText('••••••••');
+        const passwordInput = inputs[0];
+        const confirmInput = inputs[1];
 
-        const confirmInput = screen.getByLabelText('تکرار رمز عبور جدید');
+        await user.type(passwordInput, 'Test@1234');
         await user.type(confirmInput, 'Test@5678');
 
         const submitButton = screen.getByRole('button', { name: /تغییر رمز عبور/i });
         await user.click(submitButton);
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('❌ رمز عبور با تکرار آن مطابقت ندارد.');
+            // ✅ خطا توسط react-hook-form در فرم نمایش داده می‌شود
+            expect(screen.getByText('رمز عبور با تکرار آن مطابقت ندارد')).toBeInTheDocument();
         });
     });
 

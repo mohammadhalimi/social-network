@@ -1,29 +1,38 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FormInput } from '../FormInput';
+import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client/react';
-import { REQUEST_PASSWORD_RESET } from '@/app/graphql/auth.queries';
 import { ConfirmCircle } from '../../profile/svg/ConfirmCircle';
+import { REQUEST_PASSWORD_RESET } from '@/app/graphql/auth.queries';
+
+interface ForgotPasswordFormData {
+    email: string;
+}
+
 interface ForgotPasswordFormProps {
     onSuccess: () => void;
 }
 
 export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
-    const [email, setEmail] = useState('');
+    // ✅ استفاده از useForm (بدون state اضافی)
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<ForgotPasswordFormData>({
+        defaultValues: {
+            email: '',
+        },
+    });
 
     const [requestPasswordReset, { loading }] = useMutation(REQUEST_PASSWORD_RESET);
 
-    const onSubmit = async (e: React.SubmitEvent) => {
-        e.preventDefault();
-        if (!email) {
-            toast.error('❌ لطفاً ایمیل خود را وارد کنید.');
-            return;
-        }
-
+    const onSubmit = async (data: ForgotPasswordFormData) => {
         try {
-            const result = await requestPasswordReset({ variables: { email } });
+            const result = await requestPasswordReset({ variables: { email: data.email } });
 
             if (result.data?.requestPasswordReset?.success) {
                 onSuccess();
@@ -39,33 +48,17 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
     return (
         <form
             noValidate
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             className="space-y-6
         ">
-            <div>
-                <label
-                    htmlFor="email"
-                    className="
-                    block
-                    text-sm
-                    font-medium
-                    text-primary
-                    mb-1.5
-                ">
-                    ایمیل
-                </label>
-                <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="
-                    input-light
-                    w-full"
-                    placeholder="example@email.com"
-                    required
-                />
-            </div>
+            <FormInput
+                label="ایمیل"
+                type="email"
+                placeholder="example@email.com"
+                register={register('email', { required: 'ایمیل الزامی است' })}
+                error={errors.email?.message}
+                required
+            />
 
             <button
                 type="submit"
@@ -89,10 +82,7 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
                 )}
             </button>
 
-            <div
-                className="
-                text-center
-            ">
+            <div className="text-center">
                 <Link
                     href="/auth/login"
                     className="

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { FormInput } from './FormInput';
+import { FormInput } from '../FormInput';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { SubmitButton } from './SubmitButton';
@@ -114,6 +114,7 @@ export default function LoginForm() {
         register={register('email', { required: 'ایمیل الزامی است' })}
         error={errors.email?.message}
         delay={0.1}
+        required
       />
 
       <FormInput
@@ -122,13 +123,11 @@ export default function LoginForm() {
         placeholder="••••••••"
         register={register('password', {
           required: 'رمز عبور الزامی است',
-          minLength: {
-            value: 6,
-            message: 'رمز عبور حداقل ۶ کاراکتر',
-          },
+          minLength: { value: 6, message: 'رمز عبور حداقل ۶ کاراکتر' }
         })}
         error={errors.password?.message}
         delay={0.2}
+        required
       />
 
       <SubmitButton isSubmitting={isSubmitting} />

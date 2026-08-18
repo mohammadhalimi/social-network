@@ -3,8 +3,7 @@ import toast from 'react-hot-toast';
 import { useMutation } from '@apollo/client/react';
 import userEvent from '@testing-library/user-event';
 import ForgotPasswordPage from '@/app/auth/forgot-password/page';
-import
-{
+import {
 render,
 screen,
 waitFor
@@ -78,7 +77,8 @@ describe('ForgotPasswordPage', () => {
         await user.click(submitButton);
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('❌ لطفاً ایمیل خود را وارد کنید.');
+            // ✅ خطا توسط react-hook-form در فرم نمایش داده می‌شود
+            expect(screen.getByText('ایمیل الزامی است')).toBeInTheDocument();
             expect(mockRequestPasswordReset).not.toHaveBeenCalled();
         });
     });
