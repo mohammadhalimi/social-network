@@ -155,6 +155,23 @@ export default function LoginForm() {
           </span>
         </Link>
       </motion.div>
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Link
+          href="/auth/forgot-password"
+          className="
+          text-sm
+          text-secondary
+          hover:text-primary
+          transition-colors
+          ">
+          رمز عبور خود را فراموش کرده اید ؟
+        </Link>
+      </motion.div>
     </motion.form>
   );
 }
