@@ -23,6 +23,12 @@ export const userTypeDefs = `
     user: User
   }
 
+  type SearchUsersResult {
+    users: [User!]!
+    totalCount: Int!
+    hasMore: Boolean!
+  }
+
   type Mutation {
     register(
       email: String!
@@ -68,6 +74,10 @@ export const userTypeDefs = `
   type Query {
   _empty: String
   me: User   # ✅ اضافه کردن
+  searchUsers(searchTerm: String!, limit: Int = 10, offset: Int = 0): SearchUsersResult!
+    
+    # ✅ کوئری جدید برای دریافت کاربر با username
+    getUserByUsername(username: String!): User
   }
 
   type ResetPasswordPayload {
