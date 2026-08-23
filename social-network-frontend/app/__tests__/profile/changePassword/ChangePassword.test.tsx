@@ -1,9 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import ChangePassword from '@/app/components/profile/ChangePassword';
-import { useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
+import { useMutation } from '@apollo/client/react';
+import userEvent from '@testing-library/user-event';
+import {
+    render,
+    screen,
+    waitFor
+} from '@testing-library/react';
+import ChangePassword from '@/app/components/profile/ChangePassword';
 
 // ==========================================================
 // Mock: useMutation

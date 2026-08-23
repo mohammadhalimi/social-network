@@ -1,5 +1,8 @@
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import {
+    render,
+    screen
+} from '@testing-library/react';
 import ProfileInfo from '@/app/components/profile/ProfileInfo';
 
 // ==========================================================
@@ -9,9 +12,9 @@ jest.mock('next/image', () => ({
     __esModule: true,
     default: (props: any) => {
         // eslint-disable-next-line @next/next/no-img-element
-        return <img 
-            {...props} 
-            alt={props.alt || 'image'} 
+        return <img
+            {...props}
+            alt={props.alt || 'image'}
             // ✅ حذف unoptimized از props
             unoptimized={undefined}
         />;

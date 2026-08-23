@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RegisterPage from '@/app/auth/register/page';
+import { render, screen, waitFor } from '@testing-library/react';
 
 // ✅ Mock کردن toast
 jest.mock('react-hot-toast', () => ({

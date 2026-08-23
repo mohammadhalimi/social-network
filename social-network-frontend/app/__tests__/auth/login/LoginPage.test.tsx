@@ -1,8 +1,16 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import LoginPage from '@/app/auth/login/page';
-import { authStart, loginSuccess, authFailure } from '@/app/redux/features/authSlice';
+import userEvent from '@testing-library/user-event';
+import {
+    render,
+    screen,
+    waitFor
+} from '@testing-library/react';
+import {
+    authStart,
+    loginSuccess,
+    authFailure
+} from '@/app/redux/features/authSlice';
 
 // ----------------------
 // Mock: next/navigation
