@@ -48,7 +48,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
 
   const fields = [
     { label: 'نام کامل', value: user.fullName, icon: UserIcon },
-    { label: 'نام کاربری', value: `@${user.username}`, icon: AtSign },
+    { label: 'نام کاربری', value: `${user.username}@`, icon: AtSign },
     { label: 'ایمیل', value: user.email, icon: Mail },
     {
       label: 'بیوگرافی',
@@ -210,7 +210,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                 text-sm
                 sm:col-span-3
                 font-medium
-                ${field.muted ? 'text-text-secondary italic' : 'text-text-primary'}
+                ${field.muted ? 'text-secondary italic' : 'text-primary'}
               `}
               >
                 {field.value}

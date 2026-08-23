@@ -1,10 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { EditProfileForm } from '@/app/components/profile/EditProfile/EditProfile';
-import { useMutation } from '@apollo/client/react';
-import { useAppDispatch } from '@/app/redux/hooks';
 import toast from 'react-hot-toast';
+import { useMutation } from '@apollo/client/react';
+import userEvent from '@testing-library/user-event';
+import {
+    render,
+    screen,
+    waitFor
+} from '@testing-library/react';
+import { EditProfileForm } from '@/app/components/profile/EditProfile/EditProfile';
 
 // ==========================================================
 // Mock: useMutation
@@ -69,21 +72,21 @@ describe('EditProfileForm Component - Unit Tests', () => {
     });
 
     // ==========================================================
-    //  تست ۲: اعتبارسنجی نام کاربری - حداقل ۳ کاراکتر
+    //  تست ۲: اعتبارسنجی نام کاربری - حداقل ۴ کاراکتر
     // ==========================================================
-    it('should show error when username is less than 3 characters', async () => {
+    it('should show error when username is less than 4 characters', async () => {
         const user = userEvent.setup();
         render(<EditProfileForm user={mockUser} />);
 
         const usernameInput = screen.getByPlaceholderText('username');
         await user.clear(usernameInput);
-        await user.type(usernameInput, 'ab');
+        await user.type(usernameInput, 'abc');
 
         const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
         await user.click(submitButton);
 
         await waitFor(() => {
-            expect(screen.getByText('نام کاربری حداقل ۳ کاراکتر')).toBeInTheDocument();
+            expect(screen.getByText('نام کاربری باید حداقل ۴ کاراکتر باشد')).toBeInTheDocument();
         });
     });
 
@@ -128,61 +131,54 @@ describe('EditProfileForm Component - Unit Tests', () => {
     });
 
     // ==========================================================
-    //  تست ۴: جلوگیری از تایپ کاراکترهای غیرمجاز در لحظه
+    //  تست ۴: نمایش خطا هنگام تایپ کاراکتر غیرمجاز (فارسی) - بدون بلاک کردن تایپ
     // ==========================================================
-    it('should prevent typing invalid characters in username field', async () => {
+    it('should show validation error (not block typing) for Persian characters', async () => {
         const user = userEvent.setup();
         render(<EditProfileForm user={mockUser} />);
 
         const usernameInput = screen.getByPlaceholderText('username');
         await user.clear(usernameInput);
-        
-        // ✅ تایپ کاراکتر فارسی
+
+        // کاراکتر فارسی باید واقعاً وارد اینپوت بشه
         await user.type(usernameInput, 'ت');
 
-        // ✅ کاراکتر غیرمجاز تایپ نمی‌شود
-        expect(usernameInput).toHaveValue('');
-    });
+        expect(usernameInput).toHaveValue('ت');
 
-    // ==========================================================
-    //  تست ۵: نمایش toast error هنگام تایپ کاراکتر غیرمجاز
-    // ==========================================================
-    it('should show toast error when typing invalid character in username', async () => {
-        const user = userEvent.setup();
-        render(<EditProfileForm user={mockUser} />);
-
-        const usernameInput = screen.getByPlaceholderText('username');
-        await user.clear(usernameInput);
-        
-        // تایپ کاراکتر غیرمجاز (فارسی)
-        await user.type(usernameInput, 'ت');
-
+        // و پیام خطای مناسب زیر اینپوت نمایش داده بشه
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('❌ فقط حروف انگلیسی و اعداد مجاز هستند');
+            expect(
+                screen.getByText('نام کاربری فقط باید شامل حروف انگلیسی و اعداد باشد')
+            ).toBeInTheDocument();
         });
     });
 
     // ==========================================================
-    //  تست ۶: پاک کردن خودکار کاراکترهای غیرمجاز
+    //  تست ۵: نام کاربری با ترکیب فارسی و انگلیسی همچنان نامعتبر است
     // ==========================================================
-    it('should automatically remove invalid characters from username', async () => {
+    it('should keep mixed Persian/English username invalid (no auto-stripping)', async () => {
         const user = userEvent.setup();
         render(<EditProfileForm user={mockUser} />);
 
         const usernameInput = screen.getByPlaceholderText('username');
         await user.clear(usernameInput);
-        
-        // تایپ ترکیبی از مجاز و غیرمجاز
+
         await user.type(usernameInput, 'testکاربر123');
 
-        // ✅ کاراکترهای غیرمجاز حذف می‌شوند
-        expect(usernameInput).toHaveValue('test123');
+        // دیگه کاراکترها حذف نمی‌شن، مقدار کامل باقی می‌مونه
+        expect(usernameInput).toHaveValue('testکاربر123');
+
+        await waitFor(() => {
+            expect(
+                screen.getByText('نام کاربری فقط باید شامل حروف انگلیسی و اعداد باشد')
+            ).toBeInTheDocument();
+        });
     });
 
     // ==========================================================
-    //  تست ۷: وقتی نام کاربری فقط کاراکتر غیرمجاز باشد، خطای الزامی نمایش داده می‌شود
+    //  تست ۶: نام کاربری کاملاً فارسی خطای "فقط انگلیسی" می‌دهد نه خطای الزامی
     // ==========================================================
-    it('should show required error when username has only invalid characters', async () => {
+    it('should show "only English" error (not required error) for fully Persian username', async () => {
         const user = userEvent.setup();
         render(<EditProfileForm user={mockUser} />);
 
@@ -194,8 +190,47 @@ describe('EditProfileForm Component - Unit Tests', () => {
         await user.click(submitButton);
 
         await waitFor(() => {
-            // ✅ چون کاراکترهای غیرمجاز حذف می‌شوند، فیلد خالی می‌شود و خطای الزامی نمایش داده می‌شود
+            expect(
+                screen.getByText('نام کاربری فقط باید شامل حروف انگلیسی و اعداد باشد')
+            ).toBeInTheDocument();
+            expect(screen.queryByText('نام کاربری الزامی است')).not.toBeInTheDocument();
+        });
+    });
+
+    // ==========================================================
+    //  تست ۷: نام کاربری خالی خطای الزامی می‌دهد
+    // ==========================================================
+    it('should show required error when username is empty', async () => {
+        const user = userEvent.setup();
+        render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+
+        const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
+        await user.click(submitButton);
+
+        await waitFor(() => {
             expect(screen.getByText('نام کاربری الزامی است')).toBeInTheDocument();
+        });
+    });
+
+    // ==========================================================
+    //  تست ۸: نام کاربری که با عدد شروع می‌شود خطای مناسب می‌دهد
+    // ==========================================================
+    it('should show error when username starts with a number', async () => {
+        const user = userEvent.setup();
+        render(<EditProfileForm user={mockUser} />);
+
+        const usernameInput = screen.getByPlaceholderText('username');
+        await user.clear(usernameInput);
+        await user.type(usernameInput, '1testuser');
+
+        const submitButton = screen.getByRole('button', { name: /ذخیره تغییرات/i });
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText('نام کاربری نباید با عدد شروع شود')).toBeInTheDocument();
         });
     });
 });

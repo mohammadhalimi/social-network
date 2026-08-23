@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, KeyboardEvent } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FormField } from './FormField';
 import { useForm } from 'react-hook-form';
@@ -26,12 +26,6 @@ interface EditProfileProps {
   user: User | null;
 }
 
-// ✅ تابع بررسی کاراکترهای مجاز (فقط حروف انگلیسی و اعداد)
-const isValidUsernameChar = (char: string): boolean => {
-  // فقط حروف انگلیسی (a-z, A-Z) و اعداد (0-9) مجاز هستند
-  return /^[a-zA-Z0-9]$/.test(char);
-};
-
 export const EditProfileForm = ({ user }: EditProfileProps) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +36,6 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
     register,
     handleSubmit,
     setValue,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useForm<EditProfileFormData>({
     defaultValues: {
@@ -53,70 +45,10 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
       bio: user?.bio || '',
       avatar: user?.avatar || '',
     },
+    mode: 'onChange',
   });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
-  // ✅ جلوگیری از تایپ کاراکترهای غیرمجاز در فیلد username
-  const handleUsernameKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    const key = e.key;
-
-    // کلیدهای مجاز: Backspace, Delete, Tab, Arrow keys, Home, End, ...
-    const allowedSpecialKeys = [
-      'Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
-      'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter',
-    ];
-
-    // اگر کلید مجاز باشد، اجازه بده
-    if (allowedSpecialKeys.includes(key)) {
-      return;
-    }
-
-    // اگر کلید یک کاراکتر غیرمجاز باشد، جلوگیری کن
-    if (!isValidUsernameChar(key)) {
-      e.preventDefault();
-      toast.error('❌ فقط حروف انگلیسی و اعداد مجاز هستند');
-    }
-  };
-
-  // ✅ اعتبارسنجی کامل در هنگام submit
-  const validateUsername = (value: string): string | true => {
-    // بررسی خالی بودن
-    if (!value || value.trim() === '') {
-      return 'نام کاربری الزامی است';
-    }
-
-    // بررسی اینکه فقط حروف انگلیسی و اعداد باشد
-    if (!/^[a-zA-Z0-9]+$/.test(value)) {
-      return 'نام کاربری باید فقط شامل حروف انگلیسی و اعداد باشد';
-    }
-
-    // بررسی اینکه حداقل ۳ کاراکتر باشد
-    if (value.length < 3) {
-      return 'نام کاربری حداقل ۳ کاراکتر';
-    }
-
-    return true;
-  };
-
-  // ✅ اعتبارسنجی در زمان تایپ (onChange)
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    // اگر فقط حروف انگلیسی و اعداد باشد
-    if (/^[a-zA-Z0-9]*$/.test(value) || value === '') {
-      clearErrors('username');
-      setValue('username', value);
-    } else {
-      // اگر کاراکتر غیرمجاز وارد شده باشد
-      setError('username', {
-        type: 'manual',
-        message: 'فقط حروف انگلیسی و اعداد مجاز هستند',
-      });
-      // مقدار را بدون کاراکتر غیرمجاز تنظیم کن
-      const cleanValue = value.replace(/[^a-zA-Z0-9]/g, '');
-      setValue('username', cleanValue);
-    }
-  };
 
   const handleFileChange = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
@@ -184,20 +116,8 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
   };
 
   return (
-    <div
-      className="
-      bg-card
-      border
-      border-border
-      rounded-2xl
-      p-6
-      shadow-soft
-      ">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="
-        space-y-6
-        ">
+    <div className="bg-card border border-border rounded-2xl p-6 shadow-soft">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <AvatarUpload
           previewAvatar={previewAvatar}
           isUploading={isUploading}
@@ -205,13 +125,8 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
           onFileChange={handleFileChange}
           onRemove={handleRemoveAvatar}
         />
-        <div
-          className="
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          gap-5
-          ">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <FormField label="نام کامل" error={errors.fullName?.message}>
             <input
               {...register('fullName', { required: 'نام کامل الزامی است' })}
@@ -220,6 +135,7 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
               placeholder="نام و نام خانوادگی"
             />
           </FormField>
+
           <FormField
             label="نام کاربری"
             error={errors.username?.message}
@@ -227,16 +143,25 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
             <input
               {...register('username', {
                 required: 'نام کاربری الزامی است',
-                validate: validateUsername,
+                validate: {
+                  onlyEnglish: (value) =>
+                    /^[a-zA-Z0-9]*$/.test(value) ||
+                    'نام کاربری فقط باید شامل حروف انگلیسی و اعداد باشد',
+                  notStartWithNumber: (value) =>
+                    !/^[0-9]/.test(value) ||
+                    'نام کاربری نباید با عدد شروع شود',
+                  minLength: (value) =>
+                    value.length >= 4 ||
+                    'نام کاربری باید حداقل ۴ کاراکتر باشد',
+                },
               })}
               type="text"
               className="input-light"
               placeholder="username"
-              onKeyDown={handleUsernameKeyDown}
-              onChange={handleUsernameChange}
             />
           </FormField>
         </div>
+
         <FormField label="ایمیل" error={errors.email?.message}>
           <input
             {...register('email', {
@@ -251,6 +176,7 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
             placeholder="example@email.com"
           />
         </FormField>
+
         <FormField label="بیوگرافی" optional>
           <textarea
             {...register('bio')}
@@ -259,6 +185,7 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
             placeholder="درباره خودت بنویس..."
           />
         </FormField>
+
         <SubmitButton isLoading={isLoading} isUploading={isUploading} />
       </form>
     </div>
