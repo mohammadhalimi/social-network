@@ -13,6 +13,6 @@
     "rootDir": "./src",
      "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "test-minimal.ts", "test-minimal.js"],
+  "include": ["src/**/*", "test-minimal.ts", "test-minimal.js", "src/seed.ts"],
   "exclude": ["node_modules", "dist"]
 }
