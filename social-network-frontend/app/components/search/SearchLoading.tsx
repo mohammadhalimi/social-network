@@ -7,7 +7,9 @@ export const SearchLoading = () => (
         items-center
         justify-center
         py-8
-  ">
+        "
+        data-testid="search-loading"
+    >
         <div
             className="
             w-8
