@@ -7,11 +7,11 @@ import jwt from 'jsonwebtoken';
 import { ruruHTML } from 'ruru/server';
 import cookieParser from 'cookie-parser';
 import uploadRoutes from './routes/upload.route';
+import { postTypeDefs } from './graphql/schema/post.schema';
 import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
-
 dotenv.config();
 
 export const app = express();
@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 4000;
 // ترکیب TypeDefs
 const typeDefs = `
   ${userTypeDefs}
+  ${postTypeDefs}
   type Query {
     _empty: String
    
