@@ -1,7 +1,7 @@
 import prisma from '../../lib/prisma';
-import { requireAuth } from './try-catch/requireAuth';
+import { mapUser } from './helpers/mapUser';
 import { formatPost } from './helpers/formatPost';
-import { mapUser } from './helpers/mapUser'; // ✅ اضافه شد
+import { requireAuth } from './try-catch/requireAuth';
 
 export const postResolvers = {
     Query: {

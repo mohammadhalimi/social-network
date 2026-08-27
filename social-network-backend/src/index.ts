@@ -7,11 +7,14 @@ import jwt from 'jsonwebtoken';
 import { ruruHTML } from 'ruru/server';
 import cookieParser from 'cookie-parser';
 import uploadRoutes from './routes/upload.route';
+import postsRoutes from './routes/post-media.route';
 import { postTypeDefs } from './graphql/schema/post.schema';
 import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
+import { postResolvers } from './graphql/resolvers/post.resolvers';
+
 dotenv.config();
 
 export const app = express();
@@ -31,9 +34,11 @@ const typeDefs = `
 const resolvers = {
   Query: {
     ...userResolvers.Query,
+    ...postResolvers.Query,
   },
   Mutation: {
     ...userResolvers.Mutation,
+    ...postResolvers.Mutation,
   },
 };
 
@@ -52,7 +57,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // ✅ مسیر آپلود عکس
 app.use('/', uploadRoutes);
-
+app.use('/', postsRoutes);
 app.use('/graphql', (req, res, next) => {
   const token = req.cookies?.token || null;
 

@@ -2,11 +2,20 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { User, Settings, Lock, LogOut } from 'lucide-react';
+import {
+    User,
+    Settings,
+    Lock,
+    LogOut,
+    LayoutGrid,
+    PenSquare
+} from 'lucide-react';
 
 const menuItems = [
     { id: 'profile', label: 'اطلاعات کاربری', icon: User },
     { id: 'edit', label: 'ویرایش اطلاعات', icon: Settings },
+    { id: 'posts', label: 'پست‌های من', icon: LayoutGrid }, // ✅ جدید
+    { id: 'create-post', label: 'نوشتن پست جدید', icon: PenSquare }, // ✅ جدید
     { id: 'change-password', label: 'تغییر رمز عبور', icon: Lock },
 ];
 

@@ -7,12 +7,16 @@ import {
     Settings,
     Lock,
     LogOut,
-    Cog
+    Cog,
+    LayoutGrid,
+    PenSquare
 } from 'lucide-react';
 
 const menuItems = [
     { id: 'profile', label: 'اطلاعات کاربری', icon: User },
     { id: 'edit', label: 'ویرایش اطلاعات', icon: Settings },
+    { id: 'posts', label: 'پست‌های من', icon: LayoutGrid }, // ✅ جدید
+    { id: 'create-post', label: 'نوشتن پست جدید', icon: PenSquare }, // ✅ جدید
     { id: 'change-password', label: 'تغییر رمز عبور', icon: Lock },
     { id: 'settings', label: 'تنظیمات', icon: Cog },
 ];
@@ -88,11 +92,11 @@ export const Sidebar = ({
                                     text-right
                                     group
                                     ${active
-                                        ?
-                                        'bg-gradient-primary text-primary shadow-glow-primary'
-                                        :
-                                        'text-secondary hover:bg-primary/5 hover:text-primary'
-                                    }
+                                            ?
+                                            'bg-gradient-primary text-primary shadow-glow-primary'
+                                            :
+                                            'text-secondary hover:bg-primary/5 hover:text-primary'
+                                        }
                                 `}
                                 >
                                     <Icon
@@ -100,10 +104,10 @@ export const Sidebar = ({
                                         w-5
                                         h-5
                                         ${active
-                                            ?
-                                            'text-primary'
-                                            :
-                                            'text-secondary group-hover:text-primary'
+                                                ?
+                                                'text-primary'
+                                                :
+                                                'text-secondary group-hover:text-primary'
                                             }
                                      `}
                                     />
@@ -149,12 +153,12 @@ export const Sidebar = ({
                             pt-4"
                         >
                             <LogOut
-                            className="
+                                className="
                             w-5
                             h-5
                             "/>
                             <span
-                            className="
+                                className="
                             font-medium
                             hover:cursor-pointer
                             ">خروج از حساب

@@ -1,10 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Settings from './settings';
 import { motion } from 'framer-motion';
 import ProfileInfo from './ProfileInfo';
 import ChangePassword from './ChangePassword';
 import { EditProfileForm } from './EditProfile/EditProfile';
+import { PostList } from './posts/PostList';
+import { CreatePost } from './posts/CreatePost';
 
 
 interface ProfileContentProps {
@@ -14,6 +17,7 @@ interface ProfileContentProps {
 }
 
 export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps) => {
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     if (loading) {
         return (
             <div
@@ -94,6 +98,18 @@ export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps
                 return <ChangePassword />;
             case 'settings':
                 return <Settings />;
+            case 'posts':
+                return (
+                    <PostList
+                        userId={user.id}
+                        onCommentClick={(postId) => {
+                            setSelectedPostId(postId);
+                            // TODO: باز کردن مودال کامنت‌ها
+                        }}
+                    />
+                );
+            case 'create-post':
+                return <CreatePost />
             default:
                 return <ProfileInfo user={user} />;
         }
