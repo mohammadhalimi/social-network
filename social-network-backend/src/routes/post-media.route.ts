@@ -4,10 +4,7 @@ import { uploadPostMedia, deletePostMedia } from '../services/post-media.service
 
 const router = Router();
 
-// =============================================
 // ✅ آپلود رسانه پست
-// =============================================
-
 router.post('/upload-post-media', async (req, res) => {
     try {
         const result = await uploadPostMedia(req, res) as any;
@@ -20,17 +17,25 @@ router.post('/upload-post-media', async (req, res) => {
             mimetype: result.mimetype,
         });
     } catch (error: any) {
-        console.error('❌ خطا در آپلود رسانه پست:', error);
-        res.status(500).json({ 
-            error: error.message || 'خطا در آپلود فایل.' 
+        // ✅ مدیریت خطاها
+        const status = error.status || 500;
+        const message = error.message || 'خطا در آپلود فایل';
+        
+        // ✅ فقط خطاهای سرور رو با error لاگ کن
+        if (status >= 500) {
+            console.error('❌ خطای سرور در آپلود:', error);
+        } else {
+            // خطاهای کلاینت رو با warn لاگ کن
+            console.warn(`⚠️ ${message}`);
+        }
+        
+        res.status(status).json({
+            error: message,
         });
     }
 });
 
-// =============================================
 // ✅ حذف رسانه پست
-// =============================================
-
 router.delete('/delete-post-media', async (req, res) => {
     try {
         const { url } = req.body;

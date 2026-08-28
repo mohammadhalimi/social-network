@@ -68,19 +68,39 @@ export const uploadPostMedia = (req: any, res: any) => {
     return new Promise((resolve, reject) => {
         postMediaUpload.single('media')(req, res, (err: any) => {
             if (err) {
+                // ✅ مدیریت خطاهای multer
                 if (err instanceof multer.MulterError) {
                     if (err.code === 'LIMIT_FILE_SIZE') {
-                        return reject(new Error('حجم فایل بیش از حد مجاز است (حداکثر 50 مگابایت).'));
+                        return reject({
+                            status: 413,
+                            message: 'حجم فایل انتخابی بیش از حد مجاز (حداکثر ۵۰ مگابایت) است.'
+                        });
                     }
                 }
-                return reject(new Error(err.message || 'خطا در آپلود فایل.'));
+                
+                // ✅ خطای فیلتر (فرمت فایل)
+                if (err.message && err.message.includes('فرمت')) {
+                    return reject({
+                        status: 400,
+                        message: err.message
+                    });
+                }
+                
+                // ✅ خطای عمومی
+                return reject({
+                    status: 500,
+                    message: err.message || 'خطا در آپلود فایل'
+                });
             }
 
             if (!req.file) {
-                return reject(new Error('هیچ فایلی آپلود نشده است.'));
+                return reject({
+                    status: 400,
+                    message: 'هیچ فایلی آپلود نشده است.'
+                });
             }
 
-            // ساخت URL فایل
+            // موفقیت
             const baseUrl = `${req.protocol}://${req.get('host')}`;
             const fileUrl = `${baseUrl}/uploads/posts/${req.file.filename}`;
 
