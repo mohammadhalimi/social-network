@@ -23,7 +23,6 @@ export const CreatePostBlocks = ({
     onUpdateBlock,
     onRemoveBlock,
     onUploadStateChange,
-    onError,
 }: CreatePostBlocksProps) => {
     const handleFileUpload = async (index: number, file: File, type: 'image' | 'video') => {
         const loadingToast = toast.loading('در حال آپلود فایل...', {
@@ -39,11 +38,9 @@ export const CreatePostBlocks = ({
 
         try {
             onUploadStateChange(index, true);
-            onError(null as any);
-            
             const url = await uploadPostMedia(file);
             onUpdateBlock(index, 'url', url);
-            
+
             toast.dismiss(loadingToast);
             toast.success('فایل با موفقیت آپلود شد! 📁', {
                 duration: 2000,
@@ -57,11 +54,9 @@ export const CreatePostBlocks = ({
                     fontWeight: '500',
                 },
             });
-            
-            onError(null as any);
         } catch (error: any) {
             console.warn('⚠️ خطای آپلود:', error.message);
-            
+
             toast.dismiss(loadingToast);
             toast.error(error.message || 'خطا در آپلود فایل', {
                 duration: 5000,
@@ -75,8 +70,6 @@ export const CreatePostBlocks = ({
                     fontWeight: '500',
                 },
             });
-            
-            onError(error.message || 'خطا در آپلود فایل');
         } finally {
             onUploadStateChange(index, false);
         }
