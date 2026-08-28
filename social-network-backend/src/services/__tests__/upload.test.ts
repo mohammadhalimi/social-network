@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import request from 'supertest';
-import { app } from '../../../index';
-import prisma from '../../../lib/prisma';
+import { app } from '../../index';
+import prisma from '../../lib/prisma';
 
 // ✅ مسیر پوشه uploads
 const uploadDir = path.join(__dirname, '../../../uploads');
