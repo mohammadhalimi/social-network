@@ -1,7 +1,7 @@
-// components/profile/posts/CreatePost.tsx
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { ContentBlock } from './types';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client/react';
@@ -9,8 +9,6 @@ import { CreatePostHeader } from './CreatePostHeader';
 import { CreatePostBlocks } from './CreatePostBlocks';
 import { CreatePostActions } from './CreatePostActions';
 import { CREATE_POST } from '@/app/graphql/post.queries';
-import { CreatePostMessages } from './CreatePostMessages';
-
 
 export const CreatePost = () => {
     const router = useRouter();
@@ -20,34 +18,60 @@ export const CreatePost = () => {
     ]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploading, setUploading] = useState<{ [key: number]: boolean }>({});
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const [createPost] = useMutation(CREATE_POST, {
         onCompleted: () => {
             setIsSubmitting(false);
-            setShowSuccess(true);
-            setErrorMessage(null);
-            setTimeout(() => {
-                setShowSuccess(false);
-                setBlocks([
-                    { type: 'header', content: '' },
-                    { type: 'text', content: '' },
-                ]);
-            }, 3000);
+
+            // ✅ نمایش پیام موفقیت با toast
+            toast.success('پست شما با موفقیت منتشر شد! 🎉', {
+                duration: 3000,
+                icon: '✅',
+                style: {
+                    background: '#10B981',
+                    color: '#fff',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+            });
+
+            // ریست کردن فرم
+            setBlocks([
+                { type: 'header', content: '' },
+                { type: 'text', content: '' },
+            ]);
         },
         onError: (error) => {
             console.error('Error creating post:', error);
             setIsSubmitting(false);
-            const message = error.message || 'خطا در ایجاد پست';
-            setErrorMessage(message);
-            setTimeout(() => {
-                setErrorMessage(null);
-            }, 5000);
+
+            let message = error.message || 'خطا در ایجاد پست';
+
+            // تشخیص خطای احراز هویت
+            if (error.message.includes('احراز هویت') ||
+                error.message.includes('توکن') ||
+                error.message.includes('login')) {
+                message = 'لطفاً ابتدا وارد حساب کاربری خود شوید.';
+            }
+
+            // ✅ نمایش پیام خطا با toast
+            toast.error(message, {
+                duration: 5000,
+                icon: '❌',
+                style: {
+                    background: '#EF4444',
+                    color: '#fff',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+            });
         },
     });
 
-    // ✅ افزودن بلاک جدید
     const addBlock = (type: ContentBlock['type']) => {
         const newBlock: ContentBlock =
             type === 'header' ? { type: 'header', content: '' } :
@@ -57,45 +81,59 @@ export const CreatePost = () => {
         setBlocks([...blocks, newBlock]);
     };
 
-    // ✅ حذف بلاک
     const removeBlock = (index: number) => {
         if (blocks.length <= 1) return;
         setBlocks(blocks.filter((_, i) => i !== index));
     };
 
-    // ✅ آپدیت بلاک
     const updateBlock = (index: number, field: string, value: any) => {
         const newBlocks = [...blocks];
         newBlocks[index] = { ...newBlocks[index], [field]: value };
         setBlocks(newBlocks);
     };
 
-    // ✅ تغییر وضعیت آپلود
     const setUploadingState = (index: number, isLoading: boolean) => {
         setUploading(prev => ({ ...prev, [index]: isLoading }));
     };
 
-    // ✅ ارسال پست
     const handleSubmit = async () => {
         // اعتبارسنجی
         const hasHeader = blocks.some(b => b.type === 'header' && b.content.trim());
         const hasText = blocks.some(b => b.type === 'text' && b.content.trim());
 
         if (!hasHeader || !hasText) {
-            setErrorMessage('لطفاً حداقل یک عنوان و یک متن وارد کنید');
-            setTimeout(() => setErrorMessage(null), 4000);
+            toast.error('لطفاً حداقل یک عنوان و یک متن وارد کنید', {
+                duration: 4000,
+                icon: '⚠️',
+                style: {
+                    background: '#F59E0B',
+                    color: '#fff',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+            });
             return;
         }
 
         const hasUploading = Object.values(uploading).some(u => u === true);
         if (hasUploading) {
-            setErrorMessage('لطفاً منتظر بمانید تا فایل‌ها آپلود شوند');
-            setTimeout(() => setErrorMessage(null), 4000);
+            toast.loading('در حال آپلود فایل‌ها...', {
+                duration: 2000,
+                style: {
+                    background: '#3B82F6',
+                    color: '#fff',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+            });
             return;
         }
 
         setIsSubmitting(true);
-        setErrorMessage(null);
 
         try {
             const cleanedBlocks = blocks.filter(block => {
@@ -109,14 +147,30 @@ export const CreatePost = () => {
             });
 
             const content = JSON.stringify({ blocks: cleanedBlocks });
+
+            // نمایش toast در حال ارسال
+            const loadingToast = toast.loading('در حال ارسال پست...', {
+                style: {
+                    background: '#3B82F6',
+                    color: '#fff',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+            });
+
             await createPost({ variables: { content } });
+
+            // پاک کردن toast بارگذاری
+            toast.dismiss(loadingToast);
+
         } catch (error) {
             console.error('Error:', error);
             setIsSubmitting(false);
         }
     };
 
-    // محاسبه تعداد محتوا
     const contentCount = blocks.filter(b =>
         (b.type === 'header' || b.type === 'text') && b.content.trim()
     ).length;
@@ -130,35 +184,37 @@ export const CreatePost = () => {
             bg-card
             rounded-2xl
             shadow-soft
-            relative
         ">
-
-            {/* هدر و دکمه‌ها */}
             <CreatePostHeader onAddBlock={addBlock} />
 
-            {/* بلاک‌ها */}
             <CreatePostBlocks
                 blocks={blocks}
                 uploading={uploading}
                 onUpdateBlock={updateBlock}
                 onRemoveBlock={removeBlock}
                 onUploadStateChange={setUploadingState}
-                onError={setErrorMessage}
+                onError={(message) => {
+                    if (message) {
+                        toast.error(message, {
+                            duration: 5000,
+                            icon: '❌',
+                            style: {
+                                background: '#EF4444',
+                                color: '#fff',
+                                padding: '16px 24px',
+                                borderRadius: '12px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                            },
+                        });
+                    }
+                }}
             />
 
-
-            {/* پیام‌ها */}
-            <CreatePostMessages
-                showSuccess={showSuccess}
-                errorMessage={errorMessage}
-            />
-            
-            {/* اکشن‌ها */}
             <CreatePostActions
                 blocksCount={blocks.length}
                 contentCount={contentCount}
                 isSubmitting={isSubmitting}
-                errorMessage={errorMessage}
                 onSubmit={handleSubmit}
                 onCancel={() => router.back()}
             />

@@ -17,7 +17,6 @@ export const uploadPostMedia = async (file: File): Promise<string> => {
             try {
                 const error = await response.json();
                 
-                // ✅ تشخیص خطاهای مختلف
                 if (response.status === 413) {
                     errorMessage = 'حجم فایل انتخابی بیش از حد مجاز (حداکثر ۵۰ مگابایت) است. لطفاً فایل کوچکتری انتخاب کنید.';
                 } else if (error.error?.includes('فرمت')) {
@@ -26,7 +25,6 @@ export const uploadPostMedia = async (file: File): Promise<string> => {
                     errorMessage = error.error;
                 }
             } catch (e) {
-                // اگر پاسخ JSON نبود
                 errorMessage = 'خطا در ارتباط با سرور';
             }
             
@@ -36,7 +34,6 @@ export const uploadPostMedia = async (file: File): Promise<string> => {
         const data = await response.json();
         return data.url;
     } catch (error: any) {
-        // ✅ اگر خطای شبکه
         if (error.message === 'Failed to fetch' || error.message.includes('fetch')) {
             throw new Error('خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.');
         }
