@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ContentBlock } from './types';
-import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client/react';
 import { CreatePostHeader } from './CreatePostHeader';
 import { CreatePostBlocks } from './CreatePostBlocks';
@@ -11,7 +10,6 @@ import { CreatePostActions } from './CreatePostActions';
 import { CREATE_POST } from '@/app/graphql/post.queries';
 
 export const CreatePost = () => {
-    const router = useRouter();
     const [blocks, setBlocks] = useState<ContentBlock[]>([
         { type: 'header', content: '' },
         { type: 'text', content: '' },
@@ -23,7 +21,6 @@ export const CreatePost = () => {
         onCompleted: () => {
             setIsSubmitting(false);
 
-            // ✅ نمایش پیام موفقیت با toast
             toast.success('پست شما با موفقیت منتشر شد! 🎉', {
                 duration: 3000,
                 icon: '✅',
@@ -37,11 +34,8 @@ export const CreatePost = () => {
                 },
             });
 
-            // ریست کردن فرم
-            setBlocks([
-                { type: 'header', content: '' },
-                { type: 'text', content: '' },
-            ]);
+            // ✅ ریست کردن فرم بعد از موفقیت
+            resetForm();
         },
         onError: (error) => {
             console.error('Error creating post:', error);
@@ -49,14 +43,12 @@ export const CreatePost = () => {
 
             let message = error.message || 'خطا در ایجاد پست';
 
-            // تشخیص خطای احراز هویت
             if (error.message.includes('احراز هویت') ||
                 error.message.includes('توکن') ||
                 error.message.includes('login')) {
                 message = 'لطفاً ابتدا وارد حساب کاربری خود شوید.';
             }
 
-            // ✅ نمایش پیام خطا با toast
             toast.error(message, {
                 duration: 5000,
                 icon: '❌',
@@ -71,6 +63,16 @@ export const CreatePost = () => {
             });
         },
     });
+
+    // ✅ تابع ریست کردن فرم
+    const resetForm = () => {
+        setBlocks([
+            { type: 'header', content: '' },
+            { type: 'text', content: '' },
+        ]);
+        setUploading({});
+        setIsSubmitting(false);
+    };
 
     const addBlock = (type: ContentBlock['type']) => {
         const newBlock: ContentBlock =
@@ -97,7 +99,6 @@ export const CreatePost = () => {
     };
 
     const handleSubmit = async () => {
-        // اعتبارسنجی
         const hasHeader = blocks.some(b => b.type === 'header' && b.content.trim());
         const hasText = blocks.some(b => b.type === 'text' && b.content.trim());
 
@@ -148,7 +149,6 @@ export const CreatePost = () => {
 
             const content = JSON.stringify({ blocks: cleanedBlocks });
 
-            // نمایش toast در حال ارسال
             const loadingToast = toast.loading('در حال ارسال پست...', {
                 style: {
                     background: '#3B82F6',
@@ -161,8 +161,6 @@ export const CreatePost = () => {
             });
 
             await createPost({ variables: { content } });
-
-            // پاک کردن toast بارگذاری
             toast.dismiss(loadingToast);
 
         } catch (error) {
@@ -216,7 +214,7 @@ export const CreatePost = () => {
                 contentCount={contentCount}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
-                onCancel={() => router.back()}
+                onCancel={resetForm}
             />
         </div>
     );
