@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1787929796640" clover="3.2.0">
-  <project timestamp="1787929796640" name="All files">
-    <metrics statements="409" coveredstatements="50" conditionals="178" coveredconditionals="29" methods="69" coveredmethods="5" elements="656" coveredelements="84" complexity="0" loc="409" ncloc="409" packages="10" files="20" classes="20"/>
+<coverage generated="1788028491483" clover="3.2.0">
+  <project timestamp="1788028491483" name="All files">
+    <metrics statements="409" coveredstatements="36" conditionals="178" coveredconditionals="20" methods="69" coveredmethods="3" elements="656" coveredelements="59" complexity="0" loc="409" ncloc="409" packages="10" files="20" classes="20"/>
     <package name="src">
       <metrics statements="28" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="env.ts" path="E:\project-code\social_network\social-network-backend\src\env.ts">
@@ -327,7 +327,7 @@
       </file>
     </package>
     <package name="src.routes">
-      <metrics statements="59" coveredstatements="0" conditionals="30" coveredconditionals="0" methods="5" coveredmethods="0"/>
+      <metrics statements="59" coveredstatements="36" conditionals="30" coveredconditionals="20" methods="5" coveredmethods="3"/>
       <file name="post-media.route.ts" path="E:\project-code\social_network\social-network-backend\src\routes\post-media.route.ts">
         <metrics statements="23" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
@@ -355,107 +355,107 @@
         <line num="59" count="0" type="stmt"/>
       </file>
       <file name="upload.route.ts" path="E:\project-code\social_network\social-network-backend\src\routes\upload.route.ts">
-        <metrics statements="36" coveredstatements="0" conditionals="20" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
+        <metrics statements="36" coveredstatements="36" conditionals="20" coveredconditionals="20" methods="3" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="13" count="9" type="stmt"/>
+        <line num="14" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="15" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
+        <line num="24" count="6" type="stmt"/>
+        <line num="28" count="6" type="stmt"/>
+        <line num="29" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="33" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="34" count="5" type="stmt"/>
+        <line num="36" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="37" count="4" type="stmt"/>
+        <line num="38" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="42" count="3" type="stmt"/>
+        <line num="44" count="1" type="stmt"/>
+        <line num="48" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="49" count="3" type="stmt"/>
+        <line num="54" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="58" count="2" type="stmt"/>
+        <line num="59" count="2" type="stmt"/>
+        <line num="61" count="2" type="stmt"/>
+        <line num="67" count="4" type="stmt"/>
+        <line num="68" count="4" type="stmt"/>
+        <line num="70" count="4" type="stmt"/>
+        <line num="76" count="1" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.services">
+      <metrics statements="98" coveredstatements="0" conditionals="50" coveredconditionals="0" methods="13" coveredmethods="0"/>
+      <file name="post-media.service.ts" path="E:\project-code\social_network\social-network-backend\src\services\post-media.service.ts">
+        <metrics statements="58" coveredstatements="0" conditionals="34" coveredconditionals="0" methods="8" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
         <line num="3" count="0" type="stmt"/>
         <line num="4" count="0" type="stmt"/>
         <line num="5" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
         <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="15" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="15" count="0" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="33" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="36" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="58" count="0" type="stmt"/>
-        <line num="59" count="0" type="stmt"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.services">
-      <metrics statements="98" coveredstatements="50" conditionals="50" coveredconditionals="29" methods="13" coveredmethods="5"/>
-      <file name="post-media.service.ts" path="E:\project-code\social_network\social-network-backend\src\services\post-media.service.ts">
-        <metrics statements="58" coveredstatements="50" conditionals="34" coveredconditionals="29" methods="8" coveredmethods="5"/>
-        <line num="2" count="15" type="stmt"/>
-        <line num="3" count="15" type="stmt"/>
-        <line num="4" count="15" type="stmt"/>
-        <line num="5" count="15" type="stmt"/>
-        <line num="11" count="15" type="stmt"/>
-        <line num="14" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="16" count="1" type="stmt"/>
-        <line num="23" count="15" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
         <line num="25" count="0" type="stmt"/>
         <line num="28" count="0" type="stmt"/>
         <line num="29" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="38" count="15" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
         <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="45" count="0" type="stmt"/>
         <line num="47" count="0" type="stmt"/>
-        <line num="55" count="15" type="stmt"/>
-        <line num="67" count="15" type="stmt"/>
-        <line num="68" count="6" type="stmt"/>
-        <line num="69" count="6" type="stmt"/>
-        <line num="70" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="72" count="4" type="cond" truecount="2" falsecount="0"/>
-        <line num="73" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="74" count="1" type="stmt"/>
-        <line num="82" count="3" type="cond" truecount="4" falsecount="0"/>
-        <line num="83" count="1" type="stmt"/>
-        <line num="90" count="2" type="stmt"/>
-        <line num="96" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="97" count="1" type="stmt"/>
-        <line num="104" count="1" type="stmt"/>
-        <line num="105" count="1" type="stmt"/>
-        <line num="107" count="1" type="stmt"/>
-        <line num="122" count="15" type="stmt"/>
-        <line num="123" count="8" type="cond" truecount="2" falsecount="0"/>
-        <line num="125" count="5" type="stmt"/>
-        <line num="127" count="5" type="stmt"/>
-        <line num="129" count="5" type="cond" truecount="2" falsecount="0"/>
-        <line num="130" count="3" type="stmt"/>
-        <line num="131" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="132" count="1" type="stmt"/>
-        <line num="133" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="134" count="1" type="stmt"/>
-        <line num="137" count="1" type="stmt"/>
-        <line num="140" count="5" type="cond" truecount="1" falsecount="1"/>
-        <line num="142" count="5" type="stmt"/>
-        <line num="144" count="5" type="cond" truecount="2" falsecount="0"/>
-        <line num="145" count="4" type="stmt"/>
-        <line num="146" count="3" type="stmt"/>
-        <line num="147" count="3" type="stmt"/>
-        <line num="150" count="1" type="stmt"/>
-        <line num="152" count="1" type="stmt"/>
-        <line num="153" count="1" type="stmt"/>
-        <line num="161" count="15" type="stmt"/>
-        <line num="162" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="163" count="4" type="cond" truecount="2" falsecount="0"/>
-        <line num="164" count="2" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="73" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="82" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
+        <line num="96" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="104" count="0" type="stmt"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="123" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="125" count="0" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="129" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="130" count="0" type="stmt"/>
+        <line num="131" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="133" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="137" count="0" type="stmt"/>
+        <line num="140" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="142" count="0" type="stmt"/>
+        <line num="144" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="146" count="0" type="stmt"/>
+        <line num="147" count="0" type="stmt"/>
+        <line num="150" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="161" count="0" type="stmt"/>
+        <line num="162" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="163" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="164" count="0" type="stmt"/>
       </file>
       <file name="upload.service.ts" path="E:\project-code\social_network\social-network-backend\src\services\upload.service.ts">
         <metrics statements="40" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="5" coveredmethods="0"/>
