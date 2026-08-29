@@ -1,9 +1,9 @@
 // resolvers/user.resolvers.ts
 // نقطه‌ی اتصال: فقط تکه‌های کوچیک‌تر رو کنار هم می‌ذاره
 
-import { authResolvers } from './auth.resolvers';
-import { profileResolvers } from './profile.resolvers';
-import { userQueries } from './user.queries';
+import { authResolvers } from './user/auth.resolvers';
+import { profileResolvers } from './user/profile.resolvers';
+import { userQueries } from './user/user.queries';
 import { postResolvers } from './post.resolvers';
 
 export const userResolvers = {

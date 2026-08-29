@@ -1,8 +1,8 @@
 // resolvers/auth.resolvers.ts
 // resolverهای مربوط به احراز هویت
-import { mapUser } from './helpers/mapUser';
-import { AuthService } from '../../modules/auth/auth.service';
-import { successResponse, withTryCatch } from './helpers/response';
+import { mapUser } from '../helpers/mapUser';
+import { AuthService } from '../../../modules/auth/auth.service';
+import { successResponse, withTryCatch } from '../helpers/response';
 
 const authService = new AuthService();
 

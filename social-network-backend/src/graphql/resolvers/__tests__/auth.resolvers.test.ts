@@ -16,7 +16,7 @@ jest.mock('../../../modules/auth/auth.service', () => {
 });
 
 // import کردن resolver بعد از mock، تا از همون instance مشترک استفاده کنه
-import { authResolvers } from '../auth.resolvers';
+import { authResolvers } from '../user/auth.resolvers';
 
 const createMockRes = () => ({
     cookie: jest.fn(),

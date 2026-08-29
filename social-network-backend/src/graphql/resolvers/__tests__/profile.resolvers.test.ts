@@ -10,7 +10,7 @@ jest.mock('../../../modules/profile/profile.service', () => {
     };
 });
 
-import { profileResolvers } from '../profile.resolvers';
+import { profileResolvers } from '../user/profile.resolvers';
 
 describe('profileResolvers', () => {
     let mockProfileService: jest.Mocked<ProfileService>;

@@ -1,9 +1,9 @@
 // resolvers/user.queries.ts
 // Queryهای مربوط به کاربر
 
-import prisma from '../../lib/prisma';
-import { mapUser } from './helpers/mapUser';
-import { requireAuth } from './try-catch/requireAuth';
+import prisma from '../../../lib/prisma';
+import { mapUser } from '../helpers/mapUser';
+import { requireAuth } from '../try-catch/requireAuth';
 
 export const userQueries = {
     _empty: () => '',

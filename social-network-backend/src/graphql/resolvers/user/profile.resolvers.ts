@@ -1,10 +1,10 @@
 // resolvers/profile.resolvers.ts
 // resolverهای مربوط به مدیریت پروفایل
 
-import { ProfileService } from '../../modules/profile/profile.service';
-import { mapUser } from './helpers/mapUser';
-import { requireAuth } from './try-catch/requireAuth';
-import { successResponse, withTryCatch } from './helpers/response';
+import { ProfileService } from '../../../modules/profile/profile.service';
+import { mapUser } from '../helpers/mapUser';
+import { requireAuth } from '../try-catch/requireAuth';
+import { successResponse, withTryCatch } from '../helpers/response';
 
 const profileService = new ProfileService();
 

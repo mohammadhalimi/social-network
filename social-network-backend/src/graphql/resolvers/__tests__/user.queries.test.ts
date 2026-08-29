@@ -10,7 +10,7 @@ jest.mock('../../../lib/prisma', () => ({
 }));
 
 import prisma from '../../../lib/prisma';
-import { userQueries } from '../user.queries';
+import { userQueries } from '../user/user.queries';
 
 describe('userQueries', () => {
     let mockContext: { req: any; res: any; user: { userId: string; email: string } | null };
