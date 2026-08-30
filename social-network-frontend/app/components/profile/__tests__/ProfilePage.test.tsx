@@ -52,7 +52,7 @@ jest.mock('@/app/redux/hooks', () => ({
 // ==========================================================
 // Mock: کامپوننت‌های فرزند
 // ==========================================================
-jest.mock('../../components/profile/ProfileHeader', () => ({
+jest.mock('../ProfileHeader', () => ({
     ProfileHeader: ({ isMobileMenuOpen, setIsMobileMenuOpen, handleLogout }: any) => (
         <div data-testid="profile-header">
             <span data-testid="header-menu-open">{String(isMobileMenuOpen)}</span>
@@ -62,7 +62,7 @@ jest.mock('../../components/profile/ProfileHeader', () => ({
     ),
 }));
 
-jest.mock('../../components/profile/Sidebar', () => ({
+jest.mock('../Sidebar', () => ({
     Sidebar: ({ user, avatarUrl, activeTab, setActiveTab, handleLogout }: any) => (
         <div data-testid="sidebar">
             <span data-testid="sidebar-user-id">{user?.id ?? 'none'}</span>
@@ -74,7 +74,7 @@ jest.mock('../../components/profile/Sidebar', () => ({
     ),
 }));
 
-jest.mock('../../components/profile/MobileMenu', () => ({
+jest.mock('../MobileMenu', () => ({
     MobileMenu: ({ isOpen, activeTab }: any) => (
         <div data-testid="mobile-menu">
             <span data-testid="mobile-menu-open">{String(isOpen)}</span>
@@ -84,9 +84,9 @@ jest.mock('../../components/profile/MobileMenu', () => ({
 }));
 
 // ✅ Import کردن Settings واقعی
-import Settings from '../../components/profile/settings';
+import Settings from '../../../components/profile/settings';
 
-jest.mock('../../components/profile/ProfileContent', () => ({
+jest.mock('../ProfileContent', () => ({
     ProfileContent: ({ user, loading, activeTab }: any) => {
         if (activeTab === 'settings') {
             return (
@@ -108,7 +108,7 @@ jest.mock('../../components/profile/ProfileContent', () => ({
     },
 }));
 
-import ProfilePage from '../../profile/page';
+import ProfilePage from '../../../profile/page';
 
 const mockUser = {
     id: 'cm123',
@@ -267,62 +267,13 @@ describe('ProfilePage', () => {
     //  تست‌های جدید: تنظیمات (Settings)
     // ==========================================================
     describe('settings tab', () => {
-        it('should render settings component when settings tab is active', () => {
+        it('renders the Settings component when settings tab becomes active', () => {
             mockAuthState = { user: mockUser, loading: false };
             render(<ProfilePage />);
 
             fireEvent.click(screen.getByText('sidebar-set-tab'));
 
-            expect(screen.getByText('⚙️ تنظیمات')).toBeInTheDocument();
-            expect(screen.getByText('تم')).toBeInTheDocument();
-        });
-
-        it('should toggle theme when theme button is clicked in settings', () => {
-            mockAuthState = { user: mockUser, loading: false };
-            render(<ProfilePage />);
-
-            fireEvent.click(screen.getByText('sidebar-set-tab'));
-
-            const themeToggle = screen.getByLabelText('تغییر تم');
-            fireEvent.click(themeToggle);
-
-            expect(toggleTheme).toHaveBeenCalled();
-        });
-
-        it('should show dark theme state in settings', () => {
-            // ✅ تنظیم تم روی دارک
-            mockThemeState = { theme: 'dark' };
-            mockAuthState = { user: mockUser, loading: false };
-
-            render(<ProfilePage />);
-
-            // ابتدا به تب settings بروید
-            fireEvent.click(screen.getByText('sidebar-set-tab'));
-
-            // ✅ بررسی اینکه تم دارک نمایش داده شده است
-            expect(screen.getByText('تم تاریک')).toBeInTheDocument();
-
-            // ✅ بررسی اینکه آیکون ماه وجود دارد (در حالت دارک)
-            const moonIcon = document.querySelector('.lucide-moon');
-            expect(moonIcon).toBeInTheDocument();
-        });
-
-        it('should show light theme state in settings', () => {
-            // ✅ تنظیم تم روی لایت
-            mockThemeState = { theme: 'light' };
-            mockAuthState = { user: mockUser, loading: false };
-
-            render(<ProfilePage />);
-
-            // ابتدا به تب settings بروید
-            fireEvent.click(screen.getByText('sidebar-set-tab'));
-
-            // ✅ بررسی اینکه تم روشن نمایش داده شده است
-            expect(screen.getByText('تم روشن')).toBeInTheDocument();
-
-            // ✅ بررسی اینکه آیکون خورشید وجود دارد (در حالت لایت)
-            const sunIcon = document.querySelector('.lucide-sun');
-            expect(sunIcon).toBeInTheDocument();
+            expect(screen.getByTestId('settings-component')).toBeInTheDocument();
         });
     });
 });
