@@ -4,6 +4,8 @@ import {
     LIKE_POST,
     UNLIKE_POST,
     COMMENT_ON_POST,
+    UPDATE_POST,
+    DELETE_POST,
 } from '../../graphql/post.queries';
 
 import {
@@ -351,5 +353,129 @@ describe('Post Queries', () => {
         expect(commentFieldNames).toContain('user');
         expect(commentFieldNames).toContain('likesCount');
         expect(commentFieldNames).toContain('isLiked');
+    });
+
+    // ==========================================================
+    //  تست‌های UPDATE_POST
+    // ==========================================================
+    it('should have correct UPDATE_POST mutation structure', () => {
+        expect(UPDATE_POST).toBeDefined();
+        expect(UPDATE_POST.kind).toBe('Document');
+        expect(UPDATE_POST.definitions).toBeDefined();
+        expect(UPDATE_POST.definitions.length).toBeGreaterThan(0);
+    });
+
+    it('UPDATE_POST mutation should be named "UpdatePost"', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+        expect(definition?.name?.value).toBe('UpdatePost');
+    });
+
+    it('UPDATE_POST mutation should have correct variables', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+
+        const variableNames = getVariableNames(definition!);
+        expect(variableNames).toContain('postId');
+        expect(variableNames).toContain('content');
+        expect(variableNames).toHaveLength(2);
+    });
+
+    it('UPDATE_POST mutation top-level field should be "updatePost"', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getFieldNames(definition!);
+        expect(fieldNames).toContain('updatePost');
+    });
+
+    it('UPDATE_POST mutation should request success, message and post', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getNestedFieldNames(definition!, 'updatePost');
+        expect(fieldNames).toContain('success');
+        expect(fieldNames).toContain('message');
+        expect(fieldNames).toContain('post');
+    });
+
+    it('UPDATE_POST mutation should request nested post fields including updatedAt and user', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+
+        const postFieldNames = getDeeplyNestedFieldNames(definition!, 'updatePost', 'post');
+        expect(postFieldNames).toContain('id');
+        expect(postFieldNames).toContain('content');
+        expect(postFieldNames).toContain('createdAt');
+        expect(postFieldNames).toContain('updatedAt');
+        expect(postFieldNames).toContain('user');
+        expect(postFieldNames).toContain('likesCount');
+        expect(postFieldNames).toContain('commentsCount');
+        expect(postFieldNames).toContain('isLiked');
+    });
+
+    it('UPDATE_POST mutation should request correct nested user fields including avatar', () => {
+        const definition = findOperation(UPDATE_POST.definitions, 'UpdatePost');
+        expect(definition).toBeDefined();
+
+        const selectionSet = definition!.selectionSet;
+        const updatePostField = selectionSet.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'updatePost'
+        );
+        const postField = updatePostField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'post'
+        );
+        const userField = postField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'user'
+        );
+
+        expect(userField).toBeDefined();
+        const userFieldNames = getFieldNamesFromSelectionSet(userField!.selectionSet!);
+        expect(userFieldNames).toContain('id');
+        expect(userFieldNames).toContain('username');
+        expect(userFieldNames).toContain('fullName');
+        expect(userFieldNames).toContain('avatar');
+    });
+
+    // ==========================================================
+    //  تست‌های DELETE_POST
+    // ==========================================================
+    it('should have correct DELETE_POST mutation structure', () => {
+        expect(DELETE_POST).toBeDefined();
+        expect(DELETE_POST.kind).toBe('Document');
+        expect(DELETE_POST.definitions).toBeDefined();
+        expect(DELETE_POST.definitions.length).toBeGreaterThan(0);
+    });
+
+    it('DELETE_POST mutation should be named "DeletePost"', () => {
+        const definition = findOperation(DELETE_POST.definitions, 'DeletePost');
+        expect(definition).toBeDefined();
+        expect(definition?.name?.value).toBe('DeletePost');
+    });
+
+    it('DELETE_POST mutation should have correct variables', () => {
+        const definition = findOperation(DELETE_POST.definitions, 'DeletePost');
+        expect(definition).toBeDefined();
+
+        const variableNames = getVariableNames(definition!);
+        expect(variableNames).toContain('postId');
+        expect(variableNames).toHaveLength(1);
+    });
+
+    it('DELETE_POST mutation top-level field should be "deletePost"', () => {
+        const definition = findOperation(DELETE_POST.definitions, 'DeletePost');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getFieldNames(definition!);
+        expect(fieldNames).toContain('deletePost');
+    });
+
+    it('DELETE_POST mutation should request success and message', () => {
+        const definition = findOperation(DELETE_POST.definitions, 'DeletePost');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getNestedFieldNames(definition!, 'deletePost');
+        expect(fieldNames).toContain('success');
+        expect(fieldNames).toContain('message');
     });
 });

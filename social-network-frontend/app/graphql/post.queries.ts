@@ -197,3 +197,68 @@ export const COMMENT_ON_POST: TypedDocumentNode<CommentOnPostResponse, CommentOn
     }
   }
 `;
+
+// =============================================
+// ✅ ۶. Mutation ویرایش پست
+// =============================================
+
+export interface UpdatePostResponse {
+  updatePost: {
+    success: boolean;
+    message: string;
+    post: IPost;
+  };
+}
+
+export interface UpdatePostVariables {
+  postId: string;
+  content: string;
+}
+
+export const UPDATE_POST: TypedDocumentNode<UpdatePostResponse, UpdatePostVariables> = gql`
+  mutation UpdatePost($postId: ID!, $content: String!) {
+    updatePost(postId: $postId, content: $content) {
+      success
+      message
+      post {
+        id
+        content
+        createdAt
+        updatedAt
+        user {
+          id
+          username
+          fullName
+          avatar
+        }
+        likesCount
+        commentsCount
+        isLiked
+      }
+    }
+  }
+`;
+
+// =============================================
+// ✅ ۷. Mutation حذف پست
+// =============================================
+
+export interface DeletePostResponse {
+  deletePost: {
+    success: boolean;
+    message: string;
+  };
+}
+
+export interface DeletePostVariables {
+  postId: string;
+}
+
+export const DELETE_POST: TypedDocumentNode<DeletePostResponse, DeletePostVariables> = gql`
+  mutation DeletePost($postId: ID!) {
+    deletePost(postId: $postId) {
+      success
+      message
+    }
+  }
+`;
