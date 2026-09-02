@@ -262,3 +262,51 @@ export const DELETE_POST: TypedDocumentNode<DeletePostResponse, DeletePostVariab
     }
   }
 `;
+
+// =============================================
+// ✅ 8. گرفتن کامنت های یک پست
+// =============================================
+
+interface CommentUser {
+    id: string;
+    username: string;
+    fullName: string;
+    avatar: string | null;
+}
+
+interface PostComment {
+    id: string;
+    content: string;
+    createdAt: string;
+    user: CommentUser;
+}
+
+interface GetPostCommentsResponse {
+    getPost: {
+        id: string;
+        comments: PostComment[];
+    } | null;
+}
+
+interface GetPostCommentsVariables {
+    postId: string;
+}
+
+export const GET_POST_COMMENTS: TypedDocumentNode<GetPostCommentsResponse, GetPostCommentsVariables> = gql`
+  query GetPostComments($postId: ID!) {
+    getPost(postId: $postId) {
+      id
+      comments {
+        id
+        content
+        createdAt
+        user {
+          id
+          username
+          fullName
+          avatar
+        }
+      }
+    }
+  }
+`;

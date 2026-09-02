@@ -22,3 +22,4 @@ export interface BlockProps {
     onUpdate: (index: number, field: string, value: any) => void;
     onRemove: (index: number) => void;
 }
+
