@@ -47,15 +47,25 @@ export const VideoBlock = ({
             ">
                 {block.url ? (
                     <div className="relative">
-                        <video
-                            src={block.url}
-                            controls
-                            className="
-                            w-full
-                            h-auto
-                            rounded-lg
-                            max-h-lg"
-                        />
+                        <div
+                            className='
+                            my-3
+                            rounded-xl
+                            overflow-hidden
+                            flex
+                            justify-center
+                            bg-black
+                        '>
+                            <video
+                                src={block.url}
+                                controls
+                                className="
+                                max-h-[500px]
+                                w-auto
+                                max-w-full
+                                object-contain
+                            "/>
+                        </div>
                         <button
                             onClick={() => onUpdate(index, 'url', '')}
                             className="
