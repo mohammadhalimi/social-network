@@ -6,6 +6,7 @@ import {
     COMMENT_ON_POST,
     UPDATE_POST,
     DELETE_POST,
+    GET_POST_COMMENTS
 } from '../../graphql/post.queries';
 
 import {
@@ -477,5 +478,104 @@ describe('Post Queries', () => {
         const fieldNames = getNestedFieldNames(definition!, 'deletePost');
         expect(fieldNames).toContain('success');
         expect(fieldNames).toContain('message');
+    });
+
+    // ==========================================================
+    //  تست‌های GET_POST_COMMENTS
+    // ==========================================================
+    it('should have correct GET_POST_COMMENTS query structure', () => {
+        expect(GET_POST_COMMENTS).toBeDefined();
+        expect(GET_POST_COMMENTS.kind).toBe('Document');
+        expect(GET_POST_COMMENTS.definitions).toBeDefined();
+        expect(GET_POST_COMMENTS.definitions.length).toBeGreaterThan(0);
+    });
+
+    it('GET_POST_COMMENTS query should be named "GetPostComments"', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+        expect(definition?.name?.value).toBe('GetPostComments');
+    });
+
+    it('GET_POST_COMMENTS query should have correct variables', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        const variableNames = getVariableNames(definition!);
+        expect(variableNames).toContain('postId');
+        expect(variableNames).toHaveLength(1);
+    });
+
+    it('GET_POST_COMMENTS query top-level field should be "getPost"', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getFieldNames(definition!);
+        expect(fieldNames).toContain('getPost');
+    });
+
+    it('GET_POST_COMMENTS query should request "id" and "comments" fields', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        const getPostFieldNames = getNestedFieldNames(definition!, 'getPost');
+        expect(getPostFieldNames).toContain('id');
+        expect(getPostFieldNames).toContain('comments');
+    });
+
+    it('GET_POST_COMMENTS query should request nested comment fields including user', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        // پیدا کردن فیلد getPost
+        const selectionSet = definition!.selectionSet;
+        const getPostField = selectionSet.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'getPost'
+        );
+
+        expect(getPostField).toBeDefined();
+
+        // پیدا کردن فیلد comments داخل getPost
+        const commentsField = getPostField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'comments'
+        );
+
+        expect(commentsField).toBeDefined();
+
+        // گرفتن نام فیلدهای داخل comments
+        const commentFieldNames = getFieldNamesFromSelectionSet(commentsField!.selectionSet!);
+        expect(commentFieldNames).toContain('id');
+        expect(commentFieldNames).toContain('content');
+        expect(commentFieldNames).toContain('createdAt');
+        expect(commentFieldNames).toContain('user');
+    });
+
+    it('GET_POST_COMMENTS query should request correct nested user fields', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        // پیدا کردن فیلد getPost
+        const selectionSet = definition!.selectionSet;
+        const getPostField = selectionSet.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'getPost'
+        );
+
+        // پیدا کردن فیلد comments داخل getPost
+        const commentsField = getPostField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'comments'
+        );
+
+        // پیدا کردن فیلد user داخل comments
+        const userField = commentsField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'user'
+        );
+
+        expect(userField).toBeDefined();
+
+        // گرفتن نام فیلدهای داخل user
+        const userFieldNames = getFieldNamesFromSelectionSet(userField!.selectionSet!);
+        expect(userFieldNames).toContain('id');
+        expect(userFieldNames).toContain('username');
+        expect(userFieldNames).toContain('fullName');
+        expect(userFieldNames).toContain('avatar');
     });
 });
