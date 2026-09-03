@@ -1,11 +1,14 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
-import { EditPostModal } from '../EditPostModal';
-
 import toast from 'react-hot-toast';
+import { EditPostModal } from '../EditPostModal';
 import { useMutation } from '@apollo/client/react';
 import { useEditPostBlocks } from '../EditPostModal/useEditPostBlocks';
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor
+} from '@testing-library/react';
 
 jest.mock('react-hot-toast', () => ({
     success: jest.fn(),
