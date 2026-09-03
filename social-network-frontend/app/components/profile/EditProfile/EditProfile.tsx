@@ -10,9 +10,7 @@ import { useMutation } from '@apollo/client/react';
 import { useAppDispatch } from '@/app/redux/hooks';
 import { User } from '@/app/redux/features/authSlice';
 import { updateUser } from '@/app/redux/features/authSlice';
-import {
-  UPDATE_PROFILE,
-} from '@/app/graphql/profile.queries';
+import { UPDATE_PROFILE } from '@/app/graphql/profile.queries';
 
 interface EditProfileFormData {
   username: string;

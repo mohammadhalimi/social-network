@@ -10,10 +10,10 @@ interface SubmitButtonProps {
 
 export const SubmitButton = ({ isLoading, isUploading }: SubmitButtonProps) => (
   <div
-  className="
-  flex
-  justify-end
-  pt-2
+    className="
+    flex
+    justify-end
+    pt-2
   ">
     <motion.button
       type="submit"

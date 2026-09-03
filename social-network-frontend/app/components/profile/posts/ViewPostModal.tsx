@@ -69,6 +69,7 @@ export const ViewPostModal = ({ post, isOpen, onClose }: ViewPostModalProps) => 
                         hover:bg-border
                         rounded-lg
                         transition-colors
+                        cursor-pointer
                         ">
                         <X size={24} />
                     </button>

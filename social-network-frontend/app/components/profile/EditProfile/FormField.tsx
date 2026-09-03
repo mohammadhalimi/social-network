@@ -18,7 +18,6 @@ export const FormField = ({
     error,
     optional,
     children,
-    onKeyDown,
 }: FormFieldProps) => (
     <div>
         <div
