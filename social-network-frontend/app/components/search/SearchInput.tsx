@@ -22,16 +22,20 @@ export const SearchInput = ({
     inputRef,
 }: SearchInputProps) => (
     <div className="relative">
-        <Search
-            className="
-            absolute
-            right-3
-            top-1/2
-            -translate-y-1/2
-            w-5
-            h-5
-            text-secondary
-    "/>
+        {!value && (
+            <Search
+                className="
+                absolute
+                left-3
+                top-1/2
+                -translate-y-1/2
+                w-5
+                h-5
+                text-secondary
+                pointer-events-none
+            "/>
+        )}
+
         <input
             ref={inputRef}
             type="text"
@@ -42,8 +46,8 @@ export const SearchInput = ({
             className="
             input-light
             w-full
-            pr-10
-            pl-10
+            pr-4
+            pl-12
       "/>
         {value && (
             <button
@@ -56,6 +60,8 @@ export const SearchInput = ({
                 text-secondary
                 hover:text-primary
                 transition-colors
+                cursor-pointer
+                z-10
                 ">
                 <X className="
                 w-5
