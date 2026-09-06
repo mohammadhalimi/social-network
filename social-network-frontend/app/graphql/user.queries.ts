@@ -36,19 +36,47 @@ export interface GetUserByUsernameResponse {
     avatar: string | null;
     createdAt: string;
     updatedAt: string;
+    followersCount: number;   // ✅ اضافه شد
+    followingCount: number;   // ✅ اضافه شد
+    isFollowing: boolean;     // ✅ اضافه شد
+
   };
 }
 
 export interface GetUserByUsernameVariables {
   username: string;
 }
+// =============================================
+//  ✅ نوع‌های FollowUser / UnfollowUser
+// =============================================
+export interface FollowResponse {
+  success: boolean;
+  message: string;
+  isFollowing: boolean;
+  followersCount: number;
+}
 
+export interface FollowUserResponse {
+  followUser: FollowResponse;
+}
+
+export interface UnfollowUserResponse {
+  unfollowUser: FollowResponse;
+}
+
+export interface FollowUserVariables {
+  userId: string;
+}
+
+export interface UnfollowUserVariables {
+  userId: string;
+}
 // =============================================
 //  ✅ کوئری‌ها
 // =============================================
 
 // ✅ کوئری جستجوی کاربران
-export const SEARCH_USERS: TypedDocumentNode<SearchUsersResponse, SearchUsersVariables>  = gql`
+export const SEARCH_USERS: TypedDocumentNode<SearchUsersResponse, SearchUsersVariables> = gql`
   query SearchUsers($searchTerm: String!, $limit: Int, $offset: Int) {
     searchUsers(searchTerm: $searchTerm, limit: $limit, offset: $offset) {
       users {
@@ -65,7 +93,7 @@ export const SEARCH_USERS: TypedDocumentNode<SearchUsersResponse, SearchUsersVar
 `;
 
 // ✅ کوئری دریافت کاربر با username
-export const GET_USER_BY_USERNAME: TypedDocumentNode<GetUserByUsernameResponse, GetUserByUsernameVariables>   = gql`
+export const GET_USER_BY_USERNAME: TypedDocumentNode<GetUserByUsernameResponse, GetUserByUsernameVariables> = gql`
   query GetUserByUsername($username: String!) {
     getUserByUsername(username: $username) {
       id
@@ -75,6 +103,32 @@ export const GET_USER_BY_USERNAME: TypedDocumentNode<GetUserByUsernameResponse, 
       avatar
       createdAt
       updatedAt
+    }
+  }
+`;
+
+// =============================================
+//  ✅ Mutation های Follow / Unfollow
+// =============================================
+
+export const FOLLOW_USER: TypedDocumentNode<FollowUserResponse, FollowUserVariables> = gql`
+  mutation FollowUser($userId: ID!) {
+    followUser(userId: $userId) {
+      success
+      message
+      isFollowing
+      followersCount
+    }
+  }
+`;
+
+export const UNFOLLOW_USER: TypedDocumentNode<UnfollowUserResponse, UnfollowUserVariables> = gql`
+  mutation UnfollowUser($userId: ID!) {
+    unfollowUser(userId: $userId) {
+      success
+      message
+      isFollowing
+      followersCount
     }
   }
 `;
