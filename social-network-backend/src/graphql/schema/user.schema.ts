@@ -27,6 +27,13 @@ export const userTypeDefs = `
     users: [User!]!
     totalCount: Int!
     hasMore: Boolean!
+  } 
+    
+  type FollowResponse {
+    success: Boolean!
+    message: String!
+    isFollowing: Boolean!
+    followersCount: Int!
   }
 
   type Mutation {
@@ -64,6 +71,9 @@ export const userTypeDefs = `
 
     # ✅ بازنشانی رمز با توکن
     resetPassword(token: String!, newPassword: String!): ResetPasswordPayload!
+
+    followUser(userId: ID!): FollowResponse!
+    unfollowUser(userId: ID!): FollowResponse!
   }
 
   type LogoutPayload {

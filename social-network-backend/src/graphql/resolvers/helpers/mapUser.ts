@@ -1,6 +1,11 @@
 // helpers/mapUser.ts
 // تبدیل رکورد کاربر (Prisma) به شکل خروجی GraphQL
- 
+interface FollowInfo {
+    followersCount?: number;
+    followingCount?: number;
+    isFollowing?: boolean;
+}
+
 export function mapUser(user: {
     id: string | number;
     email: string;
@@ -10,7 +15,9 @@ export function mapUser(user: {
     avatar: string | null;
     createdAt: Date;
     updatedAt: Date;
-}) {
+},
+    followInfo?: FollowInfo
+) {
     return {
         id: user.id,
         email: user.email,
@@ -20,6 +27,8 @@ export function mapUser(user: {
         avatar: user.avatar,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
+        followersCount: followInfo?.followersCount ?? 0,
+        followingCount: followInfo?.followingCount ?? 0,
+        isFollowing: followInfo?.isFollowing ?? false,
     };
 }
- 

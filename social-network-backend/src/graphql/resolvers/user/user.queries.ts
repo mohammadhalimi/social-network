@@ -68,13 +68,13 @@ export const userQueries = {
         const hasMore = offset + paginatedUsers.length < totalCount;
 
         return {
-            users: paginatedUsers.map(mapUser),
+            users: paginatedUsers.map(user => mapUser(user)),
             totalCount,
             hasMore,
         };
     },
 
-    getUserByUsername: async (_: any, { username }: { username: string }) => {
+    getUserByUsername: async (_: any, { username }: { username: string }, context: any) => {
         const user = await prisma.user.findUnique({
             where: { username },
             select: {
@@ -93,6 +93,27 @@ export const userQueries = {
             throw new Error('کاربر یافت نشد.');
         }
 
-        return mapUser(user);
+        const currentUserId = context.user?.userId || null;
+
+        const [followersCount, followingCount, followRecord] = await Promise.all([
+            prisma.follow.count({ where: { followingId: user.id } }),
+            prisma.follow.count({ where: { followerId: user.id } }),
+            currentUserId
+                ? prisma.follow.findUnique({
+                    where: {
+                        followerId_followingId: {
+                            followerId: currentUserId,
+                            followingId: user.id,
+                        },
+                    },
+                })
+                : null,
+        ]);
+
+        return mapUser(user, {
+            followersCount,
+            followingCount,
+            isFollowing: !!followRecord,
+        });
     },
 };
