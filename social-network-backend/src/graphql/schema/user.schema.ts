@@ -8,6 +8,9 @@ export const userTypeDefs = `
     avatar: String
     createdAt: String!
     updatedAt: String!
+    followersCount: Int!
+    followingCount: Int!
+    isFollowing: Boolean!
   }
 
   type AuthPayload {

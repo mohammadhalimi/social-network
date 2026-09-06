@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { formatPersianDate } from '@/app/lib/formatDate';
 import { PostActions } from '../profile/posts/PostActions';
 import { ViewPostModal } from '../profile/posts/ViewPostModal';
+import { CommentForm } from './CommentForm';
 
 interface ProfilePostCardProps {
     post: any;
@@ -99,7 +100,11 @@ export const ProfilePostCard = ({ post }: ProfilePostCardProps) => {
                 post={post}
                 isOpen={showViewModal}
                 onClose={() => setShowViewModal(false)}
-            />
+            >
+                {({ postId, onCommentAdded }) => (
+                    <CommentForm postId={postId} onCommentAdded={onCommentAdded} />
+                )}
+            </ViewPostModal>
         </>
     );
 };

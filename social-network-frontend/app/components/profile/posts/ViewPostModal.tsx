@@ -1,22 +1,62 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client/react';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { formatPersianDate } from '@/app/lib/formatDate';
+import { GET_POST_COMMENTS } from '@/app/graphql/post.queries';
+
+interface PostCommentUser {
+    id: string;
+    username: string;
+    fullName: string;
+    avatar: string | null;
+}
+
+interface PostComment {
+    id: string;
+    content: string;
+    createdAt: string;
+    user: PostCommentUser;
+}
 
 interface ViewPostModalProps {
     post: any;
     isOpen: boolean;
     onClose: () => void;
+    // ✅ render prop اختیاری - فقط جایی که فرم کامنت لازمه پاس داده می‌شه
+    children?: (opts: {
+        postId: string;
+        onCommentAdded: (comment: PostComment) => void;
+    }) => React.ReactNode;
 }
 
-export const ViewPostModal = ({ post, isOpen, onClose }: ViewPostModalProps) => {
+export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModalProps) => {
+    const [comments, setComments] = useState<PostComment[]>([]);
+
+    const [fetchComments, { data: commentsData, loading: commentsLoading }] =
+        useLazyQuery(GET_POST_COMMENTS, {
+            fetchPolicy: 'network-only',
+        });
+
+    // ✅ هر بار مودال باز شد، کامنت‌ها رو تازه بگیر
+    useEffect(() => {
+        if (isOpen && post?.id) {
+            fetchComments({ variables: { postId: post.id } });
+        }
+    }, [isOpen, post?.id, fetchComments]);
+
+    useEffect(() => {
+        if (commentsData?.getPost?.comments) {
+            setComments(commentsData.getPost.comments);
+        }
+    }, [commentsData]);
+
     if (!isOpen) return null;
 
-    // ✅ فرمت تاریخ با بررسی validity
     const formattedDate = formatPersianDate(post.createdAt);
 
-    // پارس کردن محتوای JSON
     let contentBlocks = [];
     try {
         const parsed = JSON.parse(post.content);
@@ -25,167 +65,72 @@ export const ViewPostModal = ({ post, isOpen, onClose }: ViewPostModalProps) => 
         contentBlocks = [{ type: 'text', content: post.content }];
     }
 
+    // ✅ وقتی کامنت جدید با موفقیت ثبت شد، به ابتدای لیست اضافه می‌شه
+    const handleCommentAdded = (comment: PostComment) => {
+        setComments(prev => [comment, ...prev]);
+    };
+
     return (
-        <div
-            className="
-            fixed
-            inset-0
-            bg-black/50
-            flex
-            items-center
-            justify-center
-            z-50
-            p-4
-        ">
-            <div
-                className="
-                bg-card
-                rounded-2xl
-                p-6
-                max-w-3xl
-                w-full
-                max-h-[90vh]
-                overflow-y-auto
-                shadow-xl
-            ">
-                <div
-                    className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-4
-                ">
-                    <h1
-                        className="
-                        text-xl
-                        font-bold
-                        text-primary
-                    ">مشاهده پست
-                    </h1>
-                    <button
-                        onClick={onClose}
-                        className="
-                        p-1
-                        hover:bg-border
-                        rounded-lg
-                        transition-colors
-                        cursor-pointer
-                        ">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-xl font-bold text-primary">مشاهده پست</h1>
+                    <button onClick={onClose} className="p-1 hover:bg-border rounded-lg transition-colors">
                         <X size={24} />
                     </button>
                 </div>
-                <div
-                    className="
-                    flex
-                    items-center
-                    gap-3
-                    mb-4
-                ">
-                    <div
-                        className="
-                        w-10
-                        h-10
-                        rounded-full
-                        bg-gradient-primary
-                        flex
-                        items-center
-                        justify-center
-                        overflow-hidden
-                        flex-shrink-0
-                    ">
+
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center overflow-hidden flex-shrink-0">
                         {post.user?.avatar ? (
                             <Image
                                 src={post.user.avatar}
                                 alt={post.user.fullName || 'کاربر'}
-                                className="
-                                w-full
-                                h-full
-                                object-cover"
+                                className="w-full h-full object-cover"
                                 width={100}
                                 height={100}
                                 unoptimized
                             />
                         ) : (
-                            <span
-                                className="
-                                text-white
-                                font-bold
-                                text-sm
-                            ">
+                            <span className="text-white font-bold text-sm">
                                 {post.user?.fullName?.[0] || '👤'}
                             </span>
                         )}
                     </div>
-                    <div className='pt-2'>
-                        <p
-                            className="
-                            font-medium
-                            text-primary
-                            text-sm
-                        ">
+                    <div className="pt-2">
+                        <p className="font-medium text-primary text-sm">
                             {post.user?.fullName || 'کاربر ناشناس'}
                         </p>
-                        <p
-                            className="
-                            text-xs
-                            text-secondary
-                        ">
+                        <p className="text-xs text-secondary">
                             {post.user?.username || 'unknown'}@
                         </p>
-                        <p className="
-                        text-xs
-                        text-secondary
-                        ">
-                            {formattedDate}
-                        </p>
+                        <p className="text-xs text-secondary">{formattedDate}</p>
                     </div>
                 </div>
+
                 <div className="mb-4">
                     {contentBlocks.map((block: any, index: number) => {
                         switch (block.type) {
                             case 'header':
                                 return (
-                                    <h1
-                                        key={index}
-                                        className="
-                                        text-2xl
-                                        font-bold
-                                        text-primary
-                                        mb-3
-                                    ">
+                                    <h1 key={index} className="text-2xl font-bold text-primary mb-3">
                                         {block.content}
                                     </h1>
                                 );
                             case 'image':
                                 if (!block.url) return null;
                                 return (
-                                    <div
-                                        key={index}
-                                        className="
-                                        my-3
-                                        rounded-xl
-                                        overflow-hidden
-                                    ">
+                                    <div key={index} className="my-3 rounded-xl overflow-hidden">
                                         <Image
                                             src={block.url}
                                             alt={block.caption || 'تصویر'}
-                                            className="
-                                            w-full
-                                            h-auto
-                                            object-cover"
+                                            className="w-full h-auto object-cover"
                                             width={800}
                                             height={500}
                                             unoptimized
                                         />
                                         {block.caption && (
-                                            <p
-                                                className="
-                                                text-xs
-                                                text-secondary
-                                                mt-1
-                                            ">
-                                                {block.caption}
-                                            </p>
+                                            <p className="text-xs text-secondary mt-1">{block.caption}</p>
                                         )}
                                     </div>
                                 );
@@ -194,57 +139,90 @@ export const ViewPostModal = ({ post, isOpen, onClose }: ViewPostModalProps) => 
                                 return (
                                     <div
                                         key={index}
-                                        className="
-                                        my-3
-                                        rounded-xl
-                                        overflow-hidden
-                                        flex
-                                        justify-center
-                                        bg-black
-                                    ">
+                                        className="my-3 rounded-xl overflow-hidden flex justify-center bg-black"
+                                    >
                                         <video
                                             src={block.url}
                                             controls
-                                            className="
-                                            max-h-[500px]
-                                            w-auto
-                                            max-w-full
-                                            object-contain
-                                            " />
+                                            className="max-h-[500px] w-auto max-w-full object-contain"
+                                        />
                                     </div>
                                 );
                             default:
                                 return (
-                                    <p
-                                        key={index}
-                                        className="
-                                        text-primary
-                                        leading-relaxed
-                                        mb-2
-                                        whitespace-pre-wrap
-                                    ">
+                                    <p key={index} className="text-primary leading-relaxed mb-2 whitespace-pre-wrap">
                                         {block.content}
                                     </p>
                                 );
                         }
                     })}
                 </div>
-                <div
-                    className="
-                flex
-                gap-6
-                pt-3
-                border-t
-                border-border
-                text-sm
-                text-secondary
-                ">
+
+                <div className="flex gap-6 pt-3 border-t border-border text-sm text-secondary mb-4">
                     <span>🕐 {formattedDate}</span>
                     {post.updatedAt && post.updatedAt !== post.createdAt && (
                         <span>✏️ ویرایش شده</span>
                     )}
                 </div>
+
+                {/* ✅ بخش نوشتن کامنت - فقط اگه از بیرون پاس داده شده باشه */}
+                {children && (
+                    <div className="mb-4 pb-4 border-b border-border">
+                        {children({ postId: post.id, onCommentAdded: handleCommentAdded })}
+                    </div>
+                )}
+
+                {/* ✅ لیست کامنت‌ها */}
+                <div>
+                    <h2 className="text-sm font-bold text-text-primary mb-3">
+                        کامنت‌ها ({comments.length})
+                    </h2>
+
+                    {commentsLoading ? (
+                        <div className="flex justify-center py-4">
+                            <Loader2 size={20} className="animate-spin text-primary" />
+                        </div>
+                    ) : comments.length === 0 ? (
+                        <p className="text-sm text-secondary text-center py-4">
+                            هنوز کامنتی ثبت نشده است
+                        </p>
+                    ) : (
+                        <div className="space-y-3">
+                            {comments.map((comment) => (
+                                <div key={comment.id} className="flex items-start gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        {comment.user?.avatar ? (
+                                            <Image
+                                                src={comment.user.avatar}
+                                                alt={comment.user.fullName || 'کاربر'}
+                                                className="w-full h-full object-cover"
+                                                width={32}
+                                                height={32}
+                                                unoptimized
+                                            />
+                                        ) : (
+                                            <span className="text-white font-bold text-xs">
+                                                {comment.user?.fullName?.[0] || '👤'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0 bg-border/40 rounded-xl px-3 py-2">
+                                        <p className="text-xs font-medium text-text-primary">
+                                            {comment.user?.fullName || comment.user?.username || 'کاربر ناشناس'}
+                                        </p>
+                                        <p className="text-sm text-text-primary whitespace-pre-wrap">
+                                            {comment.content}
+                                        </p>
+                                        <p className="text-[10px] text-secondary mt-1">
+                                            {formatPersianDate(comment.createdAt)}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div >
+        </div>
     );
 };

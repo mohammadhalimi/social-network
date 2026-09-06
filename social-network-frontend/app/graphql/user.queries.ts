@@ -103,6 +103,9 @@ export const GET_USER_BY_USERNAME: TypedDocumentNode<GetUserByUsernameResponse, 
       avatar
       createdAt
       updatedAt
+      followersCount
+      followingCount
+      isFollowing
     }
   }
 `;
