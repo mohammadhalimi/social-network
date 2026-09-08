@@ -1,6 +1,6 @@
-import { ProfileService } from '../../../modules/profile/profile.service';
+import { ProfileService } from '../../../../modules/profile/profile.service';
 
-jest.mock('../../../modules/profile/profile.service', () => {
+jest.mock('../../../../modules/profile/profile.service', () => {
     const mockProfileServiceInstance = {
         updateProfile: jest.fn(),
         changePassword: jest.fn(),
@@ -10,7 +10,7 @@ jest.mock('../../../modules/profile/profile.service', () => {
     };
 });
 
-import { profileResolvers } from '../user/profile.resolvers';
+import { profileResolvers } from '../../user/profile.resolvers';
 
 describe('profileResolvers', () => {
     let mockProfileService: jest.Mocked<ProfileService>;

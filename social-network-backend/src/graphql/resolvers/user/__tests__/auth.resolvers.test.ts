@@ -1,8 +1,8 @@
-import { AuthService } from '../../../modules/auth/auth.service';
+import { AuthService } from '../../../../modules/auth/auth.service';
 
 // چون auth.resolvers.ts در سطح ماژول یک instance از AuthService می‌سازه،
 // باید مطمئن بشیم هر new AuthService() (چه در resolver چه در تست) همون یک object رو برگردونه.
-jest.mock('../../../modules/auth/auth.service', () => {
+jest.mock('../../../../modules/auth/auth.service', () => {
     const mockAuthServiceInstance = {
         register: jest.fn(),
         login: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock('../../../modules/auth/auth.service', () => {
 });
 
 // import کردن resolver بعد از mock، تا از همون instance مشترک استفاده کنه
-import { authResolvers } from '../user/auth.resolvers';
+import { authResolvers } from '../../user/auth.resolvers';
 
 const createMockRes = () => ({
     cookie: jest.fn(),
@@ -51,7 +51,7 @@ describe('authResolvers', () => {
             username: 'testuser',
             password: '123456',
             fullName: 'کاربر تست',
-            resetToken: null,              
+            resetToken: null,
             resetTokenExpiresAt: null,
         };
 
@@ -91,6 +91,9 @@ describe('authResolvers', () => {
                     avatar: mockUser.avatar,
                     createdAt: mockUser.createdAt.toISOString(),
                     updatedAt: mockUser.updatedAt.toISOString(),
+                    followersCount: 0,      // ✅ اضافه شد
+                    followingCount: 0,      // ✅ اضافه شد
+                    isFollowing: false,     // ✅ اضافه شد
                 },
                 token: mockToken,
             });
@@ -155,6 +158,9 @@ describe('authResolvers', () => {
                     avatar: mockUser.avatar,
                     createdAt: mockUser.createdAt.toISOString(),
                     updatedAt: mockUser.updatedAt.toISOString(),
+                    followersCount: 0,      // ✅ اضافه شد
+                    followingCount: 0,      // ✅ اضافه شد
+                    isFollowing: false,     // ✅ اضافه شد
                 },
                 token: mockToken,
             });
