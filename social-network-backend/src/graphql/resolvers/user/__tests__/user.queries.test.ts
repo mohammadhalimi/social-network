@@ -1,4 +1,4 @@
-jest.mock('../../../lib/prisma', () => ({
+jest.mock('../../../../lib/prisma', () => ({
     __esModule: true,
     default: {
         user: {
@@ -6,11 +6,15 @@ jest.mock('../../../lib/prisma', () => ({
             findMany: jest.fn(),    // ✅ اضافه شد
             count: jest.fn(),       // ✅ اضافه شد
         },
+        follow: {
+            count: jest.fn(),
+            findUnique: jest.fn(),
+        },
     },
 }));
 
-import prisma from '../../../lib/prisma';
-import { userQueries } from '../user/user.queries';
+import prisma from '../../../../lib/prisma';
+import { userQueries } from '../../user/user.queries';
 
 describe('userQueries', () => {
     let mockContext: { req: any; res: any; user: { userId: string; email: string } | null };
@@ -78,6 +82,9 @@ describe('userQueries', () => {
                 avatar: mockUser.avatar,
                 createdAt: mockUser.createdAt.toISOString(),
                 updatedAt: mockUser.updatedAt.toISOString(),
+                followersCount: 0,
+                followingCount: 0,
+                isFollowing: false,
             });
         });
 
@@ -98,60 +105,61 @@ describe('userQueries', () => {
             );
         });
     });
+
     // ==========================================================
-    //  ✅ تست‌های جدید: searchUsers
+    //  ✅ تست‌های بازنویسی شده: searchUsers (هماهنگ با منطق جدید)
     // ==========================================================
     describe('searchUsers', () => {
-        const mockUsers = [mockUser2, mockUser3];
+        const mockSearchUsers = [mockUser2, mockUser3]; // علی، سارا
 
-        it('should search users by username (case-insensitive)', async () => {
-            (prisma.user.findMany as jest.Mock).mockResolvedValue(mockUsers);
+        it('should search users with case-insensitive OR condition', async () => {
+            (prisma.user.findMany as jest.Mock).mockResolvedValue(mockSearchUsers);
             (prisma.user.count as jest.Mock).mockResolvedValue(2);
 
             const result = await userQueries.searchUsers(null as any, {
-                searchTerm: 'ali',
+                searchTerm: 'al',
                 limit: 10,
                 offset: 0,
             });
 
+            // تست شرط where (بدون take/skip/orderBy)
             expect(prisma.user.findMany).toHaveBeenCalledWith({
                 where: {
                     OR: [
-                        { username: { contains: 'ali', mode: 'insensitive' } },
-                        { fullName: { contains: 'ali', mode: 'insensitive' } },
+                        { username: { contains: 'al', mode: 'insensitive' } },
+                        { fullName: { contains: 'al', mode: 'insensitive' } },
                     ],
                 },
-                take: 10,
-                skip: 0,
-                select: {
-                    id: true,
-                    username: true,
-                    fullName: true,
-                    email: true,
-                    bio: true,
-                    avatar: true,
-                    createdAt: true,
-                    updatedAt: true,
-                },
-                orderBy: { username: 'asc' },
+                select: expect.any(Object),
             });
-            expect(prisma.user.count).toHaveBeenCalledWith({
-                where: {
-                    OR: [
-                        { username: { contains: 'ali', mode: 'insensitive' } },
-                        { fullName: { contains: 'ali', mode: 'insensitive' } },
-                    ],
-                },
-            });
-
+            
+            // تست خروجی
             expect(result.users).toHaveLength(2);
             expect(result.totalCount).toBe(2);
             expect(result.hasMore).toBe(false);
         });
 
-        it('should search users by fullName (case-insensitive)', async () => {
-            (prisma.user.findMany as jest.Mock).mockResolvedValue([mockUser2]);
-            (prisma.user.count as jest.Mock).mockResolvedValue(1);
+        it('should prioritize users whose username starts with searchTerm', async () => {
+            // mockUser2.username = 'alireza' (شروع با al)
+            // mockUser3.username = 'saramo' (شروع نمی‌شود)
+            (prisma.user.findMany as jest.Mock).mockResolvedValue([mockUser3, mockUser2]); // ترتیب برعکس
+            (prisma.user.count as jest.Mock).mockResolvedValue(2);
+
+            const result = await userQueries.searchUsers(null as any, {
+                searchTerm: 'al',
+                limit: 10,
+                offset: 0,
+            });
+
+            // انتظار داریم alireza اول بیاید
+            expect(result.users[0].username).toBe('alireza');
+            expect(result.users[1].username).toBe('saramo');
+        });
+
+        it('should prioritize users whose fullName starts with searchTerm', async () => {
+            // mockUser2.fullName = 'علی رضایی' (شروع با علی)
+            (prisma.user.findMany as jest.Mock).mockResolvedValue([mockUser3, mockUser2]);
+            (prisma.user.count as jest.Mock).mockResolvedValue(2);
 
             const result = await userQueries.searchUsers(null as any, {
                 searchTerm: 'علی',
@@ -159,37 +167,32 @@ describe('userQueries', () => {
                 offset: 0,
             });
 
-            expect(prisma.user.findMany).toHaveBeenCalledWith({
-                where: {
-                    OR: [
-                        { username: { contains: 'علی', mode: 'insensitive' } },
-                        { fullName: { contains: 'علی', mode: 'insensitive' } },
-                    ],
-                },
-                take: 10,
-                skip: 0,
-                select: expect.any(Object),
-                orderBy: { username: 'asc' },
-            });
-
-            expect(result.users).toHaveLength(1);
-            expect(result.totalCount).toBe(1);
-            expect(result.hasMore).toBe(false);
+            expect(result.users[0].username).toBe('alireza');
         });
 
-        it('should return paginated results with hasMore true when more results exist', async () => {
-            (prisma.user.findMany as jest.Mock).mockResolvedValue([mockUser2]);
-            (prisma.user.count as jest.Mock).mockResolvedValue(15);
+        it('should apply pagination manually using slice and return hasMore correctly', async () => {
+            // 3 کاربر داریم، limit=2، offset=0
+            (prisma.user.findMany as jest.Mock).mockResolvedValue([mockUser, mockUser2, mockUser3]);
+            (prisma.user.count as jest.Mock).mockResolvedValue(3);
 
             const result = await userQueries.searchUsers(null as any, {
                 searchTerm: 'a',
-                limit: 10,
+                limit: 2,
                 offset: 0,
             });
 
-            expect(result.users).toHaveLength(1);
-            expect(result.totalCount).toBe(15);
+            expect(result.users).toHaveLength(2);
             expect(result.hasMore).toBe(true);
+            
+            // تست offset جدید
+            const result2 = await userQueries.searchUsers(null as any, {
+                searchTerm: 'a',
+                limit: 2,
+                offset: 2,
+            });
+
+            expect(result2.users).toHaveLength(1);
+            expect(result2.hasMore).toBe(false);
         });
 
         it('should return empty array when no users match', async () => {
@@ -209,27 +212,30 @@ describe('userQueries', () => {
     });
 
     // ==========================================================
-    //  ✅ تست‌های جدید: getUserByUsername
+    //  ✅ تست‌های بازنویسی شده: getUserByUsername (با Follow)
     // ==========================================================
     describe('getUserByUsername', () => {
-        it('should return user when found', async () => {
+        it('should return user with follow counts when authenticated', async () => {
             (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser2);
+            
+            // فالوورها و فالووینگ‌ها
+            (prisma.follow.count as jest.Mock)
+                .mockResolvedValueOnce(150)  // followersCount
+                .mockResolvedValueOnce(45);  // followingCount
+
+            // رکورد فالو (این کاربر قبلا ما را فالو کرده است)
+            (prisma.follow.findUnique as jest.Mock).mockResolvedValue({ id: 'follow-1' });
 
             const result = await userQueries.getUserByUsername(null as any, {
                 username: 'alireza',
-            });
+            }, mockContext);
 
-            expect(prisma.user.findUnique).toHaveBeenCalledWith({
-                where: { username: 'alireza' },
-                select: {
-                    id: true,
-                    username: true,
-                    fullName: true,
-                    email: true,
-                    bio: true,
-                    avatar: true,
-                    createdAt: true,
-                    updatedAt: true,
+            expect(prisma.follow.findUnique).toHaveBeenCalledWith({
+                where: {
+                    followerId_followingId: {
+                        followerId: 'cm123', // از context.user
+                        followingId: 'cm456', // از mockUser2.id
+                    },
                 },
             });
 
@@ -242,14 +248,39 @@ describe('userQueries', () => {
                 avatar: mockUser2.avatar,
                 createdAt: mockUser2.createdAt.toISOString(),
                 updatedAt: mockUser2.updatedAt.toISOString(),
+                followersCount: 150,
+                followingCount: 45,
+                isFollowing: true, // چون followRecord وجود دارد
             });
+        });
+
+        it('should return user with default follow values when not authenticated', async () => {
+            mockContext.user = null;
+
+            (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser2);
+            
+            // فقط شمارش فالوور و فالووینگ (رکورد فالو نباید صدا زده شود)
+            (prisma.follow.count as jest.Mock)
+                .mockResolvedValueOnce(10)
+                .mockResolvedValueOnce(20);
+
+            (prisma.follow.findUnique as jest.Mock).mockResolvedValue(null);
+
+            const result = await userQueries.getUserByUsername(null as any, {
+                username: 'alireza',
+            }, mockContext);
+
+            expect(prisma.follow.findUnique).not.toHaveBeenCalled(); // چون context.user null است
+            expect(result.followersCount).toBe(10);
+            expect(result.followingCount).toBe(20);
+            expect(result.isFollowing).toBe(false); // چون followRecord ندارد
         });
 
         it('should throw error when user not found', async () => {
             (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
             await expect(
-                userQueries.getUserByUsername(null as any, { username: 'notfound' })
+                userQueries.getUserByUsername(null as any, { username: 'notfound' }, null as any)
             ).rejects.toThrow('کاربر یافت نشد.');
         });
     });
