@@ -70,6 +70,9 @@ describe('profileResolvers', () => {
                     avatar: mockUpdatedUser.avatar,
                     createdAt: mockUpdatedUser.createdAt.toISOString(),
                     updatedAt: mockUpdatedUser.updatedAt.toISOString(),
+                    followersCount: 0,      // ✅ اضافه شد
+                    followingCount: 0,      // ✅ اضافه شد
+                    isFollowing: false,     // ✅ اضافه شد
                 },
             });
         });
@@ -129,6 +132,9 @@ describe('profileResolvers', () => {
                     avatar: mockUpdatedUser.avatar,
                     createdAt: mockUpdatedUser.createdAt.toISOString(),
                     updatedAt: mockUpdatedUser.updatedAt.toISOString(),
+                    followersCount: 0,      // ✅ اضافه شد
+                    followingCount: 0,      // ✅ اضافه شد
+                    isFollowing: false,     // ✅ اضافه شد
                 },
             });
         });
