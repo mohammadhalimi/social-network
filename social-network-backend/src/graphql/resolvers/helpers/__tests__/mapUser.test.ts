@@ -60,6 +60,44 @@ describe('mapUser', () => {
 
         expect(result.id).toBe(42);
     });
+    
+    test('وقتی followInfo پاس داده نشود، مقادیر پیش‌فرض برمی‌گردد', () => {
+        const user = buildUser();
+
+        const result = mapUser(user);
+
+        expect(result.followersCount).toBe(0);
+        expect(result.followingCount).toBe(0);
+        expect(result.isFollowing).toBe(false);
+    });
+
+    test('وقتی followInfo پاس داده شود، مقادیر آن به درستی منتقل می‌شود', () => {
+        const user = buildUser();
+
+        const result = mapUser(user, {
+            followersCount: 150,
+            followingCount: 45,
+            isFollowing: true,
+        });
+
+        expect(result.followersCount).toBe(150);
+        expect(result.followingCount).toBe(45);
+        expect(result.isFollowing).toBe(true);
+    });
+
+    test('اگر در followInfo مقداری undefined باشد، پیش‌فرض آن برگردانده می‌شود', () => {
+        const user = buildUser();
+
+        const result = mapUser(user, {
+            followersCount: undefined,
+            followingCount: undefined,
+            isFollowing: undefined,
+        });
+
+        expect(result.followersCount).toBe(0);
+        expect(result.followingCount).toBe(0);
+        expect(result.isFollowing).toBe(false);
+    });
 
     test('فقط فیلدهای مشخص‌شده را در خروجی برمی‌گرداند (فیلدهای اضافه فیلتر می‌شوند)', () => {
         const user: any = buildUser();
@@ -80,6 +118,9 @@ describe('mapUser', () => {
                 'avatar',
                 'createdAt',
                 'updatedAt',
+                'followersCount',
+                'followingCount',
+                'isFollowing',
             ].sort()
         );
     });
