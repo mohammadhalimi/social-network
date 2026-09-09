@@ -9,7 +9,6 @@ import { useState } from 'react';
 import { Calendar, User, FileText } from 'lucide-react';
 import { FollowButton } from '../components/UserName/FollowButton';
 import { ProfilePostsList } from '../components/UserName/ProfilePostsList';
-import toast from 'react-hot-toast';
 
 export default function UserProfilePage() {
     const params = useParams();

@@ -1,4 +1,4 @@
-// components/feed/PostActions.tsx (یا هر جای دیگه)
+// components/feed/PostActions.tsx
 'use client';
 
 import { useState } from 'react';
@@ -27,8 +27,13 @@ export const PostActions = ({
     const [isLiked, setIsLiked] = useState(initialIsLiked);
     const [likesCount, setLikesCount] = useState(initialLikesCount);
 
-    const [likePost] = useMutation(LIKE_POST);
-    const [unlikePost] = useMutation(UNLIKE_POST);
+    // ✅ تنظیم errorPolicy برای جلوگیری از پرتاب شدن خطا به بیرون
+    const [likePost] = useMutation(LIKE_POST, {
+        errorPolicy: 'all',
+    });
+    const [unlikePost] = useMutation(UNLIKE_POST, {
+        errorPolicy: 'all',
+    });
 
     const handleLike = async () => {
         try {
@@ -43,15 +48,40 @@ export const PostActions = ({
             }
 
             if (newIsLiked) {
-                await likePost({ variables: { postId } });
+                const { error } = await likePost({ variables: { postId } });
+                
+                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
+                if (error) {
+                    toast.error(error.message || 'خطا در لایک کردن');
+                    // بازگردانی وضعیت قبلی
+                    setIsLiked(!isLiked);
+                    setLikesCount(likesCount);
+                    if (onLikeUpdate) {
+                        onLikeUpdate(!isLiked, likesCount);
+                    }
+                    return;
+                }
             } else {
-                await unlikePost({ variables: { postId } });
+                const { error } = await unlikePost({ variables: { postId } });
+
+                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
+                if (error) {
+                    toast.error(error.message || 'خطا در لایک کردن');
+                    // بازگردانی وضعیت قبلی
+                    setIsLiked(!isLiked);
+                    setLikesCount(likesCount);
+                    if (onLikeUpdate) {
+                        onLikeUpdate(!isLiked, likesCount);
+                    }
+                    return;
+                }
             }
-        } catch (error) {
+        } catch (error: any) {
+            // ✅ فقط خطاهای شبکه‌ای (مثل قطع اینترنت) را مدیریت می‌کنیم
             setIsLiked(!isLiked);
             setLikesCount(likesCount);
             console.error('Error toggling like:', error);
-            toast.error('خطا در لایک کردن');
+            toast.error(error.message || 'خطا در لایک کردن');
         }
     };
 
