@@ -1,3 +1,4 @@
+// components/profile/CommentForm.tsx
 'use client';
 
 import { useState } from 'react';
@@ -13,29 +14,45 @@ interface CommentFormProps {
 
 export const CommentForm = ({ postId, onCommentAdded }: CommentFormProps) => {
     const [content, setContent] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [commentOnPost, { loading }] = useMutation(COMMENT_ON_POST, {
-        onCompleted: (data) => {
-            if (data.commentOnPost.success && data.commentOnPost.comment) {
-                onCommentAdded(data.commentOnPost.comment);
-                setContent('');
-            } else {
-                toast.error(data.commentOnPost.message || 'خطا در ثبت کامنت');
-            }
-        },
-        onError: (error: any) => {
-            console.error('Error commenting on post:', error);
-            toast.error(error.message || 'خطا در ثبت کامنت');
-        },
+    // ✅ errorPolicy: 'all' - جلوگیری از reject شدن promise روی خطای GraphQL
+    const [commentOnPost] = useMutation(COMMENT_ON_POST, {
+        errorPolicy: 'all',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const trimmed = content.trim();
-        if (!trimmed) return;
+        if (!trimmed || isSubmitting) return;
 
-        commentOnPost({ variables: { postId, content: trimmed } });
+        setIsSubmitting(true);
+
+        try {
+            const { data, error } = await commentOnPost({
+                variables: { postId, content: trimmed },
+            });
+
+            // ✅ خطای GraphQL (مثلاً کاربر لاگین نکرده)
+            if (error) {
+                toast.error(error.message || 'خطا در ثبت کامنت');
+                return;
+            }
+
+            if (data?.commentOnPost.success && data.commentOnPost.comment) {
+                onCommentAdded(data.commentOnPost.comment);
+                setContent('');
+            } else {
+                toast.error(data?.commentOnPost.message || 'خطا در ثبت کامنت');
+            }
+        } catch (err: any) {
+            // ✅ فقط خطاهای شبکه‌ای واقعی (قطع اینترنت و غیره)
+            console.error('Error commenting on post:', err);
+            toast.error(err.message || 'خطایی رخ داد');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -45,15 +62,15 @@ export const CommentForm = ({ postId, onCommentAdded }: CommentFormProps) => {
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="نظر خود را بنویسید..."
                 rows={2}
-                disabled={loading}
+                disabled={isSubmitting}
                 className="flex-1 bg-transparent border border-border rounded-xl focus:border-primary outline-none p-2.5 text-sm text-text-primary placeholder:text-text-secondary resize-none disabled:opacity-60"
             />
             <button
                 type="submit"
-                disabled={loading || !content.trim()}
+                disabled={isSubmitting || !content.trim()}
                 className="p-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
-                {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             </button>
         </form>
     );
