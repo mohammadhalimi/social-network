@@ -17,8 +17,13 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
     const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
     const [isLoading, setIsLoading] = useState(false);
 
-    const [followUser] = useMutation(FOLLOW_USER);
-    const [unfollowUser] = useMutation(UNFOLLOW_USER);
+    // ✅ تنظیم errorPolicy برای جلوگیری از پرتاب شدن خطا به بیرون
+    const [followUser] = useMutation(FOLLOW_USER, {
+        errorPolicy: 'all',
+    });
+    const [unfollowUser] = useMutation(UNFOLLOW_USER, {
+        errorPolicy: 'all',
+    });
 
     const handleClick = async () => {
         if (isLoading) return;
@@ -28,7 +33,14 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
 
         try {
             if (previousState) {
-                const { data } = await unfollowUser({ variables: { userId } });
+                const { data, error } = await unfollowUser({ variables: { userId } });
+                
+                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
+                if (error) {
+                    toast.error(error.message || 'خطا در لغو دنبال کردن');
+                    return;
+                }
+
                 if (data?.unfollowUser.success) {
                     setIsFollowing(false);
                     onFollowChange?.(false, data.unfollowUser.followersCount);
@@ -36,7 +48,14 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
                     toast.error(data?.unfollowUser.message || 'خطا در لغو دنبال کردن');
                 }
             } else {
-                const { data } = await followUser({ variables: { userId } });
+                const { data, error } = await followUser({ variables: { userId } });
+
+                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
+                if (error) {
+                    toast.error(error.message || 'خطا در دنبال کردن');
+                    return;
+                }
+
                 if (data?.followUser.success) {
                     setIsFollowing(true);
                     onFollowChange?.(true, data.followUser.followersCount);
@@ -45,6 +64,7 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
                 }
             }
         } catch (error: any) {
+            // ✅ اینجا فقط خطاهای شبکه‌ای (مثل قطع اینترنت) را مدیریت می‌کنیم
             console.error('Error toggling follow:', error);
             toast.error(error.message || 'خطایی رخ داد');
         } finally {

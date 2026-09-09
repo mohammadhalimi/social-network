@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from '@apollo/client/react';
-import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { FOLLOW_USER, GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Calendar, User, FileText } from 'lucide-react';
 import { FollowButton } from '../components/UserName/FollowButton';
 import { ProfilePostsList } from '../components/UserName/ProfilePostsList';
+import toast from 'react-hot-toast';
 
 export default function UserProfilePage() {
     const params = useParams();
@@ -18,7 +19,6 @@ export default function UserProfilePage() {
         variables: { username },
         skip: !username,
     });
-
     // ✅ آمار فالو رو به‌صورت لوکال نگه می‌داریم تا بعد از فالو/آنفالو فوراً آپدیت بشه
     const [followersCount, setFollowersCount] = useState<number | null>(null);
 
@@ -122,7 +122,7 @@ export default function UserProfilePage() {
                             نام کاربری
                         </dt>
                         <dd className="text-sm sm:col-span-3 font-medium text-text-primary">
-                            @{user.username}
+                            {user.username}@
                         </dd>
                     </div>
 
