@@ -34,6 +34,9 @@ const mockedCommentDelete = (prisma as any).comment.delete as jest.Mock;
 const mockedMapUser = mapUser as jest.Mock;
 const mockedRequireAuth = requireAuth as jest.Mock;
 
+// ✅ تاریخ ثابت برای تست‌های قابل پیش‌بینی
+const mockDate = new Date('2026-01-15T10:00:00.000Z');
+
 beforeEach(() => {
     jest.clearAllMocks();
     mockedRequireAuth.mockReturnValue('user-1');
@@ -61,6 +64,8 @@ describe('commentResolvers.commentOnPost', () => {
             content: 'سلام',
             user: { id: 'user-1' },
             likes: [{ userId: 'user-1' }],
+            createdAt: mockDate,      // ✅ اضافه شد
+            updatedAt: mockDate,      // ✅ اضافه شد
         });
 
         const result = await commentResolvers.commentOnPost(
@@ -81,6 +86,8 @@ describe('commentResolvers.commentOnPost', () => {
                 content: 'سلام',
                 user: { mapped: true, id: 'user-1' },
                 likes: [{ userId: 'user-1' }],
+                createdAt: mockDate.toISOString(),   // ✅ اضافه شد
+                updatedAt: mockDate.toISOString(),   // ✅ اضافه شد
                 likesCount: 1,
                 isLiked: true,
                 replies: [],
@@ -94,6 +101,8 @@ describe('commentResolvers.commentOnPost', () => {
             id: 'comment-1',
             user: { id: 'user-1' },
             likes: [{ userId: 'other-user' }],
+            createdAt: mockDate,      // ✅ اضافه شد
+            updatedAt: mockDate,      // ✅ اضافه شد
         });
 
         const result = await commentResolvers.commentOnPost(
@@ -127,6 +136,8 @@ describe('commentResolvers.replyToComment', () => {
             id: 'reply-1',
             user: { id: 'user-1' },
             likes: [],
+            createdAt: mockDate,      // ✅ اضافه شد
+            updatedAt: mockDate,      // ✅ اضافه شد
         });
 
         const result = await commentResolvers.replyToComment(
@@ -146,6 +157,8 @@ describe('commentResolvers.replyToComment', () => {
                 id: 'reply-1',
                 user: { mapped: true, id: 'user-1' },
                 likes: [],
+                createdAt: mockDate.toISOString(),   // ✅ اضافه شد
+                updatedAt: mockDate.toISOString(),   // ✅ اضافه شد
                 likesCount: 0,
                 isLiked: false,
                 replies: [],
