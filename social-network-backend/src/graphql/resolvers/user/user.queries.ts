@@ -144,7 +144,7 @@ export const userQueries = {
         ]);
 
         const isFollowingMap = new Map<string, boolean>();
-        if (currentUserId) {
+        if (currentUserId && followers.length > 0) {
             const currentUserFollows = await prisma.follow.findMany({
                 where: {
                     followerId: currentUserId,
@@ -192,7 +192,7 @@ export const userQueries = {
         ]);
 
         const isFollowingMap = new Map<string, boolean>();
-        if (currentUserId) {
+        if (currentUserId && following.length > 0) {
             const currentUserFollows = await prisma.follow.findMany({
                 where: {
                     followerId: currentUserId,
