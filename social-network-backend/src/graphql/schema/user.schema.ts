@@ -97,4 +97,15 @@ export const userTypeDefs = `
     success: Boolean!
     message: String!
   }
+  
+extend type Query {
+  getFollowers(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
+  getFollowing(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
+}
+
+ type UserConnection {
+  users: [User!]!
+  totalCount: Int!
+  hasMore: Boolean!
+ }
 `;

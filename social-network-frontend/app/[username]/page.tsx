@@ -9,15 +9,21 @@ import { useState } from 'react';
 import { Calendar, User, FileText } from 'lucide-react';
 import { FollowButton } from '../components/UserName/FollowButton';
 import { ProfilePostsList } from '../components/UserName/ProfilePostsList';
+import { FollowListModal } from '../components/UserName/FollowListModal';
+import { ImagePreviewModal } from '../components/UserName/ImagePreviewModal';
 
 export default function UserProfilePage() {
     const params = useParams();
     const username = params.username as string;
+    const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
 
     const { data, loading, error } = useQuery(GET_USER_BY_USERNAME, {
         variables: { username },
         skip: !username,
     });
+
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
     // ✅ آمار فالو رو به‌صورت لوکال نگه می‌داریم تا بعد از فالو/آنفالو فوراً آپدیت بشه
     const [followersCount, setFollowersCount] = useState<number | null>(null);
 
@@ -61,10 +67,42 @@ export default function UserProfilePage() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
+            {modalType && (
+                <FollowListModal
+                    userId={user.id}
+                    type={modalType}
+                    isOpen={true}
+                    onClose={() => setModalType(null)}
+                />
+            )}
+            {/* ✅ مودال نمایش عکس پروفایل */}
+            {avatarUrl && (
+                <ImagePreviewModal
+                    isOpen={isImageModalOpen}
+                    onClose={() => setIsImageModalOpen(false)}
+                    imageUrl={avatarUrl}
+                    altText={user.fullName}
+                />
+            )}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-soft mb-6">
+
                 {/* هدر پروفایل */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-6 pb-6 mb-6 border-b border-border">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow-primary overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
+                    <div
+                        onClick={() => avatarUrl && setIsImageModalOpen(true)}
+                        className={`
+                            w-24 h-24 sm:w-32 sm:h-32 
+                            rounded-full 
+                            bg-gradient-primary 
+                            flex items-center justify-center 
+                            shadow-glow-primary 
+                            overflow-hidden 
+                            flex-shrink-0 
+                            mx-auto sm:mx-0
+                            ${avatarUrl ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''}
+                        `}
+                        title={avatarUrl ? 'برای بزرگنمایی کلیک کنید' : undefined}
+                    >
                         {avatarUrl ? (
                             <Image
                                 src={avatarUrl}
@@ -101,14 +139,20 @@ export default function UserProfilePage() {
 
                         {/* ✅ آمار فالوئر/فالووینگ */}
                         <div className="flex items-center justify-center sm:justify-start gap-6 mt-4">
-                            <div className="text-center sm:text-right">
+                            <button
+                                onClick={() => setModalType('followers')}
+                                className="text-center sm:text-right hover:opacity-80 transition-opacity"
+                            >
                                 <p className="font-bold text-text-primary">{displayedFollowersCount}</p>
                                 <p className="text-xs text-text-secondary">دنبال‌کننده</p>
-                            </div>
-                            <div className="text-center sm:text-right">
+                            </button>
+                            <button
+                                onClick={() => setModalType('following')}
+                                className="text-center sm:text-right hover:opacity-80 transition-opacity"
+                            >
                                 <p className="font-bold text-text-primary">{user.followingCount}</p>
                                 <p className="text-xs text-text-secondary">دنبال‌شونده</p>
-                            </div>
+                            </button>
                         </div>
                     </div>
                 </div>

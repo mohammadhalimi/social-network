@@ -267,18 +267,26 @@ export const DELETE_POST: TypedDocumentNode<DeletePostResponse, DeletePostVariab
 // ✅ 8. گرفتن کامنت های یک پست
 // =============================================
 
-interface CommentUser {
+
+interface PostCommentUser {
     id: string;
     username: string;
     fullName: string;
     avatar: string | null;
 }
 
+interface PostReply {
+    id: string;
+    content: string;
+    createdAt: string;
+    user: PostCommentUser;
+}
 interface PostComment {
     id: string;
     content: string;
     createdAt: string;
-    user: CommentUser;
+    user: PostCommentUser;
+    replies?: PostReply[];
 }
 
 interface GetPostCommentsResponse {
@@ -305,6 +313,86 @@ export const GET_POST_COMMENTS: TypedDocumentNode<GetPostCommentsResponse, GetPo
           username
           fullName
           avatar
+        }
+        replies {
+          id
+          content
+          createdAt
+          user {
+            id
+            username
+            fullName
+            avatar
+          }
+        }
+      }
+    }
+  }
+`;
+
+export interface ReplyToCommentResponse {
+  replyToComment: {
+    success: boolean;
+    message: string;
+    comment: {
+      id: string;
+      content: string;
+      createdAt: string;
+      user: {
+        id: string;
+        username: string;
+        fullName: string;
+        avatar: string | null;
+      };
+      likesCount: number;
+      isLiked: boolean;
+      replies: {
+        id: string;
+        content: string;
+        createdAt: string;
+        user: {
+          id: string;
+          username: string;
+          fullName: string;
+          avatar: string | null;
+        };
+      }[];
+    };
+  };
+}
+
+export interface ReplyToCommentVariables {
+  commentId: string;
+  content: string;
+}
+
+export const REPLY_TO_COMMENT: TypedDocumentNode<ReplyToCommentResponse, ReplyToCommentVariables> = gql`
+  mutation ReplyToComment($commentId: ID!, $content: String!) {
+    replyToComment(commentId: $commentId, content: $content) {
+      success
+      message
+      comment {
+        id
+        content
+        createdAt
+        user {
+          id
+          username
+          fullName
+          avatar
+        }
+        likesCount
+        isLiked
+        replies {
+          id
+          content
+          createdAt
+          user {
+            id
+            username
+            fullName
+            avatar
+          }
         }
       }
     }

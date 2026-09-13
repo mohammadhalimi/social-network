@@ -29,6 +29,8 @@ export const commentResolvers = {
             message: 'کامنت با موفقیت ثبت شد.',
             comment: {
                 ...comment,
+                createdAt: comment.createdAt.toISOString(),   // ✅ اضافه شد
+                updatedAt: comment.updatedAt.toISOString(),   // ✅ اضافه شد
                 user: mapUser(comment.user),
                 likesCount: comment.likes.length,
                 isLiked: comment.likes.some((like: any) => like.userId === userId),
@@ -61,6 +63,8 @@ export const commentResolvers = {
             comment: {
                 ...reply,
                 user: mapUser(reply.user),
+                createdAt: reply.createdAt.toISOString(),   // ✅ اضافه شد
+                updatedAt: reply.updatedAt.toISOString(),   // ✅ اضافه شد
                 likesCount: reply.likes.length,
                 isLiked: reply.likes.some((like: any) => like.userId === userId),
                 replies: [],

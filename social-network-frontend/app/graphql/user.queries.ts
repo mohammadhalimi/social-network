@@ -135,3 +135,35 @@ export const UNFOLLOW_USER: TypedDocumentNode<UnfollowUserResponse, UnfollowUser
     }
   }
 `;
+
+export const GET_FOLLOWERS: TypedDocumentNode<any, any> = gql`
+  query GetFollowers($userId: ID!, $searchTerm: String, $limit: Int, $offset: Int) {
+    getFollowers(userId: $userId, searchTerm: $searchTerm, limit: $limit, offset: $offset) {
+      users {
+        id
+        username
+        fullName
+        avatar
+        isFollowing
+      }
+      totalCount
+      hasMore
+    }
+  }
+`;
+
+export const GET_FOLLOWING: TypedDocumentNode<any, any> = gql`
+  query GetFollowing($userId: ID!, $searchTerm: String, $limit: Int, $offset: Int) {
+    getFollowing(userId: $userId, searchTerm: $searchTerm, limit: $limit, offset: $offset) {
+      users {
+        id
+        username
+        fullName
+        avatar
+        isFollowing
+      }
+      totalCount
+      hasMore
+    }
+  }
+`;

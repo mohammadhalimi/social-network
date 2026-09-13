@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 import Image from 'next/image';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Reply, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatPersianDate } from '@/app/lib/formatDate';
 import { GET_POST_COMMENTS } from '@/app/graphql/post.queries';
+import { CommentForm } from '../../UserName/CommentForm';
 
 interface PostCommentUser {
     id: string;
@@ -14,11 +15,19 @@ interface PostCommentUser {
     avatar: string | null;
 }
 
+interface PostReply {
+    id: string;
+    content: string;
+    createdAt: string;
+    user: PostCommentUser;
+}
+
 interface PostComment {
     id: string;
     content: string;
     createdAt: string;
     user: PostCommentUser;
+    replies?: PostReply[];
 }
 
 interface ViewPostModalProps {
@@ -34,7 +43,8 @@ interface ViewPostModalProps {
 
 export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModalProps) => {
     const [comments, setComments] = useState<PostComment[]>([]);
-
+    const [replyingTo, setReplyingTo] = useState<PostComment | null>(null);
+    const [showRepliesMap, setShowRepliesMap] = useState<Record<string, boolean>>({});
     const [fetchComments, { data: commentsData, loading: commentsLoading }] =
         useLazyQuery(GET_POST_COMMENTS, {
             fetchPolicy: 'network-only',
@@ -68,6 +78,15 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
     // ✅ وقتی کامنت جدید با موفقیت ثبت شد، به ابتدای لیست اضافه می‌شه
     const handleCommentAdded = (comment: PostComment) => {
         setComments(prev => [comment, ...prev]);
+    };
+    const handleReplyAdded = (parentCommentId: string, reply: PostComment) => {
+        setComments(prev =>
+            prev.map(comment =>
+                comment.id === parentCommentId
+                    ? { ...comment, replies: [...(comment.replies || []), reply] }
+                    : comment
+            )
+        );
     };
 
     return (
@@ -172,7 +191,7 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
                     </div>
                 )}
 
-                {/* ✅ لیست کامنت‌ها */}
+                {/* ✅ لیست کامنت‌ها و ریپلای‌ها */}
                 <div>
                     <h2 className="text-sm font-bold text-text-primary mb-3">
                         کامنت‌ها ({comments.length})
@@ -187,35 +206,132 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
                             هنوز کامنتی ثبت نشده است
                         </p>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-5">
                             {comments.map((comment) => (
-                                <div key={comment.id} className="flex items-start gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center overflow-hidden flex-shrink-0">
-                                        {comment.user?.avatar ? (
-                                            <Image
-                                                src={comment.user.avatar}
-                                                alt={comment.user.fullName || 'کاربر'}
-                                                className="w-full h-full object-cover"
-                                                width={32}
-                                                height={32}
-                                                unoptimized
-                                            />
-                                        ) : (
-                                            <span className="text-white font-bold text-xs">
-                                                {comment.user?.fullName?.[0] || '👤'}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0 bg-border/40 rounded-xl px-3 py-2">
-                                        <p className="text-xs font-medium text-text-primary">
-                                            {comment.user?.fullName || comment.user?.username || 'کاربر ناشناس'}
-                                        </p>
-                                        <p className="text-sm text-text-primary whitespace-pre-wrap">
-                                            {comment.content}
-                                        </p>
-                                        <p className="text-[10px] text-secondary mt-1">
-                                            {formatPersianDate(comment.createdAt)}
-                                        </p>
+                                <div key={comment.id}>
+                                    {/* کامنت اصلی */}
+                                    <div className="flex items-start gap-2.5">
+                                        <div className="w-9 h-9 rounded-full bg-gradient-primary flex items-center justify-center overflow-hidden flex-shrink-0">
+                                            {comment.user?.avatar ? (
+                                                <Image
+                                                    src={comment.user.avatar}
+                                                    alt={comment.user.fullName}
+                                                    className="w-full h-full object-cover"
+                                                    width={36}
+                                                    height={36}
+                                                    unoptimized
+                                                />
+                                            ) : (
+                                                <span className="text-white font-bold text-xs">
+                                                    {comment.user?.fullName?.[0] || '👤'}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="bg-border/40 rounded-2xl rounded-tr-sm px-3.5 py-2.5">
+                                                <p className="text-xs font-bold text-text-primary mb-0.5">
+                                                    {comment.user?.fullName || comment.user?.username || 'کاربر ناشناس'}
+                                                </p>
+                                                <p className="text-sm text-text-primary whitespace-pre-wrap leading-relaxed">
+                                                    {comment.content}
+                                                </p>
+                                            </div>
+
+                                            {/* نوار پایین کامنت: تاریخ + دکمه‌ی پاسخ */}
+                                            <div className="flex items-center gap-3 mt-1.5 px-1">
+                                                <span className="text-[11px] text-secondary">
+                                                    {formatPersianDate(comment.createdAt)}
+                                                </span>
+                                                <button
+                                                    onClick={() => setReplyingTo(replyingTo?.id === comment.id ? null : comment)}
+                                                    className={`text-xs font-medium flex items-center gap-1 transition-colors ${replyingTo?.id === comment.id
+                                                            ? 'text-primary'
+                                                            : 'text-secondary hover:text-primary'
+                                                        }`}
+                                                >
+                                                    <Reply size={13} />
+                                                    پاسخ
+                                                </button>
+                                            </div>
+
+                                            {/* فرم ریپلای */}
+                                            {replyingTo?.id === comment.id && (
+                                                <div className="mt-2">
+                                                    <CommentForm
+                                                        postId={post.id}
+                                                        parentCommentId={comment.id}
+                                                        onCommentAdded={(reply) => handleReplyAdded(comment.id, reply)}
+                                                        onCancelReply={() => setReplyingTo(null)}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* دکمه‌ی نمایش/پنهان کردن پاسخ‌ها */}
+                                            {comment.replies && comment.replies.length > 0 && (
+                                                <button
+                                                    onClick={() =>
+                                                        setShowRepliesMap(prev => ({
+                                                            ...prev,
+                                                            [comment.id]: !prev[comment.id],
+                                                        }))
+                                                    }
+                                                    className="flex items-center gap-1.5 mt-2 text-xs font-medium text-primary hover:text-primary-dark transition-colors"
+                                                >
+                                                    <span className="w-6 h-px bg-primary/40" />
+                                                    {showRepliesMap[comment.id] ? (
+                                                        <>
+                                                            پنهان کردن {comment.replies.length} پاسخ
+                                                            <ChevronUp size={13} />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            نمایش {comment.replies.length} پاسخ
+                                                            <ChevronDown size={13} />
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+
+                                            {/* لیست ریپلای‌ها */}
+                                            {comment.replies && comment.replies.length > 0 && showRepliesMap[comment.id] && (
+                                                <div className="mt-3 pr-4 border-r-2 border-primary/20 space-y-3">
+                                                    {comment.replies.map((reply) => (
+                                                        <div key={reply.id} className="flex items-start gap-2">
+                                                            <div className="w-7 h-7 rounded-full bg-gradient-primary flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                                {reply.user?.avatar ? (
+                                                                    <Image
+                                                                        src={reply.user.avatar}
+                                                                        alt={reply.user.fullName}
+                                                                        className="w-full h-full object-cover"
+                                                                        width={28}
+                                                                        height={28}
+                                                                        unoptimized
+                                                                    />
+                                                                ) : (
+                                                                    <span className="text-white font-bold text-[10px]">
+                                                                        {reply.user?.fullName?.[0] || '👤'}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="bg-primary/5 border border-primary/10 rounded-xl rounded-tr-sm px-3 py-2">
+                                                                    <p className="text-[11px] font-bold text-text-primary mb-0.5">
+                                                                        {reply.user?.fullName || reply.user?.username}
+                                                                    </p>
+                                                                    <p className="text-xs text-text-primary whitespace-pre-wrap leading-relaxed">
+                                                                        {reply.content}
+                                                                    </p>
+                                                                </div>
+                                                                <span className="text-[10px] text-secondary mt-1 block px-1">
+                                                                    {formatPersianDate(reply.createdAt)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))}

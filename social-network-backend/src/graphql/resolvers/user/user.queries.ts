@@ -116,4 +116,99 @@ export const userQueries = {
             isFollowing: !!followRecord,
         });
     },
+    getFollowers: async (_: any, { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number }, context: any) => {
+        // اگر کاربر لاگین نکرده، فقط لیست را نشان بده (نیازی به isFollowing نیست)
+        const currentUserId = context.user?.userId || null;
+
+        const where = {
+            followingId: userId,
+            ...(searchTerm ? {
+                follower: {
+                    OR: [
+                        { username: { contains: searchTerm, mode: 'insensitive' as const } },
+                        { fullName: { contains: searchTerm, mode: 'insensitive' as const } },
+                    ],
+                },
+            } : {}),
+        };
+
+        const [followers, totalCount] = await Promise.all([
+            prisma.follow.findMany({
+                where,
+                include: { follower: true },
+                skip: offset,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+            }),
+            prisma.follow.count({ where }),
+        ]);
+
+        const isFollowingMap = new Map<string, boolean>();
+        if (currentUserId) {
+            const currentUserFollows = await prisma.follow.findMany({
+                where: {
+                    followerId: currentUserId,
+                    followingId: { in: followers.map(f => f.followerId) },
+                },
+            });
+            currentUserFollows.forEach(f => isFollowingMap.set(f.followingId, true));
+        }
+
+        return {
+            users: followers.map(f => ({
+                ...mapUser(f.follower),
+                isFollowing: isFollowingMap.get(f.followerId) || false,
+            })),
+            totalCount,
+            hasMore: offset + followers.length < totalCount,
+        };
+    },
+
+    // کوئری دریافت دنبال‌شونده‌ها (Following)
+    getFollowing: async (_: any, { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number }, context: any) => {
+        const currentUserId = context.user?.userId || null;
+
+        const where = {
+            followerId: userId,
+            ...(searchTerm ? {
+                following: {
+                    OR: [
+                        { username: { contains: searchTerm, mode: 'insensitive' as const } },
+                        { fullName: { contains: searchTerm, mode: 'insensitive' as const } },
+                    ],
+                },
+            } : {}),
+        };
+
+        const [following, totalCount] = await Promise.all([
+            prisma.follow.findMany({
+                where,
+                include: { following: true },
+                skip: offset,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+            }),
+            prisma.follow.count({ where }),
+        ]);
+
+        const isFollowingMap = new Map<string, boolean>();
+        if (currentUserId) {
+            const currentUserFollows = await prisma.follow.findMany({
+                where: {
+                    followerId: currentUserId,
+                    followingId: { in: following.map(f => f.followingId) },
+                },
+            });
+            currentUserFollows.forEach(f => isFollowingMap.set(f.followingId, true));
+        }
+
+        return {
+            users: following.map(f => ({
+                ...mapUser(f.following),
+                isFollowing: isFollowingMap.get(f.followingId) || false,
+            })),
+            totalCount,
+            hasMore: offset + following.length < totalCount,
+        };
+    },
 };
