@@ -1,6 +1,10 @@
 import {
     SEARCH_USERS,
     GET_USER_BY_USERNAME,
+    FOLLOW_USER,
+    UNFOLLOW_USER,
+    GET_FOLLOWERS,
+    GET_FOLLOWING,
 } from '../../graphql/user.queries';
 
 import {
@@ -194,5 +198,224 @@ describe('User Queries', () => {
         expect(fieldNames).toContain('avatar');
         expect(fieldNames).toContain('createdAt');
         expect(fieldNames).toContain('updatedAt');
+    });
+
+    // ✅ تست جدید
+    it('GET_USER_BY_USERNAME query should request follow-related fields', () => {
+        const definition = findOperation(GET_USER_BY_USERNAME.definitions, 'GetUserByUsername');
+        expect(definition).toBeDefined();
+
+        const fieldNames = getNestedFieldNames(definition!, 'getUserByUsername');
+        expect(fieldNames).toContain('followersCount');
+        expect(fieldNames).toContain('followingCount');
+        expect(fieldNames).toContain('isFollowing');
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: FOLLOW_USER
+    // ==========================================================
+    describe('FOLLOW_USER mutation', () => {
+        it('should have correct structure', () => {
+            expect(FOLLOW_USER).toBeDefined();
+            expect(FOLLOW_USER.kind).toBe('Document');
+            expect(FOLLOW_USER.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "FollowUser"', () => {
+            const definition = findOperation(FOLLOW_USER.definitions, 'FollowUser');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('mutation');
+        });
+
+        it('should have userId variable', () => {
+            const definition = findOperation(FOLLOW_USER.definitions, 'FollowUser');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('userId');
+            expect(variableNames).toHaveLength(1);
+        });
+
+        it('top-level field should be "followUser"', () => {
+            const definition = findOperation(FOLLOW_USER.definitions, 'FollowUser');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('followUser');
+        });
+
+        it('should request success, message, isFollowing and followersCount', () => {
+            const definition = findOperation(FOLLOW_USER.definitions, 'FollowUser');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'followUser');
+            expect(fieldNames).toContain('success');
+            expect(fieldNames).toContain('message');
+            expect(fieldNames).toContain('isFollowing');
+            expect(fieldNames).toContain('followersCount');
+        });
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: UNFOLLOW_USER
+    // ==========================================================
+    describe('UNFOLLOW_USER mutation', () => {
+        it('should have correct structure', () => {
+            expect(UNFOLLOW_USER).toBeDefined();
+            expect(UNFOLLOW_USER.kind).toBe('Document');
+            expect(UNFOLLOW_USER.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "UnfollowUser"', () => {
+            const definition = findOperation(UNFOLLOW_USER.definitions, 'UnfollowUser');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('mutation');
+        });
+
+        it('should have userId variable', () => {
+            const definition = findOperation(UNFOLLOW_USER.definitions, 'UnfollowUser');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('userId');
+            expect(variableNames).toHaveLength(1);
+        });
+
+        it('top-level field should be "unfollowUser"', () => {
+            const definition = findOperation(UNFOLLOW_USER.definitions, 'UnfollowUser');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('unfollowUser');
+        });
+
+        it('should request success, message, isFollowing and followersCount', () => {
+            const definition = findOperation(UNFOLLOW_USER.definitions, 'UnfollowUser');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'unfollowUser');
+            expect(fieldNames).toContain('success');
+            expect(fieldNames).toContain('message');
+            expect(fieldNames).toContain('isFollowing');
+            expect(fieldNames).toContain('followersCount');
+        });
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: GET_FOLLOWERS
+    // ==========================================================
+    describe('GET_FOLLOWERS query', () => {
+        it('should have correct structure', () => {
+            expect(GET_FOLLOWERS).toBeDefined();
+            expect(GET_FOLLOWERS.kind).toBe('Document');
+            expect(GET_FOLLOWERS.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "GetFollowers"', () => {
+            const definition = findOperation(GET_FOLLOWERS.definitions, 'GetFollowers');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('query');
+        });
+
+        it('should have userId, searchTerm, limit and offset variables', () => {
+            const definition = findOperation(GET_FOLLOWERS.definitions, 'GetFollowers');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('userId');
+            expect(variableNames).toContain('searchTerm');
+            expect(variableNames).toContain('limit');
+            expect(variableNames).toContain('offset');
+            expect(variableNames).toHaveLength(4);
+        });
+
+        it('top-level field should be "getFollowers"', () => {
+            const definition = findOperation(GET_FOLLOWERS.definitions, 'GetFollowers');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('getFollowers');
+        });
+
+        it('should request users, totalCount and hasMore', () => {
+            const definition = findOperation(GET_FOLLOWERS.definitions, 'GetFollowers');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'getFollowers');
+            expect(fieldNames).toContain('users');
+            expect(fieldNames).toContain('totalCount');
+            expect(fieldNames).toContain('hasMore');
+        });
+
+        it('should request correct nested user fields including isFollowing', () => {
+            const definition = findOperation(GET_FOLLOWERS.definitions, 'GetFollowers');
+            expect(definition).toBeDefined();
+
+            const userFieldNames = getDeeplyNestedFieldNames(definition!, 'getFollowers', 'users');
+            expect(userFieldNames).toContain('id');
+            expect(userFieldNames).toContain('username');
+            expect(userFieldNames).toContain('fullName');
+            expect(userFieldNames).toContain('avatar');
+            expect(userFieldNames).toContain('isFollowing');
+        });
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: GET_FOLLOWING
+    // ==========================================================
+    describe('GET_FOLLOWING query', () => {
+        it('should have correct structure', () => {
+            expect(GET_FOLLOWING).toBeDefined();
+            expect(GET_FOLLOWING.kind).toBe('Document');
+            expect(GET_FOLLOWING.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "GetFollowing"', () => {
+            const definition = findOperation(GET_FOLLOWING.definitions, 'GetFollowing');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('query');
+        });
+
+        it('should have userId, searchTerm, limit and offset variables', () => {
+            const definition = findOperation(GET_FOLLOWING.definitions, 'GetFollowing');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('userId');
+            expect(variableNames).toContain('searchTerm');
+            expect(variableNames).toContain('limit');
+            expect(variableNames).toContain('offset');
+            expect(variableNames).toHaveLength(4);
+        });
+
+        it('top-level field should be "getFollowing"', () => {
+            const definition = findOperation(GET_FOLLOWING.definitions, 'GetFollowing');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('getFollowing');
+        });
+
+        it('should request users, totalCount and hasMore', () => {
+            const definition = findOperation(GET_FOLLOWING.definitions, 'GetFollowing');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'getFollowing');
+            expect(fieldNames).toContain('users');
+            expect(fieldNames).toContain('totalCount');
+            expect(fieldNames).toContain('hasMore');
+        });
+
+        it('should request correct nested user fields including isFollowing', () => {
+            const definition = findOperation(GET_FOLLOWING.definitions, 'GetFollowing');
+            expect(definition).toBeDefined();
+
+            const userFieldNames = getDeeplyNestedFieldNames(definition!, 'getFollowing', 'users');
+            expect(userFieldNames).toContain('id');
+            expect(userFieldNames).toContain('username');
+            expect(userFieldNames).toContain('fullName');
+            expect(userFieldNames).toContain('avatar');
+            expect(userFieldNames).toContain('isFollowing');
+        });
     });
 });
