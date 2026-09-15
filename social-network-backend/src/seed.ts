@@ -1,10 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import { faker } from '@faker-js/faker';
-
 import dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
+import { faker } from '@faker-js/faker';
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 dotenv.config();
 

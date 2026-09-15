@@ -6,7 +6,8 @@ import {
     COMMENT_ON_POST,
     UPDATE_POST,
     DELETE_POST,
-    GET_POST_COMMENTS
+    GET_POST_COMMENTS,
+    REPLY_TO_COMMENT,
 } from '../../graphql/post.queries';
 
 import {
@@ -577,5 +578,134 @@ describe('Post Queries', () => {
         expect(userFieldNames).toContain('username');
         expect(userFieldNames).toContain('fullName');
         expect(userFieldNames).toContain('avatar');
+    });
+
+    // ✅ تست جدید: بررسی وجود فیلد replies و زیرفیلدهای صحیح آن
+    it('GET_POST_COMMENTS query should request nested replies with correct subfields', () => {
+        const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
+        expect(definition).toBeDefined();
+
+        const selectionSet = definition!.selectionSet;
+        const getPostField = selectionSet.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'getPost'
+        );
+
+        const commentsField = getPostField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'comments'
+        );
+
+        expect(commentsField).toBeDefined();
+
+        // بررسی وجود فیلد replies داخل comments
+        const repliesField = commentsField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'replies'
+        );
+
+        expect(repliesField).toBeDefined();
+        expect(repliesField?.selectionSet).toBeDefined(); // باید زیرفیلد داشته باشد، نه یک فیلد اسکالر خالی
+
+        const replyFieldNames = getFieldNamesFromSelectionSet(repliesField!.selectionSet!);
+        expect(replyFieldNames).toContain('id');
+        expect(replyFieldNames).toContain('content');
+        expect(replyFieldNames).toContain('createdAt');
+        expect(replyFieldNames).toContain('user');
+
+        // بررسی زیرفیلدهای user داخل replies
+        const replyUserField = repliesField?.selectionSet?.selections.find(
+            (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'user'
+        );
+
+        expect(replyUserField).toBeDefined();
+        const replyUserFieldNames = getFieldNamesFromSelectionSet(replyUserField!.selectionSet!);
+        expect(replyUserFieldNames).toContain('id');
+        expect(replyUserFieldNames).toContain('username');
+        expect(replyUserFieldNames).toContain('fullName');
+        expect(replyUserFieldNames).toContain('avatar');
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: REPLY_TO_COMMENT
+    // ==========================================================
+    describe('REPLY_TO_COMMENT mutation', () => {
+        it('should have correct structure', () => {
+            expect(REPLY_TO_COMMENT).toBeDefined();
+            expect(REPLY_TO_COMMENT.kind).toBe('Document');
+            expect(REPLY_TO_COMMENT.definitions).toBeDefined();
+            expect(REPLY_TO_COMMENT.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "ReplyToComment"', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('mutation');
+        });
+
+        it('should have commentId and content variables', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('commentId');
+            expect(variableNames).toContain('content');
+            expect(variableNames).toHaveLength(2);
+        });
+
+        it('top-level field should be "replyToComment"', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('replyToComment');
+        });
+
+        it('should request success, message and comment', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'replyToComment');
+            expect(fieldNames).toContain('success');
+            expect(fieldNames).toContain('message');
+            expect(fieldNames).toContain('comment');
+        });
+
+        it('should request nested comment fields including likesCount, isLiked and user', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+
+            const commentFieldNames = getDeeplyNestedFieldNames(definition!, 'replyToComment', 'comment');
+            expect(commentFieldNames).toContain('id');
+            expect(commentFieldNames).toContain('content');
+            expect(commentFieldNames).toContain('createdAt');
+            expect(commentFieldNames).toContain('user');
+            expect(commentFieldNames).toContain('likesCount');
+            expect(commentFieldNames).toContain('isLiked');
+            expect(commentFieldNames).toContain('replies');
+        });
+
+        it('should request replies with a valid (non-empty) selection set', () => {
+            const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
+            expect(definition).toBeDefined();
+
+            const selectionSet = definition!.selectionSet;
+            const replyToCommentField = selectionSet.selections.find(
+                (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'replyToComment'
+            );
+            const commentField = replyToCommentField?.selectionSet?.selections.find(
+                (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'comment'
+            );
+            const repliesField = commentField?.selectionSet?.selections.find(
+                (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'replies'
+            );
+
+            expect(repliesField).toBeDefined();
+            // ✅ همون چیزی که باعث ارور «must have a selection of subfields» می‌شد
+            expect(repliesField?.selectionSet).toBeDefined();
+
+            const replyFieldNames = getFieldNamesFromSelectionSet(repliesField!.selectionSet!);
+            expect(replyFieldNames).toContain('id');
+            expect(replyFieldNames).toContain('content');
+            expect(replyFieldNames).toContain('createdAt');
+            expect(replyFieldNames).toContain('user');
+        });
     });
 });
