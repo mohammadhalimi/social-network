@@ -1,25 +1,26 @@
-// components/profile/CommentForm.tsx
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@apollo/client/react';
-import { Send, Loader2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { COMMENT_ON_POST, REPLY_TO_COMMENT } from '@/app/graphql/post.queries';
+import { useMutation } from '@apollo/client/react';
+import { CommentFormProps } from './CommentForm/types';
+import { ReplyHeader } from './CommentForm/ReplyHeader';
+import { CommentInput } from './CommentForm/CommentInput';
+import {
+    COMMENT_ON_POST,
+    REPLY_TO_COMMENT
+} from '@/app/graphql/post.queries';
 
-interface CommentFormProps {
-    postId: string;
-    onCommentAdded: (comment: any) => void;
-    // ✅ اگر این مقدار ست شود، یعنی داریم ریپلای می‌زنیم
-    parentCommentId?: string | null;
-    onCancelReply?: () => void;
-}
-
-export const CommentForm = ({ postId, onCommentAdded, parentCommentId = null, onCancelReply }: CommentFormProps) => {
+export const CommentForm = ({
+    postId,
+    onCommentAdded,
+    parentCommentId = null,
+    onCancelReply,
+}: CommentFormProps) => {
     const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // ✅ استفاده از دو useMutation جداگانه
+    // ✅ دو useMutation جداگانه برای کامنت و ریپلای
     const [commentOnPost] = useMutation(COMMENT_ON_POST, {
         errorPolicy: 'all',
     });
@@ -81,33 +82,20 @@ export const CommentForm = ({ postId, onCommentAdded, parentCommentId = null, on
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-end gap-2">
-            <div className="flex-1">
-                {/* اگر در حالت ریپلای هستیم، نشان می‌دهیم */}
-                {parentCommentId && (
-                    <div className="flex items-center justify-between mb-1 px-2 py-1 bg-border/50 rounded-t-lg text-xs text-secondary">
-                        <span>در حال پاسخ به کامنت...</span>
-                        <button type="button" onClick={onCancelReply} className="hover:text-primary">
-                            <X size={14} />
-                        </button>
-                    </div>
-                )}
-                <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder={parentCommentId ? "پاسخ خود را بنویسید..." : "نظر خود را بنویسید..."}
-                    rows={2}
-                    disabled={isSubmitting}
-                    className="w-full bg-transparent border border-border rounded-xl focus:border-primary outline-none p-2.5 text-sm text-text-primary placeholder:text-text-secondary resize-none disabled:opacity-60"
-                />
-            </div>
-            <button
-                type="submit"
-                disabled={isSubmitting || !content.trim()}
-                className="p-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-            >
-                {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            </button>
-        </form>
+        <div>
+            {/* نوار بالای فرم در حالت ریپلای */}
+            {parentCommentId && onCancelReply && (
+                <ReplyHeader onCancel={onCancelReply} />
+            )}
+
+            {/* ورودی و دکمه ارسال */}
+            <CommentInput
+                value={content}
+                onChange={setContent}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                isReply={!!parentCommentId}
+            />
+        </div>
     );
 };
