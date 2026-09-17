@@ -1,8 +1,8 @@
-// components/common/ImagePreviewModal.tsx
 'use client';
 
-import { X } from 'lucide-react';
 import Image from 'next/image';
+import { X } from 'lucide-react';
+
 
 interface ImagePreviewModalProps {
     isOpen: boolean;
@@ -11,7 +11,13 @@ interface ImagePreviewModalProps {
     altText?: string;
 }
 
-export const ImagePreviewModal = ({ isOpen, onClose, imageUrl, altText = 'تصویر' }: ImagePreviewModalProps) => {
+export const ImagePreviewModal = (
+    {
+        isOpen,
+        onClose,
+        imageUrl,
+        altText = 'تصویر' }: ImagePreviewModalProps) => {
+            
     if (!isOpen) return null;
 
     return (
@@ -55,7 +61,15 @@ export const ImagePreviewModal = ({ isOpen, onClose, imageUrl, altText = 'تصو
                 </button>
 
                 {/* تصویر بزرگ */}
-                <div className="relative w-full h-full flex items-center justify-center">
+                <div
+                    className="
+                    relative
+                    w-full
+                    h-full
+                    flex
+                    items-center
+                    justify-center
+                ">
                     <Image
                         src={imageUrl}
                         alt={altText}
