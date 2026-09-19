@@ -1,9 +1,7 @@
-// components/common/FollowListModal/__tests__/FollowListModal.test.tsx
-
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { useQuery } from '@apollo/client/react';
 import { FollowListModal } from '../FollowListModal';
 import { GET_FOLLOWERS, GET_FOLLOWING } from '@/app/graphql/user.queries';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
 // ✅ Mock کردن useQuery
 jest.mock('@apollo/client/react', () => ({
