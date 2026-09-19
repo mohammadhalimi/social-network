@@ -186,6 +186,10 @@ describe('likeResolvers - احراز هویت', () => {
         await expect(likeResolvers.unlikeComment(null, { commentId: 'c1' }, {})).rejects.toThrow();
 
         expect(mockedLikeFindUnique).not.toHaveBeenCalled();
+        expect(mockedLikeCreate).not.toHaveBeenCalled();
+        expect(mockedLikeDelete).not.toHaveBeenCalled();
         expect(mockedCommentLikeFindUnique).not.toHaveBeenCalled();
+        expect(mockedCommentLikeCreate).not.toHaveBeenCalled();
+        expect(mockedCommentLikeDelete).not.toHaveBeenCalled();
     });
 });
