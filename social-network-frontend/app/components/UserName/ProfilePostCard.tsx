@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
+import { CommentForm } from './CommentForm';
 import { formatPersianDate } from '@/app/lib/formatDate';
 import { PostActions } from '../profile/posts/PostActions';
 import { ViewPostModal } from '../profile/posts/ViewPostModal';
-import { CommentForm } from './CommentForm';
 
 interface ProfilePostCardProps {
     post: any;
@@ -48,15 +48,33 @@ export const ProfilePostCard = ({ post }: ProfilePostCardProps) => {
     return (
         <>
             <div
-                className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft hover:shadow-md transition-all cursor-pointer"
+                className="
+                bg-card
+                border
+                border-border
+                rounded-2xl
+                overflow-hidden
+                shadow-soft
+                hover:shadow-md
+                transition-all
+                cursor-pointer"
                 onClick={() => setShowViewModal(true)}
             >
                 {showImage && (
-                    <div className="relative w-full h-48 bg-border">
+                    <div
+                        className="
+                        relative
+                        w-full
+                        h-48
+                        bg-border
+                    ">
                         <Image
                             src={previewImage!}
                             alt="پیش‌نمایش"
-                            className="w-full h-full object-cover"
+                            className="
+                            w-full
+                            h-full
+                            object-cover"
                             width={400}
                             height={200}
                             unoptimized
@@ -64,27 +82,62 @@ export const ProfilePostCard = ({ post }: ProfilePostCardProps) => {
                     </div>
                 )}
                 {showVideo && (
-                    <div className="relative w-full h-48 bg-border overflow-hidden">
+                    <div
+                        className="
+                        relative
+                        w-full
+                        h-48
+                        bg-border
+                        overflow-hidden
+                    ">
                         <video
                             src={previewVideo!}
                             autoPlay
                             muted
                             loop
                             playsInline
-                            className="w-full h-full object-cover"
+                            className="
+                            w-full
+                            h-full
+                            object-cover"
                         />
                     </div>
                 )}
 
-                <div className="p-4">
-                    <h3 className="font-bold text-text-primary text-base mb-1 line-clamp-1">
+                <div
+                    className="
+                p-4
+                ">
+                    <h1
+                        className="
+                        font-bold
+                        text-primary
+                        text-base
+                        mb-1
+                        line-clamp-1
+                    ">
                         {headerText}
-                    </h3>
-                    <p className="text-xs text-secondary mb-2">{formattedDate}</p>
-                    <p className="text-secondary text-sm line-clamp-2 mb-3">{previewText}</p>
+                    </h1>
+                    <p
+                        className="
+                        text-xs
+                        text-secondary
+                        mb-2
+                    ">
+                        {formattedDate}
+                    </p>
+                    <p
+                        className="
+                        text-secondary
+                        text-sm
+                        line-clamp-2
+                        mb-3
+                    ">
+                        {previewText}
+                    </p>
 
-                    {/* ✅ برای جلوگیری از باز شدن مودال هنگام کلیک روی دکمه‌های لایک/کامنت/اشتراک‌گذاری */}
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div
+                        onClick={(e) => e.stopPropagation()}>
                         <PostActions
                             postId={post.id}
                             isLiked={post.isLiked}
