@@ -10,9 +10,11 @@ import { FollowButton } from '../FollowButton';
 interface UserListItemProps {
     user: FollowUser;
     onClose: () => void;
+    onFollowChange?: () => void;  // ✅ اضافه شد
+
 }
 
-export const UserListItem = React.memo(({ user, onClose }: UserListItemProps) => {
+export const UserListItem = React.memo(({ user, onClose, onFollowChange}: UserListItemProps) => {
     return (
         <div
             className="
@@ -101,6 +103,7 @@ export const UserListItem = React.memo(({ user, onClose }: UserListItemProps) =>
             <FollowButton
                 userId={user.id}
                 initialIsFollowing={user.isFollowing}
+                onFollowChange={onFollowChange}
             />
         </div>
     );

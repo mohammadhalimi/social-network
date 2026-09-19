@@ -9,6 +9,7 @@ interface ProfileHeaderProps {
     user: ProfileUser;
     avatarUrl: string | null;
     displayedFollowersCount: number;
+    displayedFollowingCount: number;  // ✅ جدید
     onAvatarClick: () => void;
     onFollowersClick: () => void;
     onFollowingClick: () => void;
@@ -19,6 +20,7 @@ export const ProfileHeader = ({
     user,
     avatarUrl,
     displayedFollowersCount,
+    displayedFollowingCount,
     onAvatarClick,
     onFollowersClick,
     onFollowingClick,
@@ -182,7 +184,7 @@ export const ProfileHeader = ({
                             font-bold
                             text-primary
                         ">
-                            {user.followingCount}
+                            {displayedFollowingCount}
                         </p>
                         <p
                             className="

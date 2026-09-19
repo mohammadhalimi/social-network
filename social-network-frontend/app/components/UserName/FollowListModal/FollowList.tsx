@@ -12,6 +12,7 @@ interface FollowListProps {
     type: 'followers' | 'following';
     onClose: () => void;
     onLoadMore: () => void;
+    onFollowChange?: () => void;
 }
 
 export const FollowList = ({
@@ -22,6 +23,7 @@ export const FollowList = ({
     type,
     onClose,
     onLoadMore,
+    onFollowChange,
 }: FollowListProps) => {
     // حالت لودینگ اولیه
     if (loading) {
@@ -63,7 +65,12 @@ export const FollowList = ({
                 space-y-3
             ">
                 {users.map((u) => (
-                    <UserListItem key={u.id} user={u} onClose={onClose} />
+                    <UserListItem
+                    key={u.id}
+                    user={u}
+                    onClose={onClose}
+                    onFollowChange={onFollowChange}
+                    />
                 ))}
             </div>
 

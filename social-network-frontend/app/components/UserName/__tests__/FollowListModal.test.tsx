@@ -8,7 +8,7 @@ jest.mock('@apollo/client/react', () => ({
     useQuery: jest.fn(),
 }));
 
-// ✅ Mock کردن FollowList - فقط بررسی می‌کنیم props درست پاس داده می‌شن
+// ✅ Mock کردن FollowList - حالا onFollowChange رو هم دریافت و شبیه‌سازی می‌کنیم
 jest.mock('../FollowListModal/FollowList', () => ({
     FollowList: (props: any) => (
         <div data-testid="follow-list">
@@ -18,11 +18,18 @@ jest.mock('../FollowListModal/FollowList', () => ({
             <span data-testid="has-more">{String(props.hasMore)}</span>
             <span data-testid="type">{props.type}</span>
             <button onClick={props.onLoadMore}>لود بیشتر</button>
+            {/* ✅ دکمه‌ای برای شبیه‌سازی تغییر فالو */}
+            <button
+                data-testid="trigger-follow-change"
+                onClick={props.onFollowChange}
+            >
+                تغییر فالو
+            </button>
         </div>
     ),
 }));
 
-// ✅ Mock کردن SearchInput - یه اینپوت ساده که onChange رو صدا می‌زنه
+// ✅ Mock کردن SearchInput
 jest.mock('../FollowListModal/SearchInput', () => ({
     SearchInput: (props: any) => (
         <input
@@ -115,7 +122,7 @@ describe('FollowListModal', () => {
 
         expect(mockedUseQuery).toHaveBeenCalledWith(
             GET_FOLLOWERS,
-            expect.objectContaining({ variables: expect.objectContaining({ }), skip: true })
+            expect.objectContaining({ variables: expect.objectContaining({}), skip: true })
         );
     });
 
@@ -269,7 +276,7 @@ describe('FollowListModal', () => {
         });
     });
 
-    it('وقتی hasMore=false باشد، handleLoadMore کاری انجام نمی‌دهد', async () => {
+    it('وقتی hasMore=false باشد، handleLoadMore کاری انجام نمی‌دهد', () => {
         mockedUseQuery.mockReturnValue({
             data: { getFollowers: { users: mockUsers, hasMore: false } },
             loading: false,
@@ -279,8 +286,43 @@ describe('FollowListModal', () => {
 
         render(<FollowListModal userId="user-1" type="followers" isOpen={true} onClose={jest.fn()} />);
 
-        // چون hasMore=false است، دکمه‌ی "لود بیشتر" اصلاً رندر نمی‌شود (بر اساس منطق mock ما)
-        // ولی می‌توانیم مستقیم fetchMore را بررسی کنیم که صدا زده نشده
         expect(fetchMoreMock).not.toHaveBeenCalled();
+    });
+
+    // ==========================================================
+    //  ✅ تست‌های جدید: onFollowChange
+    // ==========================================================
+    it('onFollowChange را به FollowList پاس می‌دهد', () => {
+        const onFollowChange = jest.fn();
+
+        render(
+            <FollowListModal
+                userId="user-1"
+                type="followers"
+                isOpen={true}
+                onClose={jest.fn()}
+                onFollowChange={onFollowChange}
+            />
+        );
+
+        // ✅ دکمه‌ی trigger-follow-change (که در mock FollowList قرار دادیم) onFollowChange را صدا می‌زند
+        fireEvent.click(screen.getByTestId('trigger-follow-change'));
+
+        expect(onFollowChange).toHaveBeenCalledTimes(1);
+    });
+
+    it('اگر onFollowChange پاس داده نشود، خطایی رخ نمی‌دهد', () => {
+        render(
+            <FollowListModal
+                userId="user-1"
+                type="followers"
+                isOpen={true}
+                onClose={jest.fn()}
+                // ✅ onFollowChange پاس داده نشده
+            />
+        );
+
+        // نباید خطایی رخ دهد
+        expect(screen.getByTestId('follow-list')).toBeInTheDocument();
     });
 });

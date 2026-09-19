@@ -1,12 +1,15 @@
+// app/user/[username]/components/UserProfileContent.tsx
 'use client';
 
 import { useState } from 'react';
-import { ProfileUser } from './types';
-import { ProfileInfo } from './ProfileInfo';
-import { ProfileHeader } from './ProfileHeader';
-import { FollowListModal } from '@/app/components/UserName/FollowListModal';
+import { useQuery } from '@apollo/client/react';
+import { FollowListModal } from './FollowListModal';
+import { ImagePreviewModal } from './ImagePreviewModal';
 import { ProfilePostsList } from '@/app/components/UserName/ProfilePostsList';
-import { ImagePreviewModal } from '@/app/components/UserName/ImagePreviewModal';
+import { ProfileHeader } from './ProfileHeader';
+import { ProfileInfo } from './ProfileInfo';
+import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
+import { ProfileUser } from './types';
 
 interface UserProfileContentProps {
     user: ProfileUser;
@@ -17,22 +20,39 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
     const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [followersCount, setFollowersCount] = useState<number | null>(null);
+    const [followingCount, setFollowingCount] = useState<number | null>(null);
+
+    // ✅ برای رفرش کردن دیتای پروفایل بعد از فالو/آنفالو
+    const { refetch } = useQuery(GET_USER_BY_USERNAME, {
+        variables: { username: user.username },
+        skip: true, // فقط برای دسترسی به refetch
+    });
 
     const displayedFollowersCount = followersCount ?? user.followersCount;
+    const displayedFollowingCount = followingCount ?? user.followingCount;
+
+    // ✅ هر بار که فالو/آنفالو تغییر می‌کند، دیتا رو دوباره بگیر
+    const handleFollowChange = () => {
+        refetch().then(({ data }) => {
+            if (data?.getUserByUsername) {
+                setFollowersCount(data.getUserByUsername.followersCount);
+                setFollowingCount(data.getUserByUsername.followingCount);
+            }
+        });
+    };
 
     return (
         <>
-            {/* مودال لیست فالوور/فالووینگ */}
             {modalType && (
                 <FollowListModal
                     userId={user.id}
                     type={modalType}
                     isOpen={true}
                     onClose={() => setModalType(null)}
+                    onFollowChange={handleFollowChange}  // ✅ callback
                 />
             )}
 
-            {/* مودال نمایش عکس */}
             {avatarUrl && (
                 <ImagePreviewModal
                     isOpen={isImageModalOpen}
@@ -42,7 +62,6 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 />
             )}
 
-            {/* کارت اصلی پروفایل */}
             <div
                 className="
                 bg-card
@@ -57,6 +76,7 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                     user={user}
                     avatarUrl={avatarUrl}
                     displayedFollowersCount={displayedFollowersCount}
+                    displayedFollowingCount={displayedFollowingCount}  // ✅ جدید
                     onAvatarClick={() => setIsImageModalOpen(true)}
                     onFollowersClick={() => setModalType('followers')}
                     onFollowingClick={() => setModalType('following')}
@@ -65,7 +85,6 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 <ProfileInfo user={user} />
             </div>
 
-            {/* لیست پست‌ها */}
             <div
                 className="
                 bg-card
@@ -84,9 +103,7 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 ">
                     پست‌ها
                 </h1>
-                <ProfilePostsList
-                    userId={user.id}
-                />
+                <ProfilePostsList userId={user.id} />
             </div>
         </>
     );

@@ -9,7 +9,11 @@ import { SearchInput } from './FollowListModal/SearchInput';
 import { GET_FOLLOWERS, GET_FOLLOWING } from '@/app/graphql/user.queries';
 import { FollowListModalProps, FollowUser } from './FollowListModal/types';
 
-export const FollowListModal = ({ userId, type, isOpen, onClose }: FollowListModalProps) => {
+interface ExtendedFollowListModalProps extends FollowListModalProps {
+    onFollowChange?: () => void;  // ✅ callback برای آپدیت پروفایل
+}
+
+export const FollowListModal = ({ userId, type, isOpen, onClose, onFollowChange}: ExtendedFollowListModalProps) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState<FollowUser[]>([]);
     const [hasMore, setHasMore] = useState(true);
@@ -125,6 +129,7 @@ export const FollowListModal = ({ userId, type, isOpen, onClose }: FollowListMod
                     type={type}
                     onClose={onClose}
                     onLoadMore={handleLoadMore}
+                    onFollowChange={onFollowChange}
                 />
             </div>
         </div>
