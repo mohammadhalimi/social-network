@@ -16,9 +16,6 @@ import {
     ChevronUp
 } from 'lucide-react';
 
-
-
-
 interface CommentItemProps {
     comment: PostComment;
     postId: string;
@@ -26,7 +23,6 @@ interface CommentItemProps {
     setReplyingTo: (comment: PostComment | null) => void;
     onReplyAdded: (parentCommentId: string, reply: PostReply) => void;
 }
-
 
 export const CommentItem = ({
     comment,
