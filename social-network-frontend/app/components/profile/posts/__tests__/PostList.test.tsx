@@ -1,8 +1,16 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { PostList } from '../PostList';
-import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
+import { PostList } from '../PostList';
+import {
+    useQuery,
+    useMutation
+} from '@apollo/client/react';
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor
+} from '@testing-library/react';
 
 jest.mock('react-hot-toast', () => ({
     success: jest.fn(),

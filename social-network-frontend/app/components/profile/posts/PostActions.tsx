@@ -2,10 +2,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@apollo/client/react';
-import { LIKE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useMutation } from '@apollo/client/react';
+import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { LIKE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
 
 interface PostActionsProps {
     postId: string;
@@ -49,36 +49,34 @@ export const PostActions = ({
 
             if (newIsLiked) {
                 const { error } = await likePost({ variables: { postId } });
-                
-                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
+
                 if (error) {
                     toast.error(error.message || 'خطا در لایک کردن');
-                    // بازگردانی وضعیت قبلی
-                    setIsLiked(!isLiked);
+                    // ✅ بازگردانی به مقدار اصلی (قبل از کلیک)
+                    setIsLiked(isLiked);
                     setLikesCount(likesCount);
                     if (onLikeUpdate) {
-                        onLikeUpdate(!isLiked, likesCount);
+                        onLikeUpdate(isLiked, likesCount);
                     }
                     return;
                 }
             } else {
                 const { error } = await unlikePost({ variables: { postId } });
 
-                // ✅ اگر خطای GraphQL وجود داشت، همان‌جا مدیریتش کن
                 if (error) {
                     toast.error(error.message || 'خطا در لایک کردن');
-                    // بازگردانی وضعیت قبلی
-                    setIsLiked(!isLiked);
+                    // ✅ بازگردانی به مقدار اصلی (قبل از کلیک)
+                    setIsLiked(isLiked);
                     setLikesCount(likesCount);
                     if (onLikeUpdate) {
-                        onLikeUpdate(!isLiked, likesCount);
+                        onLikeUpdate(isLiked, likesCount);
                     }
                     return;
                 }
             }
         } catch (error: any) {
-            // ✅ فقط خطاهای شبکه‌ای (مثل قطع اینترنت) را مدیریت می‌کنیم
-            setIsLiked(!isLiked);
+            // ✅ بازگردانی به مقدار اصلی (قبل از کلیک)
+            setIsLiked(isLiked);
             setLikesCount(likesCount);
             console.error('Error toggling like:', error);
             toast.error(error.message || 'خطا در لایک کردن');
