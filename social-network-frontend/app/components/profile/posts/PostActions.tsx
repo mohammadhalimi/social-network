@@ -30,9 +30,28 @@ export const PostActions = ({
     // ✅ تنظیم errorPolicy برای جلوگیری از پرتاب شدن خطا به بیرون
     const [likePost] = useMutation(LIKE_POST, {
         errorPolicy: 'all',
+        update: (cache) => {
+            cache.modify({
+                id: cache.identify({ __typename: 'Post', id: postId }),
+                fields: {
+                    isLiked: () => true,
+                    likesCount: (prev: number) => prev + 1,
+                },
+            });
+        },
     });
+
     const [unlikePost] = useMutation(UNLIKE_POST, {
         errorPolicy: 'all',
+        update: (cache) => {
+            cache.modify({
+                id: cache.identify({ __typename: 'Post', id: postId }),
+                fields: {
+                    isLiked: () => false,
+                    likesCount: (prev: number) => Math.max(0, prev - 1),
+                },
+            });
+        },
     });
 
     const handleLike = async () => {
@@ -114,6 +133,7 @@ export const PostActions = ({
                     text-sm
                     transition-colors
                     group
+                    cursor-pointer
                     ${isLiked ? 'text-red-500' : 'text-secondary hover:text-red-500'}`}
             >
                 <Heart
@@ -143,6 +163,7 @@ export const PostActions = ({
                 hover:text-primary
                 transition-colors
                 group
+                cursor-pointer
                 ">
                 <MessageCircle
                     className="

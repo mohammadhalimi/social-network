@@ -1,6 +1,7 @@
 // posts.graphql.ts
 import { gql } from '@apollo/client';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { PostComment } from '../components/profile/posts/ViewPostModal/types';
 
 // =============================================
 // ✅ Types & Interfaces
@@ -268,36 +269,15 @@ export const DELETE_POST: TypedDocumentNode<DeletePostResponse, DeletePostVariab
 // =============================================
 
 
-interface PostCommentUser {
-    id: string;
-    username: string;
-    fullName: string;
-    avatar: string | null;
-}
-
-interface PostReply {
-    id: string;
-    content: string;
-    createdAt: string;
-    user: PostCommentUser;
-}
-interface PostComment {
-    id: string;
-    content: string;
-    createdAt: string;
-    user: PostCommentUser;
-    replies?: PostReply[];
-}
-
 interface GetPostCommentsResponse {
-    getPost: {
-        id: string;
-        comments: PostComment[];
-    } | null;
+  getPost: {
+    id: string;
+    comments: PostComment[];  // ✅ از تایپ مشترک استفاده می‌کند
+  } | null;
 }
 
 interface GetPostCommentsVariables {
-    postId: string;
+  postId: string;
 }
 
 export const GET_POST_COMMENTS: TypedDocumentNode<GetPostCommentsResponse, GetPostCommentsVariables> = gql`
@@ -308,6 +288,8 @@ export const GET_POST_COMMENTS: TypedDocumentNode<GetPostCommentsResponse, GetPo
         id
         content
         createdAt
+        likesCount  
+        isLiked     
         user {
           id
           username
@@ -318,6 +300,8 @@ export const GET_POST_COMMENTS: TypedDocumentNode<GetPostCommentsResponse, GetPo
           id
           content
           createdAt
+          likesCount  
+          isLiked  
           user {
             id
             username
@@ -395,6 +379,54 @@ export const REPLY_TO_COMMENT: TypedDocumentNode<ReplyToCommentResponse, ReplyTo
           }
         }
       }
+    }
+  }
+`;
+
+// =============================================
+//  ✅ Mutation های لایک کامنت
+// =============================================
+
+export interface LikeCommentResponse {
+  likeComment: {
+    success: boolean;
+    message: string;
+    isLiked: boolean;
+  };
+}
+
+export interface LikeCommentVariables {
+  commentId: string;
+}
+
+export const LIKE_COMMENT: TypedDocumentNode<LikeCommentResponse, LikeCommentVariables> = gql`
+  mutation LikeComment($commentId: ID!) {
+    likeComment(commentId: $commentId) {
+      success
+      message
+      isLiked
+    }
+  }
+`;
+
+export interface UnlikeCommentResponse {
+  unlikeComment: {
+    success: boolean;
+    message: string;
+    isLiked: boolean;
+  };
+}
+
+export interface UnlikeCommentVariables {
+  commentId: string;
+}
+
+export const UNLIKE_COMMENT: TypedDocumentNode<UnlikeCommentResponse, UnlikeCommentVariables> = gql`
+  mutation UnlikeComment($commentId: ID!) {
+    unlikeComment(commentId: $commentId) {
+      success
+      message
+      isLiked
     }
   }
 `;

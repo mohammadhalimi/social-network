@@ -87,7 +87,7 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
                 font-medium
                 transition-colors
                 disabled:opacity-60
-                disabled:cursor-not-allowed
+                cursor-pointer
                 ${isFollowing
                     ? 'bg-border text-primary hover:bg-red-500/10 hover:text-red-500'
                     : 'bg-primary text-white hover:bg-secondary'

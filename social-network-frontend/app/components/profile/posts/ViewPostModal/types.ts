@@ -12,6 +12,8 @@ export interface PostReply {
     content: string;
     createdAt: string;
     user: PostCommentUser;
+    likesCount: number; 
+    isLiked: boolean;    
 }
 
 export interface PostComment {
@@ -20,6 +22,8 @@ export interface PostComment {
     createdAt: string;
     user: PostCommentUser;
     replies?: PostReply[];
+    likesCount: number; 
+    isLiked: boolean;    
 }
 
 // ✅ تایپ برای پراپ‌های ViewPostModal

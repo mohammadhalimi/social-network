@@ -1,7 +1,4 @@
 // graphql/resolvers/post/__tests__/post.queries.test.ts
-//
-// prisma و formatPost mock می‌شوند تا تست کاملاً روی منطق خود resolverها
-// (نه دیتابیس واقعی یا فرمت‌دهی) متمرکز باشد.
 
 jest.mock('../../../../lib/prisma', () => ({
     __esModule: true,
@@ -38,11 +35,12 @@ beforeEach(() => {
 // getPost
 // ===================================================================
 describe('postQueries.getPost', () => {
-    test('پست را با include صحیح از prisma می‌خواند و آن را فرمت می‌کند', async () => {
+    test('پست را با include صحیح از prisma می‌خواند و با userId کاربر لاگین‌شده فرمت می‌کند', async () => {
         const rawPost = { id: 'post-1' };
         mockedFindUnique.mockResolvedValue(rawPost);
+        const context = { user: { userId: 'user-1' } };
 
-        const result = await postQueries.getPost(null, { postId: 'post-1' });
+        const result = await postQueries.getPost(null, { postId: 'post-1' }, context);
 
         expect(mockedFindUnique).toHaveBeenCalledWith({
             where: { id: 'post-1' },
@@ -63,16 +61,26 @@ describe('postQueries.getPost', () => {
                 },
             },
         });
-        expect(mockedFormatPost).toHaveBeenCalledWith(rawPost);
-        expect(result).toEqual({ formatted: true, id: 'post-1', userId: null });
+        expect(mockedFormatPost).toHaveBeenCalledWith(rawPost, 'user-1');  // ✅ userId پاس داده شد
+        expect(result).toEqual({ formatted: true, id: 'post-1', userId: 'user-1' });
+    });
+
+    test('اگر کاربر لاگین نکرده باشد، userId برابر null به formatPost پاس می‌شود', async () => {
+        const rawPost = { id: 'post-1' };
+        mockedFindUnique.mockResolvedValue(rawPost);
+        const context = {};  // ✅ بدون user
+
+        await postQueries.getPost(null, { postId: 'post-1' }, context);
+
+        expect(mockedFormatPost).toHaveBeenCalledWith(rawPost, null);  // ✅
     });
 
     test('اگر پست پیدا نشود، خطا پرتاب می‌کند و formatPost فراخوانی نمی‌شود', async () => {
         mockedFindUnique.mockResolvedValue(null);
 
-        await expect(postQueries.getPost(null, { postId: 'missing' })).rejects.toThrow(
-            'پست یافت نشد.'
-        );
+        await expect(
+            postQueries.getPost(null, { postId: 'missing' }, {})
+        ).rejects.toThrow('پست یافت نشد.');
         expect(mockedFormatPost).not.toHaveBeenCalled();
     });
 });
@@ -81,14 +89,15 @@ describe('postQueries.getPost', () => {
 // getUserPosts
 // ===================================================================
 describe('postQueries.getUserPosts', () => {
-    test('پست‌های کاربر را با فیلتر isPublished و pagination صحیح می‌خواند', async () => {
+    test('پست‌های کاربر را با فیلتر isPublished و pagination صحیح می‌خواند و با currentUserId فرمت می‌کند', async () => {
         mockedFindMany.mockResolvedValue([{ id: 'p1' }, { id: 'p2' }]);
+        const context = { user: { userId: 'user-logged-in' } };
 
-        const result = await postQueries.getUserPosts(null, {
-            userId: 'user-1',
-            limit: 5,
-            offset: 20,
-        });
+        const result = await postQueries.getUserPosts(
+            null,
+            { userId: 'user-1', limit: 5, offset: 20 },
+            context
+        );
 
         expect(mockedFindMany).toHaveBeenCalledWith({
             where: { userId: 'user-1', isPublished: true },
@@ -106,16 +115,33 @@ describe('postQueries.getUserPosts', () => {
             take: 5,
             skip: 20,
         });
+        // ✅ currentUserId پاس داده می‌شود
+        expect(mockedFormatPost).toHaveBeenNthCalledWith(1, { id: 'p1' }, 'user-logged-in');
+        expect(mockedFormatPost).toHaveBeenNthCalledWith(2, { id: 'p2' }, 'user-logged-in');
         expect(result).toEqual([
-            { formatted: true, id: 'p1', userId: null },
-            { formatted: true, id: 'p2', userId: null },
+            { formatted: true, id: 'p1', userId: 'user-logged-in' },
+            { formatted: true, id: 'p2', userId: 'user-logged-in' },
         ]);
+    });
+
+    test('اگر کاربر لاگین نکرده باشد، currentUserId برابر null به formatPost پاس می‌شود', async () => {
+        mockedFindMany.mockResolvedValue([{ id: 'p1' }]);
+        const context = {};  // ✅ بدون user
+
+        await postQueries.getUserPosts(
+            null,
+            { userId: 'user-1', limit: 10, offset: 0 },
+            context
+        );
+
+        expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' }, null);  // ✅
     });
 
     test('اگر limit/offset ارسال نشود، مقادیر پیش‌فرض 10 و 0 استفاده می‌شود', async () => {
         mockedFindMany.mockResolvedValue([]);
+        const context = { user: { userId: 'user-1' } };
 
-        await postQueries.getUserPosts(null, { userId: 'user-1' } as any);
+        await postQueries.getUserPosts(null, { userId: 'user-1' } as any, context);
 
         expect(mockedFindMany).toHaveBeenCalledWith(
             expect.objectContaining({ take: 10, skip: 0 })
@@ -124,29 +150,21 @@ describe('postQueries.getUserPosts', () => {
 
     test('اگر کاربر هیچ پستی نداشته باشد، آرایه خالی برمی‌گرداند', async () => {
         mockedFindMany.mockResolvedValue([]);
+        const context = { user: { userId: 'user-1' } };
 
-        const result = await postQueries.getUserPosts(null, {
-            userId: 'user-1',
-            limit: 10,
-            offset: 0,
-        });
+        const result = await postQueries.getUserPosts(
+            null,
+            { userId: 'user-1', limit: 10, offset: 0 },
+            context
+        );
 
         expect(result).toEqual([]);
         expect(mockedFormatPost).not.toHaveBeenCalled();
     });
-
-    test('formatPost را بدون userId (بدون isLiked) فراخوانی می‌کند', async () => {
-        mockedFindMany.mockResolvedValue([{ id: 'p1' }]);
-
-        await postQueries.getUserPosts(null, { userId: 'user-1', limit: 10, offset: 0 });
-
-        expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' });
-        expect(mockedFormatPost).toHaveBeenCalledTimes(1);
-    });
 });
 
 // ===================================================================
-// getFeed
+// getFeed (بدون تغییر)
 // ===================================================================
 describe('postQueries.getFeed', () => {
     test('فقط پست‌های isPublished را می‌خواند و به formatPost با userId کاربر لاگین‌شده پاس می‌دهد', async () => {

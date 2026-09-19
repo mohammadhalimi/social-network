@@ -8,6 +8,8 @@ import {
     DELETE_POST,
     GET_POST_COMMENTS,
     REPLY_TO_COMMENT,
+    LIKE_COMMENT,
+    UNLIKE_COMMENT,
 } from '../../graphql/post.queries';
 
 import {
@@ -523,11 +525,10 @@ describe('Post Queries', () => {
         expect(getPostFieldNames).toContain('comments');
     });
 
-    it('GET_POST_COMMENTS query should request nested comment fields including user', () => {
+    it('GET_POST_COMMENTS query should request nested comment fields including user, likesCount and isLiked', () => {
         const definition = findOperation(GET_POST_COMMENTS.definitions, 'GetPostComments');
         expect(definition).toBeDefined();
 
-        // پیدا کردن فیلد getPost
         const selectionSet = definition!.selectionSet;
         const getPostField = selectionSet.selections.find(
             (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'getPost'
@@ -535,19 +536,20 @@ describe('Post Queries', () => {
 
         expect(getPostField).toBeDefined();
 
-        // پیدا کردن فیلد comments داخل getPost
         const commentsField = getPostField?.selectionSet?.selections.find(
             (s): s is FieldNode => s.kind === 'Field' && s.name.value === 'comments'
         );
 
         expect(commentsField).toBeDefined();
 
-        // گرفتن نام فیلدهای داخل comments
         const commentFieldNames = getFieldNamesFromSelectionSet(commentsField!.selectionSet!);
         expect(commentFieldNames).toContain('id');
         expect(commentFieldNames).toContain('content');
         expect(commentFieldNames).toContain('createdAt');
+        expect(commentFieldNames).toContain('likesCount');  // ✅ جدید
+        expect(commentFieldNames).toContain('isLiked');     // ✅ جدید
         expect(commentFieldNames).toContain('user');
+        expect(commentFieldNames).toContain('replies');     // ✅ جدید
     });
 
     it('GET_POST_COMMENTS query should request correct nested user fields', () => {
@@ -668,7 +670,7 @@ describe('Post Queries', () => {
             expect(fieldNames).toContain('comment');
         });
 
-        it('should request nested comment fields including likesCount, isLiked and user', () => {
+        it('should request nested comment fields including likesCount, isLiked and replies', () => {
             const definition = findOperation(REPLY_TO_COMMENT.definitions, 'ReplyToComment');
             expect(definition).toBeDefined();
 
@@ -706,6 +708,92 @@ describe('Post Queries', () => {
             expect(replyFieldNames).toContain('content');
             expect(replyFieldNames).toContain('createdAt');
             expect(replyFieldNames).toContain('user');
+        });
+    });
+    // ==========================================================
+    //  ✅ تست‌های جدید: LIKE_COMMENT و UNLIKE_COMMENT
+    // ==========================================================
+    describe('LIKE_COMMENT mutation', () => {
+        it('should have correct structure', () => {
+            expect(LIKE_COMMENT).toBeDefined();
+            expect(LIKE_COMMENT.kind).toBe('Document');
+            expect(LIKE_COMMENT.definitions).toBeDefined();
+            expect(LIKE_COMMENT.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "LikeComment"', () => {
+            const definition = findOperation(LIKE_COMMENT.definitions, 'LikeComment');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('mutation');
+        });
+
+        it('should have commentId variable', () => {
+            const definition = findOperation(LIKE_COMMENT.definitions, 'LikeComment');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('commentId');
+            expect(variableNames).toHaveLength(1);
+        });
+
+        it('top-level field should be "likeComment"', () => {
+            const definition = findOperation(LIKE_COMMENT.definitions, 'LikeComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('likeComment');
+        });
+
+        it('should request success, message and isLiked', () => {
+            const definition = findOperation(LIKE_COMMENT.definitions, 'LikeComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'likeComment');
+            expect(fieldNames).toContain('success');
+            expect(fieldNames).toContain('message');
+            expect(fieldNames).toContain('isLiked');
+        });
+    });
+
+    describe('UNLIKE_COMMENT mutation', () => {
+        it('should have correct structure', () => {
+            expect(UNLIKE_COMMENT).toBeDefined();
+            expect(UNLIKE_COMMENT.kind).toBe('Document');
+            expect(UNLIKE_COMMENT.definitions).toBeDefined();
+            expect(UNLIKE_COMMENT.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "UnlikeComment"', () => {
+            const definition = findOperation(UNLIKE_COMMENT.definitions, 'UnlikeComment');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('mutation');
+        });
+
+        it('should have commentId variable', () => {
+            const definition = findOperation(UNLIKE_COMMENT.definitions, 'UnlikeComment');
+            expect(definition).toBeDefined();
+
+            const variableNames = getVariableNames(definition!);
+            expect(variableNames).toContain('commentId');
+            expect(variableNames).toHaveLength(1);
+        });
+
+        it('top-level field should be "unlikeComment"', () => {
+            const definition = findOperation(UNLIKE_COMMENT.definitions, 'UnlikeComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getFieldNames(definition!);
+            expect(fieldNames).toContain('unlikeComment');
+        });
+
+        it('should request success, message and isLiked', () => {
+            const definition = findOperation(UNLIKE_COMMENT.definitions, 'UnlikeComment');
+            expect(definition).toBeDefined();
+
+            const fieldNames = getNestedFieldNames(definition!, 'unlikeComment');
+            expect(fieldNames).toContain('success');
+            expect(fieldNames).toContain('message');
+            expect(fieldNames).toContain('isLiked');
         });
     });
 });

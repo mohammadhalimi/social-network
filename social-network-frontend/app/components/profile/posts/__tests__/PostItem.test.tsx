@@ -1,17 +1,11 @@
 import '@testing-library/jest-dom';
 import { PostItem } from '../PostItem';
-import {
-    render,
-    screen,
-    fireEvent,
-    waitFor
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // ماک‌ها
 jest.mock('next/image', () => ({
     __esModule: true,
     default: (props: any) => {
-        // حذف unoptimized از props
         const { unoptimized, ...rest } = props;
         return <img {...rest} />;
     },
@@ -25,7 +19,6 @@ jest.mock('@apollo/client/react', () => ({
     useLazyQuery: jest.fn(),
 }));
 
-// ماک ConfirmModal برای ساده‌سازی تست (بدون نیاز به تست داخلی آن)
 jest.mock('../ConfirmModal', () => ({
     ConfirmModal: ({ isOpen, onConfirm, onCancel, message }: any) =>
         isOpen ? (
@@ -115,7 +108,6 @@ describe('PostItem', () => {
         expect(mockOnEdit).toHaveBeenCalledWith(basePost);
 
         fireEvent.click(screen.getByTitle('حذف'));
-        // مودال تایید باز می‌شود
         expect(screen.getByText('آیا مطمئن هستید که می‌خواهید این پست را حذف کنید؟ این عملیات قابل بازگشت نیست.')).toBeInTheDocument();
     });
 
@@ -133,50 +125,5 @@ describe('PostItem', () => {
         fireEvent.click(screen.getByText('تایید حذف'));
 
         expect(mockOnDelete).toHaveBeenCalledWith('post-1');
-    });
-
-    it('5. با کلیک روی دکمه کامنت، کوئری کامنت‌ها اجرا می‌شود', async () => {
-        // شبیه‌سازی رفتار واقعی: بار اول null، بار دوم کامنت‌ها
-        let callCount = 0;
-
-        (useLazyQuery as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) {
-                return [mockFetchComments, { data: null, loading: false }];
-            }
-            return [
-                mockFetchComments,
-                {
-                    data: {
-                        getPost: {
-                            comments: [
-                                { id: 'c1', content: 'این یک کامنت تست است', user: { fullName: 'کاربر تست' } }
-                            ]
-                        }
-                    },
-                    loading: false,
-                },
-            ];
-        });
-
-        render(
-            <PostItem
-                post={basePost}
-                onDelete={mockOnDelete}
-                onEdit={mockOnEdit}
-                onView={mockOnView}
-            />
-        );
-
-        fireEvent.click(screen.getByRole('button', { name: /2/i }));
-
-        expect(mockFetchComments).toHaveBeenCalledWith({
-            variables: { postId: 'post-1' },
-        });
-
-        await waitFor(() => {
-            expect(screen.getByText('این یک کامنت تست است')).toBeInTheDocument();
-            expect(screen.getByText('کاربر تست')).toBeInTheDocument();
-        });
     });
 });

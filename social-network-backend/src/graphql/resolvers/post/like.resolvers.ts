@@ -13,12 +13,25 @@ export const likeResolvers = {
         });
 
         if (existingLike) {
-            return { success: false, message: 'شما قبلاً این پست را لایک کرده‌اید.', isLiked: true };
+            const likesCount = await prisma.like.count({ where: { postId } });
+            return {
+                success: false,
+                message: 'شما قبلاً این پست را لایک کرده‌اید.',
+                isLiked: true,
+                likesCount,  // ✅ اضافه شد
+            };
         }
 
         await prisma.like.create({ data: { userId, postId } });
 
-        return { success: true, message: 'پست با موفقیت لایک شد.', isLiked: true };
+        const likesCount = await prisma.like.count({ where: { postId } });  // ✅ محاسبه
+
+        return {
+            success: true,
+            message: 'پست با موفقیت لایک شد.',
+            isLiked: true,
+            likesCount,  // ✅ اضافه شد
+        };
     },
 
     unlikePost: async (_: any, { postId }: { postId: string }, context: any) => {
@@ -29,12 +42,25 @@ export const likeResolvers = {
         });
 
         if (!like) {
-            return { success: false, message: 'شما این پست را لایک نکرده‌اید.', isLiked: false };
+            const likesCount = await prisma.like.count({ where: { postId } });
+            return {
+                success: false,
+                message: 'شما این پست را لایک نکرده‌اید.',
+                isLiked: false,
+                likesCount,  // ✅ اضافه شد
+            };
         }
 
         await prisma.like.delete({ where: { id: like.id } });
 
-        return { success: true, message: 'لایک پست برداشته شد.', isLiked: false };
+        const likesCount = await prisma.like.count({ where: { postId } });  // ✅ محاسبه
+
+        return {
+            success: true,
+            message: 'لایک پست برداشته شد.',
+            isLiked: false,
+            likesCount,  // ✅ اضافه شد
+        };
     },
 
     likeComment: async (_: any, { commentId }: { commentId: string }, context: any) => {

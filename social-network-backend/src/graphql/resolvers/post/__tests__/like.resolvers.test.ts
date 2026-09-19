@@ -7,6 +7,7 @@ jest.mock('../../../../lib/prisma', () => ({
             findUnique: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
+            count: jest.fn(),  // ✅ اضافه شد
         },
         commentLike: {
             findUnique: jest.fn(),
@@ -27,6 +28,7 @@ import { likeResolvers } from '../like.resolvers';
 const mockedLikeFindUnique = (prisma as any).like.findUnique as jest.Mock;
 const mockedLikeCreate = (prisma as any).like.create as jest.Mock;
 const mockedLikeDelete = (prisma as any).like.delete as jest.Mock;
+const mockedLikeCount = (prisma as any).like.count as jest.Mock;  // ✅ اضافه شد
 const mockedCommentLikeFindUnique = (prisma as any).commentLike.findUnique as jest.Mock;
 const mockedCommentLikeCreate = (prisma as any).commentLike.create as jest.Mock;
 const mockedCommentLikeDelete = (prisma as any).commentLike.delete as jest.Mock;
@@ -35,14 +37,16 @@ const mockedRequireAuth = requireAuth as jest.Mock;
 beforeEach(() => {
     jest.clearAllMocks();
     mockedRequireAuth.mockReturnValue('user-1');
+    mockedLikeCount.mockResolvedValue(5);  // ✅ مقدار پیش‌فرض
 });
 
 // ===================================================================
 // likePost
 // ===================================================================
 describe('likeResolvers.likePost', () => {
-    test('اگر لایک قبلاً وجود داشته باشد، بدون ساخت لایک جدید پیام خطا برمی‌گرداند', async () => {
+    test('اگر لایک قبلاً وجود داشته باشد، بدون ساخت لایک جدید پیام خطا و likesCount برمی‌گرداند', async () => {
         mockedLikeFindUnique.mockResolvedValue({ id: 'like-1' });
+        mockedLikeCount.mockResolvedValue(10);  // ✅
 
         const result = await likeResolvers.likePost(null, { postId: 'post-1' }, {});
 
@@ -50,25 +54,30 @@ describe('likeResolvers.likePost', () => {
             where: { userId_postId: { userId: 'user-1', postId: 'post-1' } },
         });
         expect(mockedLikeCreate).not.toHaveBeenCalled();
+        expect(mockedLikeCount).toHaveBeenCalledWith({ where: { postId: 'post-1' } });  // ✅
         expect(result).toEqual({
             success: false,
             message: 'شما قبلاً این پست را لایک کرده‌اید.',
             isLiked: true,
+            likesCount: 10,  // ✅
         });
     });
 
-    test('اگر لایک وجود نداشته باشد، لایک جدید می‌سازد و موفقیت برمی‌گرداند', async () => {
+    test('اگر لایک وجود نداشته باشد، لایک جدید می‌سازد و likesCount جدید برمی‌گرداند', async () => {
         mockedLikeFindUnique.mockResolvedValue(null);
+        mockedLikeCount.mockResolvedValue(6);  // ✅
 
         const result = await likeResolvers.likePost(null, { postId: 'post-1' }, {});
 
         expect(mockedLikeCreate).toHaveBeenCalledWith({
             data: { userId: 'user-1', postId: 'post-1' },
         });
+        expect(mockedLikeCount).toHaveBeenCalledWith({ where: { postId: 'post-1' } });  // ✅
         expect(result).toEqual({
             success: true,
             message: 'پست با موفقیت لایک شد.',
             isLiked: true,
+            likesCount: 6,  // ✅
         });
     });
 });
@@ -77,35 +86,41 @@ describe('likeResolvers.likePost', () => {
 // unlikePost
 // ===================================================================
 describe('likeResolvers.unlikePost', () => {
-    test('اگر لایکی وجود نداشته باشد، بدون حذف پیام خطا برمی‌گرداند', async () => {
+    test('اگر لایکی وجود نداشته باشد، بدون حذف پیام خطا و likesCount برمی‌گرداند', async () => {
         mockedLikeFindUnique.mockResolvedValue(null);
+        mockedLikeCount.mockResolvedValue(5);  // ✅
 
         const result = await likeResolvers.unlikePost(null, { postId: 'post-1' }, {});
 
         expect(mockedLikeDelete).not.toHaveBeenCalled();
+        expect(mockedLikeCount).toHaveBeenCalledWith({ where: { postId: 'post-1' } });  // ✅
         expect(result).toEqual({
             success: false,
             message: 'شما این پست را لایک نکرده‌اید.',
             isLiked: false,
+            likesCount: 5,  // ✅
         });
     });
 
-    test('اگر لایک وجود داشته باشد، آن را حذف می‌کند', async () => {
+    test('اگر لایک وجود داشته باشد، آن را حذف می‌کند و likesCount جدید برمی‌گرداند', async () => {
         mockedLikeFindUnique.mockResolvedValue({ id: 'like-1' });
+        mockedLikeCount.mockResolvedValue(4);  // ✅
 
         const result = await likeResolvers.unlikePost(null, { postId: 'post-1' }, {});
 
         expect(mockedLikeDelete).toHaveBeenCalledWith({ where: { id: 'like-1' } });
+        expect(mockedLikeCount).toHaveBeenCalledWith({ where: { postId: 'post-1' } });  // ✅
         expect(result).toEqual({
             success: true,
             message: 'لایک پست برداشته شد.',
             isLiked: false,
+            likesCount: 4,  // ✅
         });
     });
 });
 
 // ===================================================================
-// likeComment
+// likeComment (بدون تغییر)
 // ===================================================================
 describe('likeResolvers.likeComment', () => {
     test('اگر لایک قبلاً وجود داشته باشد، بدون ساخت لایک جدید پیام خطا برمی‌گرداند', async () => {
@@ -141,7 +156,7 @@ describe('likeResolvers.likeComment', () => {
 });
 
 // ===================================================================
-// unlikeComment
+// unlikeComment (بدون تغییر)
 // ===================================================================
 describe('likeResolvers.unlikeComment', () => {
     test('اگر لایکی وجود نداشته باشد، بدون حذف پیام خطا برمی‌گرداند', async () => {
@@ -172,7 +187,7 @@ describe('likeResolvers.unlikeComment', () => {
 });
 
 // ===================================================================
-// احراز هویت مشترک
+// احراز هویت مشترک (بدون تغییر)
 // ===================================================================
 describe('likeResolvers - احراز هویت', () => {
     test('همه‌ی resolverها قبل از هر کاری requireAuth را صدا می‌زنند', async () => {
@@ -188,6 +203,7 @@ describe('likeResolvers - احراز هویت', () => {
         expect(mockedLikeFindUnique).not.toHaveBeenCalled();
         expect(mockedLikeCreate).not.toHaveBeenCalled();
         expect(mockedLikeDelete).not.toHaveBeenCalled();
+        expect(mockedLikeCount).not.toHaveBeenCalled();  // ✅
         expect(mockedCommentLikeFindUnique).not.toHaveBeenCalled();
         expect(mockedCommentLikeCreate).not.toHaveBeenCalled();
         expect(mockedCommentLikeDelete).not.toHaveBeenCalled();

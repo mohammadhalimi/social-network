@@ -45,8 +45,8 @@ export const CommentInput = ({
                     outline-none
                     p-2.5
                     text-sm
-                    text-text-primary
-                    placeholder:text-text-secondary
+                    text-primary
+                    placeholder:text-secondary
                     resize-none
                     disabled:opacity-60
                 "

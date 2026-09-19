@@ -5,7 +5,9 @@ import prisma from '../../../lib/prisma';
 import { formatPost } from '../helpers/formatPost';
 
 export const postQueries = {
-    getPost: async (_: any, { postId }: { postId: string }) => {
+    getPost: async (_: any, { postId }: { postId: string }, context: any) => {
+        const userId = context.user?.userId || null;
+
         const post = await prisma.post.findUnique({
             where: { id: postId },
             include: {
@@ -27,13 +29,15 @@ export const postQueries = {
         });
 
         if (!post) throw new Error('پست یافت نشد.');
-        return formatPost(post);
+        return formatPost(post, userId);  // ✅ userId پاس داده شد
     },
 
     getUserPosts: async (
         _: any,
-        { userId, limit = 10, offset = 0 }: { userId: string; limit: number; offset: number }
+        { userId, limit = 10, offset = 0 }: { userId: string; limit: number; offset: number },
+        context: any
     ) => {
+        const currentUserId = context.user?.userId || null;
         const posts = await prisma.post.findMany({
             where: { userId, isPublished: true },
             include: {
@@ -51,7 +55,7 @@ export const postQueries = {
             skip: offset,
         });
 
-        return posts.map((post) => formatPost(post));
+        return posts.map((post) => formatPost(post, currentUserId));
     },
 
     getFeed: async (

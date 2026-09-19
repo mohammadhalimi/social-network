@@ -106,6 +106,7 @@ export const FollowListModal = ({ userId, type, isOpen, onClose }: FollowListMod
                         hover:bg-border
                         rounded-lg
                         transition-colors
+                        cursor-pointer
                         ">
                         <X size={20} />
                     </button>

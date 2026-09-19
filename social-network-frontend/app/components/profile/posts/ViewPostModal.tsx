@@ -8,24 +8,12 @@ import {
     useEffect
 } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
+import { PostComment, PostReply } from './ViewPostModal/types';
 import { formatPersianDate } from '@/app/lib/formatDate';
 import { CommentsList } from './ViewPostModal/CommentsList';
 import { GET_POST_COMMENTS } from '@/app/graphql/post.queries';
 import { PostContentBlocks } from './ViewPostModal/PostContentBlocks';
 
-
-interface PostComment {
-    id: string;
-    content: string;
-    createdAt: string;
-    user: {
-        id: string;
-        username: string;
-        fullName: string;
-        avatar: string | null;
-    };
-    replies?: any[];
-}
 
 interface ViewPostModalProps {
     post: any;
@@ -74,7 +62,7 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
         setComments(prev => [comment, ...prev]);
     };
 
-    const handleReplyAdded = (parentCommentId: string, reply: any) => {
+    const handleReplyAdded = (parentCommentId: string, reply: PostReply) => {
         setComments(prev =>
             prev.map(comment =>
                 comment.id === parentCommentId
@@ -128,6 +116,7 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
                         hover:bg-border
                         rounded-lg
                         transition-colors
+                        cursor-pointer
                     ">
                         <X
                             size={24}

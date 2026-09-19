@@ -150,7 +150,6 @@ export const ProfileHeader = ({
                         onClick={onFollowersClick}
                         className="
                         text-center
-                        sm:text-right
                         hover:opacity-80
                         transition-opacity
                         cursor-pointer
@@ -174,9 +173,9 @@ export const ProfileHeader = ({
                         onClick={onFollowingClick}
                         className="
                         text-center
-                        sm:text-right
                         hover:opacity-80
                         transition-opacity
+                        cursor-pointer
                         ">
                         <p
                             className="

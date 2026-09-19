@@ -1,8 +1,8 @@
-import type { PostComment } from '../types';
 import { CommentItem } from '../CommentItem';
+import type { PostComment, PostReply } from '../types';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// ✅ Mock کردن next/image (چون در محیط تست به بک‌اند Next.js دسترسی نداریم)
+// ✅ Mock کردن next/image
 jest.mock('next/image', () => ({
     __esModule: true,
     default: (props: any) => {
@@ -11,7 +11,17 @@ jest.mock('next/image', () => ({
     },
 }));
 
-// ✅ Mock کردن CommentForm - فقط رفتار CommentItem رو تست می‌کنیم، نه خود فرم
+// ✅ Mock کردن CommentLikeButton (چون useMutation داره و جداگانه تست میشه)
+jest.mock('../CommentLikeButton', () => ({
+    CommentLikeButton: ({ initialLikesCount, initialIsLiked }: any) => (
+        <div data-testid="comment-like-button">
+            <span>لایک: {initialLikesCount}</span>
+            <span>{initialIsLiked ? '❤️' : '🤍'}</span>
+        </div>
+    ),
+}));
+
+// ✅ Mock کردن CommentForm
 jest.mock('../../../../UserName/CommentForm', () => ({
     CommentForm: ({ onCommentAdded, onCancelReply }: any) => (
         <div data-testid="comment-form">
@@ -23,11 +33,12 @@ jest.mock('../../../../UserName/CommentForm', () => ({
     ),
 }));
 
-// ✅ Mock کردن ReplyItem - فقط بررسی می‌کنیم رندر می‌شه یا نه
+// ✅ Mock کردن ReplyItem
 jest.mock('../ReplyItem', () => ({
     ReplyItem: ({ reply }: any) => <div data-testid="reply-item">{reply.content}</div>,
 }));
 
+// ✅ Mock comment با فیلدهای کامل
 const mockComment: PostComment = {
     id: 'comment-1',
     content: 'این یک کامنت تستی است',
@@ -39,7 +50,23 @@ const mockComment: PostComment = {
         avatar: null,
     },
     replies: [],
+    likesCount: 0,
+    isLiked: false,
 };
+
+// ✅ تابع کمکی برای ساخت ریپلای (جلوگیری از تکرار و رفع خطای TypeScript)
+const createReply = (
+    id: string,
+    content: string,
+    createdAt: string = '2026-01-15T11:00:00.000Z'
+): PostReply => ({
+    id,
+    content,
+    createdAt,
+    user: mockComment.user,
+    likesCount: 0,
+    isLiked: false,
+});
 
 describe('CommentItem', () => {
     const defaultProps = {
@@ -83,7 +110,6 @@ describe('CommentItem', () => {
     it('تاریخ فرمت‌شده کامنت را نمایش می‌دهد', () => {
         render(<CommentItem {...defaultProps} />);
 
-        // formatPersianDate واقعی صدا زده می‌شود، پس فقط بررسی می‌کنیم چیزی رندر شده و خالی نیست
         const dateElements = screen.getAllByText(/.+/, { selector: 'span.text-\\[11px\\]' });
         expect(dateElements.length).toBeGreaterThan(0);
     });
@@ -174,8 +200,8 @@ describe('CommentItem', () => {
         const commentWithReplies: PostComment = {
             ...mockComment,
             replies: [
-                { id: 'reply-1', content: 'پاسخ ۱', createdAt: '2026-01-15T11:00:00.000Z', user: mockComment.user },
-                { id: 'reply-2', content: 'پاسخ ۲', createdAt: '2026-01-15T12:00:00.000Z', user: mockComment.user },
+                createReply('reply-1', 'پاسخ ۱', '2026-01-15T11:00:00.000Z'),
+                createReply('reply-2', 'پاسخ ۲', '2026-01-15T12:00:00.000Z'),
             ],
         };
         render(<CommentItem {...defaultProps} comment={commentWithReplies} />);
@@ -186,9 +212,7 @@ describe('CommentItem', () => {
     it('پاسخ‌ها ابتدا مخفی هستند (ReplyItem رندر نمی‌شود)', () => {
         const commentWithReplies: PostComment = {
             ...mockComment,
-            replies: [
-                { id: 'reply-1', content: 'پاسخ ۱', createdAt: '2026-01-15T11:00:00.000Z', user: mockComment.user },
-            ],
+            replies: [createReply('reply-1', 'پاسخ ۱')],
         };
         render(<CommentItem {...defaultProps} comment={commentWithReplies} />);
 
@@ -198,9 +222,7 @@ describe('CommentItem', () => {
     it('با کلیک روی دکمه‌ی نمایش، پاسخ‌ها ظاهر و متن دکمه به "پنهان کردن" تغییر می‌کند', () => {
         const commentWithReplies: PostComment = {
             ...mockComment,
-            replies: [
-                { id: 'reply-1', content: 'پاسخ ۱', createdAt: '2026-01-15T11:00:00.000Z', user: mockComment.user },
-            ],
+            replies: [createReply('reply-1', 'پاسخ ۱')],
         };
         render(<CommentItem {...defaultProps} comment={commentWithReplies} />);
 
@@ -213,9 +235,7 @@ describe('CommentItem', () => {
     it('با کلیک دوباره روی دکمه، پاسخ‌ها دوباره پنهان می‌شوند', () => {
         const commentWithReplies: PostComment = {
             ...mockComment,
-            replies: [
-                { id: 'reply-1', content: 'پاسخ ۱', createdAt: '2026-01-15T11:00:00.000Z', user: mockComment.user },
-            ],
+            replies: [createReply('reply-1', 'پاسخ ۱')],
         };
         render(<CommentItem {...defaultProps} comment={commentWithReplies} />);
 
@@ -231,8 +251,8 @@ describe('CommentItem', () => {
         const commentWithReplies: PostComment = {
             ...mockComment,
             replies: [
-                { id: 'reply-1', content: 'پاسخ اول', createdAt: '2026-01-15T11:00:00.000Z', user: mockComment.user },
-                { id: 'reply-2', content: 'پاسخ دوم', createdAt: '2026-01-15T12:00:00.000Z', user: mockComment.user },
+                createReply('reply-1', 'پاسخ اول', '2026-01-15T11:00:00.000Z'),
+                createReply('reply-2', 'پاسخ دوم', '2026-01-15T12:00:00.000Z'),
             ],
         };
         render(<CommentItem {...defaultProps} comment={commentWithReplies} />);

@@ -3,6 +3,7 @@
 
 import Image from 'next/image';
 import { PostReply } from './types';
+import { CommentLikeButton } from './CommentLikeButton';
 import { formatPersianDate } from '@/app/lib/formatDate';
 
 
@@ -97,6 +98,11 @@ export const ReplyItem = ({ reply }: ReplyItemProps) => {
                 ">
                     {formatPersianDate(reply.createdAt)}
                 </span>
+                <CommentLikeButton
+                    commentId={reply.id}
+                    initialIsLiked={reply.isLiked}
+                    initialLikesCount={reply.likesCount}
+                />
             </div>
         </div>
     );
