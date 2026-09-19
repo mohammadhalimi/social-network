@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useMutation } from '@apollo/client/react';
 import { UserPlus, UserCheck, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { FOLLOW_USER, UNFOLLOW_USER } from '@/app/graphql/user.queries';
 
 interface FollowButtonProps {
@@ -77,11 +77,20 @@ export const FollowButton = ({ userId, initialIsFollowing, onFollowChange }: Fol
             onClick={handleClick}
             disabled={isLoading}
             className={`
-                flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium
-                transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+                flex
+                items-center
+                gap-2
+                px-6
+                py-2
+                rounded-lg
+                text-sm
+                font-medium
+                transition-colors
+                disabled:opacity-60
+                disabled:cursor-not-allowed
                 ${isFollowing
-                    ? 'bg-border text-text-primary hover:bg-red-500/10 hover:text-red-500'
-                    : 'bg-primary text-white hover:bg-primary-dark'
+                    ? 'bg-border text-primary hover:bg-red-500/10 hover:text-red-500'
+                    : 'bg-primary text-white hover:bg-secondary'
                 }
             `}
         >
