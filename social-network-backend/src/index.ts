@@ -12,9 +12,11 @@ import { postTypeDefs } from './graphql/schema/post.schema';
 import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { storyTypeDefs } from './graphql/schema/story.schema';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
 import { postResolvers } from './graphql/resolvers/post.resolvers';
-
+import { storyResolvers } from './graphql/resolvers/story.resolvers';
+// ✅ اضافه شد
 dotenv.config();
 
 export const app = express();
@@ -24,6 +26,7 @@ const PORT = process.env.PORT || 4000;
 const typeDefs = `
   ${userTypeDefs}
   ${postTypeDefs}
+  ${storyTypeDefs}
   type Query {
     _empty: String
    
@@ -35,10 +38,12 @@ const resolvers = {
   Query: {
     ...userResolvers.Query,
     ...postResolvers.Query,
+    ...storyResolvers.Query
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...postResolvers.Mutation,
+    ...storyResolvers.Mutation
   },
 };
 

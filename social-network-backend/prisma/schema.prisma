@@ -24,6 +24,12 @@ model User {
   commentLikes CommentLike[]
   following Follow[] @relation("Following") 
   followers Follow[] @relation("Followers") 
+
+  // ✅ روابط جدید مربوط به استوری
+  stories         Story[]
+  storyViews      StoryView[]
+  closeFriendsOf  CloseFriend[] @relation("CloseFriendsOwner")   // لیستی که خودم مدیریت می‌کنم
+  closeFriendedBy CloseFriend[] @relation("CloseFriendsMember")  // کسانی که منو به‌عنوان close friend گذاشتن
 }
 
 model Post {
@@ -85,4 +91,52 @@ model Follow {
   createdAt   DateTime @default(now())
 
   @@unique([followerId, followingId])
+}
+
+// =============================================
+// ✅ مدل‌های جدید: Story
+// =============================================
+
+enum StoryVisibility {
+  PUBLIC
+  FOLLOWERS
+  CLOSE_FRIENDS
+}
+
+model Story {
+  id         String          @id @default(cuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaUrl   String
+  mediaType  String          // "image" | "video"
+  visibility StoryVisibility @default(FOLLOWERS)
+  createdAt  DateTime        @default(now())
+  expiresAt  DateTime        // createdAt + مدت انتخابی کاربر
+  views      StoryView[]
+}
+
+model StoryView {
+  id       String   @id @default(cuid())
+  storyId  String
+  story    Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewerId String
+  viewer   User     @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+  viewedAt DateTime @default(now())
+
+  @@unique([storyId, viewerId])
+}
+
+// ✅ مدل جدید: دوستان نزدیک
+model CloseFriend {
+  id String @id @default(cuid())
+
+  ownerId String // کسی که این لیست رو مدیریت می‌کنه
+  owner   User   @relation("CloseFriendsOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  friendId String // کاربری که به‌عنوان دوست نزدیک انتخاب شده
+  friend   User   @relation("CloseFriendsMember", fields: [friendId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([ownerId, friendId])
 }
