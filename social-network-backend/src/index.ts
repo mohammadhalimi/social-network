@@ -8,6 +8,7 @@ import { ruruHTML } from 'ruru/server';
 import cookieParser from 'cookie-parser';
 import uploadRoutes from './routes/upload.route';
 import postsRoutes from './routes/post-media.route';
+import storyMediaRoutes from './routes/story-media.route';
 import { postTypeDefs } from './graphql/schema/post.schema';
 import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
@@ -16,6 +17,7 @@ import { storyTypeDefs } from './graphql/schema/story.schema';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
 import { postResolvers } from './graphql/resolvers/post.resolvers';
 import { storyResolvers } from './graphql/resolvers/story.resolvers';
+
 // ✅ اضافه شد
 dotenv.config();
 
@@ -63,6 +65,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // ✅ مسیر آپلود عکس
 app.use('/', uploadRoutes);
 app.use('/', postsRoutes);
+app.use('/', storyMediaRoutes);
+
 app.use('/graphql', (req, res, next) => {
   const token = req.cookies?.token || null;
 
