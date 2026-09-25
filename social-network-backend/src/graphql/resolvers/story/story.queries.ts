@@ -1,7 +1,7 @@
 // resolvers/story/story.queries.ts
 import prisma from '../../../lib/prisma';
+import { mapUser } from '../helpers/mapUser';
 import { requireAuth } from '../try-catch/requireAuth';
-import { canViewStory } from '../helpers/checkStoryAccess';
 
 export const storyQueries = {
     getUserStories: async (_: any, { userId }: { userId: string }, context: any) => {
@@ -46,22 +46,19 @@ export const storyQueries = {
         }
 
         // ✅ بهینه‌سازی: یک بار following و closeFriend رو بگیر
-        const [followingSet, closeFriendSet] = await Promise.all([
-            prisma.follow.findMany({
-                where: { followerId: viewerId, followingId: userId },
-                select: { followingId: true },
-            }).then(rows => new Set(rows.map(r => r.followingId))),
-            prisma.closeFriend.findMany({
-                where: { ownerId: userId, friendId: viewerId },
-                select: { ownerId: true },
-            }).then(rows => new Set(rows.map(r => r.ownerId))),
+        const [isFollower, isCloseFriend] = await Promise.all([
+            prisma.follow.findUnique({
+                where: { followerId_followingId: { followerId: viewerId, followingId: userId } },
+            }),
+            prisma.closeFriend.findUnique({
+                where: { ownerId_friendId: { ownerId: userId, friendId: viewerId } },
+            }),
         ]);
 
-        // ✅ فیلتر استوری‌ها بر اساس دسترسی (بدون Query اضافه)
         const visibleStories = stories.filter(story => {
             if (story.visibility === 'PUBLIC') return true;
-            if (story.visibility === 'FOLLOWERS') return followingSet.has(story.userId);
-            if (story.visibility === 'CLOSE_FRIENDS') return closeFriendSet.has(story.userId);
+            if (story.visibility === 'FOLLOWERS') return !!isFollower;
+            if (story.visibility === 'CLOSE_FRIENDS') return !!isCloseFriend;
             return false;
         });
 
@@ -134,10 +131,6 @@ export const storyQueries = {
             include: { friend: true },
         });
 
-        return closeFriends.map(cf => ({
-            ...cf.friend,
-            createdAt: cf.friend.createdAt.toISOString(),
-            updatedAt: cf.friend.updatedAt.toISOString(),
-        }));
+        return closeFriends.map(cf => mapUser(cf.friend));
     },
 };
