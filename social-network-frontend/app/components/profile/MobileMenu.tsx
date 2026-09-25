@@ -8,7 +8,8 @@ import {
     Lock,
     LogOut,
     LayoutGrid,
-    PenSquare
+    PenSquare,
+    Cog
 } from 'lucide-react';
 
 const menuItems = [
@@ -17,6 +18,7 @@ const menuItems = [
     { id: 'posts', label: 'پست‌های من', icon: LayoutGrid }, // ✅ جدید
     { id: 'create-post', label: 'نوشتن پست جدید', icon: PenSquare }, // ✅ جدید
     { id: 'change-password', label: 'تغییر رمز عبور', icon: Lock },
+    { id: 'settings', label: 'تنظیمات', icon: Cog },
 ];
 
 interface MobileMenuProps {

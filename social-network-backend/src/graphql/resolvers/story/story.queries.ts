@@ -12,7 +12,14 @@ export const storyQueries = {
                 userId,
                 expiresAt: { gt: new Date() },
             },
-            include: { user: true, views: true },
+            include: {
+                user: true,
+                views: {
+                    include: {
+                        viewer: true,  // ✅ viewer لود می‌شود
+                    },
+                },
+            },
             orderBy: { createdAt: 'asc' },
         });
 

@@ -9,7 +9,7 @@ import { MobileMenu } from '../components/profile/MobileMenu';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { ProfileContent } from '../components/profile/ProfileContent';
-
+import { CreateStoryModal } from '../components/story/CreateStoryModal';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function ProfilePage() {
   const { user, loading } = useAppSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState('profile');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [activeTab]);
@@ -44,20 +44,20 @@ export default function ProfilePage() {
       });
 
       const result = await response.json();
-      
+
       if (result.data?.logout?.success) {
         // ✅ ۲. پاک کردن توکن از Redux
         dispatch(logout());
-        
+
         // ✅ ۳. پاک کردن کوکی از مرورگر (با تنظیم تاریخ انقضا به گذشته)
         document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-        
+
         // ✅ ۴. پاک کردن localStorage (اگر چیزی ذخیره شده باشد)
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        
+
         toast.success('✅ با موفقیت خارج شدید!');
-        
+
         // ✅ ۵. هدایت به صفحه لاگین
         router.push('/auth/login');
       } else {
@@ -94,6 +94,7 @@ export default function ProfilePage() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           handleLogout={handleLogout}
+          onOpenStoryModal={() => setIsStoryModalOpen(true)}
         />
 
         <main className="flex-1 min-w-0 p-6 lg:pt-3">
@@ -112,6 +113,13 @@ export default function ProfilePage() {
         setActiveTab={setActiveTab}
         handleLogout={handleLogout}
         isOpen={isMobileMenuOpen}
+      />
+
+      {/* ✅ مودال ساخت استوری */}
+      <CreateStoryModal
+        isOpen={isStoryModalOpen}
+        onClose={() => setIsStoryModalOpen(false)}
+        onSuccess={() => toast.success('استوری شما فعال شد!')}
       />
     </div>
   );

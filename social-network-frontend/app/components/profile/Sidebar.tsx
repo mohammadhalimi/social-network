@@ -27,6 +27,7 @@ interface SidebarProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     handleLogout: () => void;
+    onOpenStoryModal: () => void;
 }
 
 export const Sidebar = ({
@@ -35,6 +36,7 @@ export const Sidebar = ({
     activeTab,
     setActiveTab,
     handleLogout,
+    onOpenStoryModal,
 }: SidebarProps) => {
     const isActive = (id: string) => activeTab === id;
 
@@ -63,6 +65,7 @@ export const Sidebar = ({
                     <SidebarUserCard
                         user={user}
                         avatarUrl={avatarUrl}
+                        onOpenStoryModal={onOpenStoryModal}
                     />
                     <nav
                         className="

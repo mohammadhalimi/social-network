@@ -10,6 +10,9 @@ import { ProfileHeader } from './ProfileHeader';
 import { ProfileInfo } from './ProfileInfo';
 import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
 import { ProfileUser } from './types';
+import { useAppSelector } from '@/app/redux/hooks';
+import { StoriesBar } from '../story/StoriesBar';
+import { CreateStoryModal } from '../story/CreateStoryModal';
 
 interface UserProfileContentProps {
     user: ProfileUser;
@@ -19,9 +22,12 @@ interface UserProfileContentProps {
 export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps) => {
     const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
     const [followersCount, setFollowersCount] = useState<number | null>(null);
     const [followingCount, setFollowingCount] = useState<number | null>(null);
-
+    // ✅ دریافت کاربر لاگین‌شده برای تشخیص isOwner
+    const currentUser = useAppSelector(state => state.auth.user);
+    const isOwner = currentUser?.id === user.id;
     // ✅ برای رفرش کردن دیتای پروفایل بعد از فالو/آنفالو
     const { refetch } = useQuery(GET_USER_BY_USERNAME, {
         variables: { username: user.username },
@@ -43,6 +49,25 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
 
     return (
         <>
+            {/* ✅ نوار استوری‌ها */}
+            <StoriesBar
+                userId={user.id}
+                isOwner={isOwner}
+                currentUserAvatar={isOwner ? avatarUrl : null}
+                onCreateStory={() => setIsStoryModalOpen(true)}
+            />
+
+            {/* ✅ مودال ساخت استوری (فقط برای صاحب پروفایل) */}
+            {isOwner && (
+                <CreateStoryModal
+                    isOpen={isStoryModalOpen}
+                    onClose={() => setIsStoryModalOpen(false)}
+                    onSuccess={() => {
+                        setIsStoryModalOpen(false);
+                        // ✅ رفرش استوری‌ها با refetch یا key
+                    }}
+                />
+            )}
             {modalType && (
                 <FollowListModal
                     userId={user.id}
