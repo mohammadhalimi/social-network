@@ -113,6 +113,7 @@ export default function ProfilePage() {
         setActiveTab={setActiveTab}
         handleLogout={handleLogout}
         isOpen={isMobileMenuOpen}
+        onOpenStoryModal={() => setIsStoryModalOpen(true)}
       />
 
       {/* ✅ مودال ساخت استوری */}
