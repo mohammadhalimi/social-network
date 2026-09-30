@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1790794373869" clover="3.2.0">
-  <project timestamp="1790794373870" name="All files">
-    <metrics statements="703" coveredstatements="24" conditionals="331" coveredconditionals="23" methods="124" coveredmethods="11" elements="1158" coveredelements="58" complexity="0" loc="703" ncloc="703" packages="14" files="35" classes="35"/>
+<coverage generated="1790794659103" clover="3.2.0">
+  <project timestamp="1790794659103" name="All files">
+    <metrics statements="703" coveredstatements="46" conditionals="331" coveredconditionals="38" methods="124" coveredmethods="14" elements="1158" coveredelements="98" complexity="0" loc="703" ncloc="703" packages="14" files="35" classes="35"/>
     <package name="src">
       <metrics statements="28" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="env.ts" path="E:\project-code\social_network\social-network-backend\src\env.ts">
@@ -66,21 +66,21 @@
       </file>
     </package>
     <package name="src.graphql.resolvers.helpers">
-      <metrics statements="46" coveredstatements="24" conditionals="38" coveredconditionals="23" methods="14" coveredmethods="11"/>
+      <metrics statements="46" coveredstatements="46" conditionals="38" coveredconditionals="38" methods="14" coveredmethods="14"/>
       <file name="checkStoryAccess.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\checkStoryAccess.ts">
-        <metrics statements="12" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="9" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="11" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="28" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
+        <metrics statements="12" coveredstatements="12" conditionals="10" coveredconditionals="10" methods="1" coveredmethods="1"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="9" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="11" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="14" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="16" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="28" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
       </file>
       <file name="formatPost.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\formatPost.ts">
         <metrics statements="13" coveredstatements="13" conditionals="12" coveredconditionals="12" methods="6" coveredmethods="6"/>
@@ -116,17 +116,17 @@
         <line num="20" count="4" type="cond" truecount="2" falsecount="0"/>
       </file>
       <file name="storyDuration.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\storyDuration.ts">
-        <metrics statements="10" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="cond" truecount="0" falsecount="5"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
+        <metrics statements="10" coveredstatements="10" conditionals="5" coveredconditionals="5" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="13" type="cond" truecount="5" falsecount="0"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="4" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="6" type="stmt"/>
+        <line num="15" count="5" type="stmt"/>
       </file>
     </package>
     <package name="src.graphql.resolvers.post">
