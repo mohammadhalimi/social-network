@@ -1,7 +1,4 @@
 // graphql/resolvers/helpers/__tests__/formatPost.test.ts
-//
-// mapUser جداگانه تست شده (mapUser.test.ts)، پس اینجا mock می‌شود تا
-// تست‌های formatPost/formatComment مستقل و متمرکز بر منطق خودشان باشند.
 
 jest.mock('../mapUser', () => ({
     mapUser: jest.fn((user: any) => ({ mapped: true, sourceId: user?.id })),
@@ -12,6 +9,30 @@ import { mapUser } from '../mapUser';
 
 const mockedMapUser = mapUser as jest.Mock;
 
+// ✅ تاریخ‌های پیش‌فرض برای Mock
+const ISO_DATE = '2024-01-01T10:00:00.000Z';
+const ISO_DATE_UPDATED = '2024-06-15T12:30:00.000Z';
+
+// ✅ تابع کمکی برای ساخت پست
+const buildPost = (overrides: any = {}) => ({
+    id: 'post-1',
+    text: 'سلام دنیا',
+    createdAt: new Date(ISO_DATE),
+    updatedAt: new Date(ISO_DATE_UPDATED),
+    user: { id: 'u1' },
+    ...overrides,
+});
+
+// ✅ تابع کمکی برای ساخت کامنت
+const buildComment = (overrides: any = {}) => ({
+    id: 'c1',
+    text: 'یک کامنت',
+    createdAt: new Date(ISO_DATE),
+    updatedAt: new Date(ISO_DATE_UPDATED),
+    user: { id: 'u1' },
+    ...overrides,
+});
+
 beforeEach(() => {
     jest.clearAllMocks();
 });
@@ -21,7 +42,7 @@ beforeEach(() => {
 // ===================================================================
 describe('formatPost', () => {
     test('پستی بدون likes/comments را با مقادیر پیش‌فرض صفر فرمت می‌کند', () => {
-        const post = { id: 'post-1', text: 'سلام دنیا', user: { id: 'u1' } };
+        const post = buildPost();
 
         const result = formatPost(post);
 
@@ -34,22 +55,34 @@ describe('formatPost', () => {
     });
 
     test('فیلدهای اصلی پست را حفظ می‌کند (spread)', () => {
-        const post = { id: 'post-1', text: 'متن پست', createdAt: '2024-01-01', user: {} };
+        const post = buildPost({ id: 'post-1', text: 'متن پست' });
 
         const result = formatPost(post);
 
         expect(result.id).toBe('post-1');
         expect(result.text).toBe('متن پست');
-        expect(result.createdAt).toBe('2024-01-01');
+    });
+
+    // ✅ تست جدید: تبدیل createdAt و updatedAt به ISO
+    test('createdAt و updatedAt را به رشته ISO تبدیل می‌کند', () => {
+        const post = buildPost();
+
+        const result = formatPost(post);
+
+        expect(result.createdAt).toBe(ISO_DATE);
+        expect(result.updatedAt).toBe(ISO_DATE_UPDATED);
+        expect(typeof result.createdAt).toBe('string');
+        expect(typeof result.updatedAt).toBe('string');
     });
 
     test('likesCount و commentsCount را طبق طول آرایه‌ها محاسبه می‌کند', () => {
-        const post = {
-            id: 'post-1',
-            user: {},
+        const post = buildPost({
             likes: [{ userId: 'a' }, { userId: 'b' }, { userId: 'c' }],
-            comments: [{ id: 'c1', user: {} }, { id: 'c2', user: {} }],
-        };
+            comments: [
+                buildComment({ id: 'c1' }),
+                buildComment({ id: 'c2' }),
+            ],
+        });
 
         const result = formatPost(post);
 
@@ -58,11 +91,9 @@ describe('formatPost', () => {
     });
 
     test('اگر userId در بین لایک‌ها باشد، isLiked برابر true است', () => {
-        const post = {
-            id: 'post-1',
-            user: {},
+        const post = buildPost({
             likes: [{ userId: 'x' }, { userId: 'y' }],
-        };
+        });
 
         const result = formatPost(post, 'y');
 
@@ -70,11 +101,9 @@ describe('formatPost', () => {
     });
 
     test('اگر userId در بین لایک‌ها نباشد، isLiked برابر false است', () => {
-        const post = {
-            id: 'post-1',
-            user: {},
+        const post = buildPost({
             likes: [{ userId: 'x' }, { userId: 'y' }],
-        };
+        });
 
         const result = formatPost(post, 'z');
 
@@ -82,11 +111,9 @@ describe('formatPost', () => {
     });
 
     test('اگر userId ارسال نشود، isLiked همیشه false است حتی اگر لایک وجود داشته باشد', () => {
-        const post = {
-            id: 'post-1',
-            user: {},
+        const post = buildPost({
             likes: [{ userId: 'x' }],
-        };
+        });
 
         const result = formatPost(post);
 
@@ -94,14 +121,12 @@ describe('formatPost', () => {
     });
 
     test('هر کامنت را با formatComment فرمت می‌کند و userId را عبور می‌دهد', () => {
-        const post = {
-            id: 'post-1',
-            user: {},
+        const post = buildPost({
             comments: [
-                { id: 'c1', user: { id: 'cu1' }, likes: [{ userId: 'me' }] },
-                { id: 'c2', user: { id: 'cu2' }, likes: [] },
+                buildComment({ id: 'c1', user: { id: 'cu1' }, likes: [{ userId: 'me' }] }),
+                buildComment({ id: 'c2', user: { id: 'cu2' }, likes: [] }),
             ],
-        };
+        });
 
         const result = formatPost(post, 'me');
 
@@ -111,7 +136,7 @@ describe('formatPost', () => {
     });
 
     test('likes یا comments برابر null هم به آرایه خالی تبدیل می‌شود', () => {
-        const post: any = { id: 'post-1', user: {}, likes: null, comments: null };
+        const post = buildPost({ likes: null, comments: null });
 
         const result = formatPost(post);
 
@@ -126,7 +151,7 @@ describe('formatPost', () => {
 // ===================================================================
 describe('formatComment', () => {
     test('کامنتی بدون likes/replies را با مقادیر پیش‌فرض صفر فرمت می‌کند', () => {
-        const comment = { id: 'c1', text: 'یک کامنت', user: { id: 'u1' } };
+        const comment = buildComment();
 
         const result = formatComment(comment);
 
@@ -137,7 +162,7 @@ describe('formatComment', () => {
     });
 
     test('فیلدهای اصلی کامنت را حفظ می‌کند (spread)', () => {
-        const comment = { id: 'c1', text: 'متن کامنت', user: {} };
+        const comment = buildComment({ id: 'c1', text: 'متن کامنت' });
 
         const result = formatComment(comment);
 
@@ -145,8 +170,20 @@ describe('formatComment', () => {
         expect(result.text).toBe('متن کامنت');
     });
 
+    // ✅ تست جدید: تبدیل createdAt و updatedAt به ISO
+    test('createdAt و updatedAt را به رشته ISO تبدیل می‌کند', () => {
+        const comment = buildComment();
+
+        const result = formatComment(comment);
+
+        expect(result.createdAt).toBe(ISO_DATE);
+        expect(result.updatedAt).toBe(ISO_DATE_UPDATED);
+    });
+
     test('likesCount را طبق طول آرایه likes محاسبه می‌کند', () => {
-        const comment = { id: 'c1', user: {}, likes: [{ userId: 'a' }, { userId: 'b' }] };
+        const comment = buildComment({
+            likes: [{ userId: 'a' }, { userId: 'b' }],
+        });
 
         const result = formatComment(comment);
 
@@ -154,7 +191,9 @@ describe('formatComment', () => {
     });
 
     test('اگر userId در بین لایک‌های کامنت باشد، isLiked برابر true است', () => {
-        const comment = { id: 'c1', user: {}, likes: [{ userId: 'me' }] };
+        const comment = buildComment({
+            likes: [{ userId: 'me' }],
+        });
 
         const result = formatComment(comment, 'me');
 
@@ -162,7 +201,9 @@ describe('formatComment', () => {
     });
 
     test('اگر userId ارسال نشود، isLiked همیشه false است', () => {
-        const comment = { id: 'c1', user: {}, likes: [{ userId: 'me' }] };
+        const comment = buildComment({
+            likes: [{ userId: 'me' }],
+        });
 
         const result = formatComment(comment);
 
@@ -170,14 +211,12 @@ describe('formatComment', () => {
     });
 
     test('replies را به‌صورت بازگشتی با formatComment فرمت می‌کند', () => {
-        const comment = {
-            id: 'c1',
-            user: {},
+        const comment = buildComment({
             replies: [
-                { id: 'r1', user: {}, likes: [{ userId: 'me' }] },
-                { id: 'r2', user: {}, likes: [] },
+                buildComment({ id: 'r1', user: {}, likes: [{ userId: 'me' }] }),
+                buildComment({ id: 'r2', user: {}, likes: [] }),
             ],
-        };
+        });
 
         const result = formatComment(comment, 'me');
 
@@ -187,17 +226,17 @@ describe('formatComment', () => {
     });
 
     test('بازگشت چند سطحی (reply داخل reply) را درست فرمت می‌کند', () => {
-        const comment = {
-            id: 'c1',
-            user: {},
+        const comment = buildComment({
             replies: [
-                {
+                buildComment({
                     id: 'r1',
                     user: {},
-                    replies: [{ id: 'r1-1', user: {}, likes: [{ userId: 'me' }] }],
-                },
+                    replies: [
+                        buildComment({ id: 'r1-1', user: {}, likes: [{ userId: 'me' }] }),
+                    ],
+                }),
             ],
-        };
+        });
 
         const result = formatComment(comment, 'me');
 
@@ -206,7 +245,7 @@ describe('formatComment', () => {
     });
 
     test('likes یا replies برابر null هم به آرایه خالی تبدیل می‌شود', () => {
-        const comment: any = { id: 'c1', user: {}, likes: null, replies: null };
+        const comment = buildComment({ likes: null, replies: null });
 
         const result = formatComment(comment);
 
