@@ -2,9 +2,14 @@
 'use client';
 
 import Image from 'next/image';
-import { User } from '@/app/redux/features/authSlice';
-import { CirclePlus } from 'lucide-react';
-
+import {
+    User
+} from '@/app/redux/features/authSlice';
+import {
+    CirclePlus,
+    ExternalLink,
+} from 'lucide-react';
+import Link from 'next/link';
 interface SidebarUserCardProps {
     user: User;
     avatarUrl: string | null;
@@ -86,6 +91,15 @@ export const SidebarUserCard = ({ user, avatarUrl, onOpenStoryModal }: SidebarUs
             <p className="text-xs text-secondary truncate max-w-[140px]">
                 @{user?.username || '—'}
             </p>
+            {user?.username && (
+                <Link
+                    href={`/${user.username}`}
+                    className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-primary hover:underline cursor-pointer"
+                >
+                    <ExternalLink size={10} />
+                    مشاهده‌ی پروفایل عمومی
+                </Link>
+            )}
         </div>
     </div>
 );

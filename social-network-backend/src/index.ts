@@ -14,6 +14,7 @@ import { userTypeDefs } from './graphql/schema/user.schema';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { storyTypeDefs } from './graphql/schema/story.schema';
+import { startStoryCleanupJob } from './jobs/storyCleanupJob';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
 import { postResolvers } from './graphql/resolvers/post.resolvers';
 import { storyResolvers } from './graphql/resolvers/story.resolvers';
@@ -102,5 +103,6 @@ if (require.main === module) {
     console.log(`🚀 سرور در حال اجراست:`);
     console.log(`📡 GraphQL API: http://localhost:${PORT}/graphql`);
     console.log(`🎨 محیط تست: http://localhost:${PORT}/playground`);
+    startStoryCleanupJob();
   });
 }
