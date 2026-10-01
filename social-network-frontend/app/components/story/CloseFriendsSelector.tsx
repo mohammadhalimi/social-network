@@ -58,7 +58,7 @@ export const CloseFriendsSelector = ({ userId, onChange }: CloseFriendsSelectorP
                     bg-primary
                     text-white
                     rounded-lg
-                    hover:bg-primary
+                    hover:bg-secondary
                     disabled:opacity-50
                     ">
                     {isSaving ? 'در حال ذخیره...' : 'ذخیره'}
