@@ -79,7 +79,13 @@ export default function ProfilePage() {
   const avatarUrl = user ? getAvatarUrl(user.avatar) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+    <div
+      className="
+      min-h-screen
+      bg-gray-50/50
+      flex
+      flex-col
+    ">
       <ProfileHeader
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -87,7 +93,12 @@ export default function ProfilePage() {
         user={user}
       />
 
-      <div className="flex flex-1 bg-gray">
+      <div
+        className="
+        flex
+        flex-1
+        bg-gray
+      ">
         <Sidebar
           user={user}
           avatarUrl={avatarUrl}
@@ -97,7 +108,13 @@ export default function ProfilePage() {
           onOpenStoryModal={() => setIsStoryModalOpen(true)}
         />
 
-        <main className="flex-1 min-w-0 p-6 lg:pt-3">
+        <main
+          className="
+          flex-1
+          min-w-0
+          p-6
+          lg:pt-3
+        ">
           <ProfileContent
             user={user}
             loading={loading}

@@ -28,7 +28,6 @@ import { logout } from '@/app/redux/features/authSlice';
 jest.mock('@/app/redux/features/themeSlice', () => ({
     toggleTheme: jest.fn(() => ({ type: 'theme/toggle' })),
 }));
-import { toggleTheme } from '@/app/redux/features/themeSlice';
 
 // ==========================================================
 // Mock: redux hooks
@@ -106,6 +105,11 @@ jest.mock('../ProfileContent', () => ({
             </div>
         );
     },
+}));
+
+jest.mock('../../story/CreateStoryModal', () => ({
+    CreateStoryModal: ({ isOpen }: any) =>
+        isOpen ? <div data-testid="create-story-modal">مودال استوری باز است</div> : null,
 }));
 
 import ProfilePage from '../../../profile/page';
