@@ -9,6 +9,7 @@ import {
   FileText,
   Calendar,
 } from 'lucide-react';
+import { getAvatarUrl } from '@/app/lib/utils/avatar';
 
 interface ProfileInfoProps {
   user: User | null;
@@ -36,13 +37,6 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
       </div>
     );
   }
-
-  const getAvatarUrl = (avatar: string | null | undefined) => {
-    if (!avatar) return null;
-    if (avatar.startsWith('http')) return avatar;
-    if (avatar.startsWith('/uploads/')) return `http://localhost:4000${avatar}`;
-    return `http://localhost:4000/uploads/${avatar}`;
-  };
 
   const avatarUrl = getAvatarUrl(user.avatar);
 

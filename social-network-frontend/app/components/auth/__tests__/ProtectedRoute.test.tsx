@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import { ProtectedRoute } from '../../components/auth/ProtectedRoute';
+import { ProtectedRoute } from '../ProtectedRoute';
 
 // ==========================================================
 // Mock: next/navigation
