@@ -37,6 +37,10 @@ describe('useCreateStory', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        // ✅ Mock کردن URL.createObjectURL
+        global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
+
         createStoryMock = jest.fn();
         onSuccess = jest.fn();
         onClose = jest.fn();
