@@ -20,7 +20,7 @@ export const useFollowersPagination = (userId: string) => {
     const [loadingMore, setLoadingMore] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
-
+    const prevDebouncedSearchRef = useRef(debouncedSearch);
     // ✅ Debounce برای جستجو
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
@@ -32,19 +32,19 @@ export const useFollowersPagination = (userId: string) => {
         fetchPolicy: 'cache-and-network',
     });
 
-    // ✅ هماهنگ‌سازی با داده‌های جدید
+    // ✅ ادغام: هم data رو ست می‌کنه، هم در صورت تغییر search، لیست رو ریست می‌کنه
     useEffect(() => {
         if (data?.getFollowers?.users) {
             setAllFollowers(data.getFollowers.users);
             setHasMore(data.getFollowers.hasMore);
+        } else if (prevDebouncedSearchRef.current !== debouncedSearch) {
+            // ✅ search تغییر کرده و data جدید هنوز نیامده
+            setAllFollowers([]);
+            setHasMore(true);
         }
-    }, [data]);
+        prevDebouncedSearchRef.current = debouncedSearch;
+    }, [data, debouncedSearch]);
 
-    // ✅ ریست لیست وقتی search تغییر می‌کند
-    useEffect(() => {
-        setAllFollowers([]);
-        setHasMore(true);
-    }, [debouncedSearch]);
 
     const handleLoadMore = useCallback(async () => {
         if (!hasMore || loadingMore || loading) return;
