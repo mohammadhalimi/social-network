@@ -42,9 +42,15 @@ describe('useCloseFriendsSelection', () => {
             refetch: refetchCloseMock,
         });
 
-        mockedUseMutation
-            .mockReturnValueOnce([addCloseFriendMock])
-            .mockReturnValueOnce([removeCloseFriendMock]);
+        // ✅ ماک هوشمند: بار اول addCloseFriend، بار دوم removeCloseFriend
+        let callCount = 0;
+        mockedUseMutation.mockImplementation(() => {
+            callCount++;
+            if (callCount % 2 === 1) {
+                return [addCloseFriendMock];
+            }
+            return [removeCloseFriendMock];
+        });
     });
 
     // ==========================================================
@@ -225,19 +231,38 @@ describe('useCloseFriendsSelection', () => {
     });
 
     it('isSaving در حین save برابر true و بعد از اتمام false است', async () => {
+        // ✅ addCloseFriend را معلق نگه دار
+        let resolveAdd: any;
+        addCloseFriendMock.mockReturnValue(
+            new Promise((resolve) => {
+                resolveAdd = resolve;
+            })
+        );
+
         const { result } = renderHook(() => useCloseFriendsSelection());
+
+        act(() => {
+            result.current.toggle('friend-3');
+        });
 
         expect(result.current.isSaving).toBe(false);
 
-        const savePromise = act(async () => {
-            const promise = result.current.save();
-            // بلافاصله بعد از فراخوانی save، باید true باشد
-            await waitFor(() => expect(result.current.isSaving).toBe(true));
-            await promise;
+        // ✅ save را صدا بزن (بدون await)
+        let savePromise: Promise<void>;
+        act(() => {
+            savePromise = result.current.save();
         });
 
-        await savePromise;
+        // ✅ isSaving باید true باشد
+        await waitFor(() => expect(result.current.isSaving).toBe(true));
 
+        // ✅ Promise را resolve کن
+        await act(async () => {
+            resolveAdd({ data: {}, error: undefined });
+            await savePromise!;
+        });
+
+        // ✅ isSaving باید false شده باشد
         expect(result.current.isSaving).toBe(false);
     });
 });
