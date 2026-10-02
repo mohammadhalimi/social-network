@@ -250,7 +250,7 @@ describe('useStoryViewer', () => {
     // ==========================================================
     it('برای ویدیو، progress بر اساس currentTime/duration محاسبه می‌شود', () => {
         const stories = [makeStory({ id: 's1', mediaType: 'video' })];
-        const { result } = renderHook(() =>
+        const { result, rerender } = renderHook(() =>
             useStoryViewer({ stories, initialIndex: 0, isOwner: true, isOpen: true, onClose })
         );
 
@@ -259,9 +259,13 @@ describe('useStoryViewer', () => {
         Object.defineProperty(fakeVideo, 'duration', { value: 10, configurable: true });
         Object.defineProperty(fakeVideo, 'currentTime', { value: 5, configurable: true });
 
+        // ✅ videoRef.current رو ست کن
         act(() => {
             (result.current.videoRef as any).current = fakeVideo;
         });
+
+        // ✅ rerender کن تا useEffect با videoRef.current اجرا بشه
+        rerender();
 
         act(() => {
             fakeVideo.dispatchEvent(new Event('timeupdate'));
@@ -272,7 +276,7 @@ describe('useStoryViewer', () => {
 
     it('با پایان یافتن ویدیو (ended)، به استوری بعدی می‌رود', () => {
         const stories = [makeStory({ id: 's1', mediaType: 'video' }), makeStory({ id: 's2' })];
-        const { result } = renderHook(() =>
+        const { result, rerender } = renderHook(() =>
             useStoryViewer({ stories, initialIndex: 0, isOwner: true, isOpen: true, onClose })
         );
 
@@ -282,13 +286,14 @@ describe('useStoryViewer', () => {
             (result.current.videoRef as any).current = fakeVideo;
         });
 
+        rerender();
+
         act(() => {
             fakeVideo.dispatchEvent(new Event('ended'));
         });
 
         expect(result.current.currentIndex).toBe(1);
     });
-
     // ==========================================================
     //  کلیدهای میانبر
     // ==========================================================
