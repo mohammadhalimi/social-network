@@ -1,8 +1,8 @@
 // components/story/StoryViewerModal/__tests__/useStoryViewer.test.tsx
 
-import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMutation } from '@apollo/client/react';
 import { useStoryViewer } from '../useStoryViewer';
+import { renderHook, act, waitFor, render } from '@testing-library/react';
 
 jest.mock('@apollo/client/react', () => ({
     useMutation: jest.fn(),
@@ -248,51 +248,74 @@ describe('useStoryViewer', () => {
     // ==========================================================
     //  Progress برای ویدیو
     // ==========================================================
+    // ==========================================================
+    //  Progress برای ویدیو
+    // ==========================================================
     it('برای ویدیو، progress بر اساس currentTime/duration محاسبه می‌شود', () => {
         const stories = [makeStory({ id: 's1', mediaType: 'video' })];
-        const { result, rerender } = renderHook(() =>
-            useStoryViewer({ stories, initialIndex: 0, isOwner: true, isOpen: true, onClose })
-        );
 
-        // ✅ شبیه‌سازی عنصر video
-        const fakeVideo = document.createElement('video');
+        // ✅ یک کامپوننت واقعی که videoRef رو به یک video DOM وصل می‌کنه
+        const TestComponent = () => {
+            const { videoRef, progress } = useStoryViewer({
+                stories,
+                initialIndex: 0,
+                isOwner: true,
+                isOpen: true,
+                onClose,
+            });
+            return (
+                <div>
+                    <video ref={videoRef} data-testid="video" />
+                    <span data-testid="progress">{progress}</span>
+                </div>
+            );
+        };
+
+        const { getByTestId } = render(<TestComponent />);
+
+        const fakeVideo = getByTestId('video') as HTMLVideoElement;
         Object.defineProperty(fakeVideo, 'duration', { value: 10, configurable: true });
         Object.defineProperty(fakeVideo, 'currentTime', { value: 5, configurable: true });
 
-        // ✅ videoRef.current رو ست کن
-        act(() => {
-            (result.current.videoRef as any).current = fakeVideo;
-        });
-
-        // ✅ rerender کن تا useEffect با videoRef.current اجرا بشه
-        rerender();
-
+        // ✅ حالا event رو dispatch کن
         act(() => {
             fakeVideo.dispatchEvent(new Event('timeupdate'));
         });
 
-        expect(result.current.progress).toBe(50);
+        expect(getByTestId('progress').textContent).toBe('50');
     });
 
     it('با پایان یافتن ویدیو (ended)، به استوری بعدی می‌رود', () => {
-        const stories = [makeStory({ id: 's1', mediaType: 'video' }), makeStory({ id: 's2' })];
-        const { result, rerender } = renderHook(() =>
-            useStoryViewer({ stories, initialIndex: 0, isOwner: true, isOpen: true, onClose })
-        );
+        const stories = [
+            makeStory({ id: 's1', mediaType: 'video' }),
+            makeStory({ id: 's2' }),
+        ];
 
-        const fakeVideo = document.createElement('video');
+        const TestComponent = () => {
+            const { videoRef, currentIndex } = useStoryViewer({
+                stories,
+                initialIndex: 0,
+                isOwner: true,
+                isOpen: true,
+                onClose,
+            });
+            return (
+                <div>
+                    <video ref={videoRef} data-testid="video" />
+                    <span data-testid="current-index">{currentIndex}</span>
+                </div>
+            );
+        };
 
-        act(() => {
-            (result.current.videoRef as any).current = fakeVideo;
-        });
+        const { getByTestId } = render(<TestComponent />);
 
-        rerender();
+        const fakeVideo = getByTestId('video') as HTMLVideoElement;
 
         act(() => {
             fakeVideo.dispatchEvent(new Event('ended'));
         });
 
-        expect(result.current.currentIndex).toBe(1);
+        expect(getByTestId('current-index').textContent).toBe('1');
     });
     // ==========================================================
     //  کلیدهای میانبر
