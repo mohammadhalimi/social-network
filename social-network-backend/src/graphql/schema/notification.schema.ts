@@ -35,21 +35,27 @@ export const notificationTypeDefs = `
     hasMore: Boolean!
   }
 
-  type FollowRequestResponse {
+  type ActionResponse {
     success: Boolean!
     message: String!
   }
 
+  type UpdatePrivacyResponse {
+    success: Boolean!
+    message: String!
+    isPrivate: Boolean!
+  }
+
   type Query {
     getNotifications(limit: Int, offset: Int): NotificationsResult!
-    getPendingFollowRequests(limit: Int, offset: Int): NotificationsResult!
   }
 
   type Mutation {
-    markNotificationRead(notificationId: ID!): FollowRequestResponse!
-    markAllNotificationsRead: FollowRequestResponse!
-    acceptFollowRequest(requestId: ID!): FollowRequestResponse!
-    rejectFollowRequest(requestId: ID!): FollowRequestResponse!
-    cancelFollowRequest(targetUserId: ID!): FollowRequestResponse!
+    updatePrivacy(isPrivate: Boolean!): UpdatePrivacyResponse!
+    markNotificationRead(notificationId: ID!): ActionResponse!
+    markAllNotificationsRead: ActionResponse!
+    acceptFollowRequest(requestId: ID!): ActionResponse!
+    rejectFollowRequest(requestId: ID!): ActionResponse!
+    cancelFollowRequest(targetUserId: ID!): ActionResponse!
   }
 `;

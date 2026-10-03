@@ -11,6 +11,8 @@ export const userTypeDefs = `
     followersCount: Int!
     followingCount: Int!
     isFollowing: Boolean!
+    isPrivate: Boolean!
+    isFollowRequestPending: Boolean!
   }
 
   type AuthPayload {
@@ -31,11 +33,13 @@ export const userTypeDefs = `
     totalCount: Int!
     hasMore: Boolean!
   } 
-    
+
+  # ✅ فقط یک‌بار تعریف شده، با isPending
   type FollowResponse {
     success: Boolean!
     message: String!
     isFollowing: Boolean!
+    isPending: Boolean!
     followersCount: Int!
   }
 
@@ -54,7 +58,6 @@ export const userTypeDefs = `
 
     logout: LogoutPayload!
 
-    # ✅ Mutation جدید برای ویرایش پروفایل
     updateProfile(
       username: String
       fullName: String
@@ -63,16 +66,12 @@ export const userTypeDefs = `
       avatar: String
     ): UpdateProfilePayload!
 
-    # ✅ Mutation جدید برای تغییر رمز عبور
     changePassword(
       oldPassword: String!
       newPassword: String!
     ): UpdateProfilePayload!
 
-    # ✅ درخواست بازیابی رمز
     requestPasswordReset(email: String!): ResetPasswordPayload!
-
-    # ✅ بازنشانی رمز با توکن
     resetPassword(token: String!, newPassword: String!): ResetPasswordPayload!
 
     followUser(userId: ID!): FollowResponse!
@@ -83,29 +82,24 @@ export const userTypeDefs = `
     success: Boolean!
     message: String!
   }
-    
+
   type Query {
-  _empty: String
-  me: User   # ✅ اضافه کردن
-  searchUsers(searchTerm: String!, limit: Int = 10, offset: Int = 0): SearchUsersResult!
-    
-    # ✅ کوئری جدید برای دریافت کاربر با username
+    _empty: String
+    me: User
+    searchUsers(searchTerm: String!, limit: Int = 10, offset: Int = 0): SearchUsersResult!
     getUserByUsername(username: String!): User
+    getFollowers(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
+    getFollowing(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
   }
 
   type ResetPasswordPayload {
     success: Boolean!
     message: String!
   }
-  
-extend type Query {
-  getFollowers(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
-  getFollowing(userId: ID!, searchTerm: String, limit: Int, offset: Int): UserConnection!
-}
 
- type UserConnection {
-  users: [User!]!
-  totalCount: Int!
-  hasMore: Boolean!
- }
+  type UserConnection {
+    users: [User!]!
+    totalCount: Int!
+    hasMore: Boolean!
+  }
 `;

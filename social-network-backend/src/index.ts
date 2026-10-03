@@ -20,6 +20,8 @@ import { startStoryCleanupJob } from './jobs/storyCleanupJob';
 import { userResolvers } from './graphql/resolvers/user.resolvers';
 import { postResolvers } from './graphql/resolvers/post.resolvers';
 import { storyResolvers } from './graphql/resolvers/story.resolvers';
+import { notificationTypeDefs } from './graphql/schema/notification.schema';
+import { notificationResolvers } from './graphql/resolvers/notification.resolvers';
 
 // ✅ اضافه شد
 dotenv.config();
@@ -32,6 +34,7 @@ const typeDefs = `
   ${userTypeDefs}
   ${postTypeDefs}
   ${storyTypeDefs}
+  ${notificationTypeDefs}
   type Query {
     _empty: String
    
@@ -43,12 +46,14 @@ const resolvers = {
   Query: {
     ...userResolvers.Query,
     ...postResolvers.Query,
-    ...storyResolvers.Query
+    ...storyResolvers.Query,
+    ...notificationResolvers.Query,
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...postResolvers.Mutation,
-    ...storyResolvers.Mutation
+    ...storyResolvers.Mutation,
+    ...notificationResolvers.Mutation,
   },
 };
 

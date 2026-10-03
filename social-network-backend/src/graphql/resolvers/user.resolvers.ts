@@ -4,14 +4,16 @@
 import { postResolvers } from './post.resolvers';
 import { userQueries } from './user/user.queries';
 import { authResolvers } from './user/auth.resolvers';
+import { followResolvers } from './user/follow.resolvers';
 import { profileResolvers } from './user/profile.resolvers';
-import { followResolvers } from './user/follow.resolvers'; // ✅ اضافه شد
+import { privacyResolvers } from './user/privacy.resolvers';
 
 export const userResolvers = {
     Mutation: {
         ...authResolvers,
         ...profileResolvers,
         ...followResolvers,
+        ...privacyResolvers,
         ...postResolvers.Mutation,
     },
     Query: userQueries,
