@@ -1,4 +1,5 @@
 import './env';
+import http from 'http';
 import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -6,6 +7,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { ruruHTML } from 'ruru/server';
 import cookieParser from 'cookie-parser';
+import { initializeSocket } from './socket';
 import uploadRoutes from './routes/upload.route';
 import postsRoutes from './routes/post-media.route';
 import storyMediaRoutes from './routes/story-media.route';
@@ -99,10 +101,15 @@ app.get('/', (_req, res) => {
 });
 
 if (require.main === module) {
+  const httpServer = http.createServer(app);
+  initializeSocket(httpServer);
+
   app.listen(PORT, () => {
     console.log(`🚀 سرور در حال اجراست:`);
     console.log(`📡 GraphQL API: http://localhost:${PORT}/graphql`);
     console.log(`🎨 محیط تست: http://localhost:${PORT}/playground`);
+    console.log(`🔌 Socket.IO فعال است`);
+
     startStoryCleanupJob();
   });
 }
