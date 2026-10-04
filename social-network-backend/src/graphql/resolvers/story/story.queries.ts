@@ -7,6 +7,28 @@ export const storyQueries = {
     getUserStories: async (_: any, { userId }: { userId: string }, context: any) => {
         const viewerId = context.user?.userId || null;
 
+        // ✅ چک حریم خصوصی حساب، قبل از هر چیز دیگه
+        const profileOwner = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, isPrivate: true },
+        });
+
+        if (!profileOwner) {
+            return [];
+        }
+
+        if (profileOwner.isPrivate && viewerId !== userId) {
+            if (!viewerId) return [];
+
+            const isFollower = await prisma.follow.findUnique({
+                where: { followerId_followingId: { followerId: viewerId, followingId: userId } },
+            });
+
+            if (!isFollower) {
+                return []; // ✅ حساب خصوصی است و بیننده فالوور نیست: هیچ استوری‌ای نمایش داده نمی‌شود
+            }
+        }
+
         const stories = await prisma.story.findMany({
             where: {
                 userId,
@@ -16,14 +38,13 @@ export const storyQueries = {
                 user: true,
                 views: {
                     include: {
-                        viewer: true,  // ✅ viewer لود می‌شود
+                        viewer: true,
                     },
                 },
             },
             orderBy: { createdAt: 'asc' },
         });
 
-        // ✅ اگر viewer لاگین نیست، فقط استوری‌های PUBLIC رو نشون بده
         if (!viewerId) {
             return stories
                 .filter(s => s.visibility === 'PUBLIC')
@@ -37,7 +58,6 @@ export const storyQueries = {
                 }));
         }
 
-        // ✅ اگر viewer خود صاحب استوری است، همه رو نشون بده
         if (viewerId === userId) {
             return stories.map(story => ({
                 ...story,
@@ -52,7 +72,6 @@ export const storyQueries = {
             }));
         }
 
-        // ✅ بهینه‌سازی: یک بار following و closeFriend رو بگیر
         const [isFollower, isCloseFriend] = await Promise.all([
             prisma.follow.findUnique({
                 where: { followerId_followingId: { followerId: viewerId, followingId: userId } },
@@ -78,10 +97,11 @@ export const storyQueries = {
             viewers: [],
         }));
     },
+
+    // ✅ بدون تغییر - چون همیشه فقط کاربرهایی که فالو می‌کنی رو شامل می‌شه
     getFollowingStories: async (_: any, __: any, context: any) => {
         const userId = requireAuth(context, 'برای مشاهده باید وارد شوید.');
 
-        // ✅ یک بار followingIds رو بگیر
         const following = await prisma.follow.findMany({
             where: { followerId: userId },
             select: { followingId: true },
@@ -96,10 +116,9 @@ export const storyQueries = {
                 expiresAt: { gt: new Date() },
             },
             include: { user: true, views: true },
-            orderBy: { createdAt: 'asc' },  // ✅ asc برای ترتیب زمانی
+            orderBy: { createdAt: 'asc' },
         });
 
-        // ✅ بهینه‌سازی: یک بار closeFriendSet رو بگیر
         const closeFriendSet = new Set(
             (await prisma.closeFriend.findMany({
                 where: {
@@ -112,7 +131,6 @@ export const storyQueries = {
 
         const followingSet = new Set(followingIds);
 
-        // ✅ فیلتر استوری‌ها بر اساس دسترسی (بدون Query اضافه)
         const visibleStories = stories.filter(story => {
             if (story.visibility === 'PUBLIC') return true;
             if (story.visibility === 'FOLLOWERS') return followingSet.has(story.userId);
