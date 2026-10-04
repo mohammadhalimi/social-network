@@ -86,6 +86,7 @@ export const userQueries = {
                 avatar: true,
                 createdAt: true,
                 updatedAt: true,
+                isPrivate: true, // ✅ اضافه شد
             },
         });
 
@@ -95,7 +96,7 @@ export const userQueries = {
 
         const currentUserId = context.user?.userId || null;
 
-        const [followersCount, followingCount, followRecord] = await Promise.all([
+        const [followersCount, followingCount, followRecord, pendingRequest] = await Promise.all([
             prisma.follow.count({ where: { followingId: user.id } }),
             prisma.follow.count({ where: { followerId: user.id } }),
             currentUserId
@@ -108,14 +109,27 @@ export const userQueries = {
                     },
                 })
                 : null,
+            // ✅ چک درخواست فالوی در حال انتظار
+            currentUserId
+                ? prisma.followRequest.findUnique({
+                    where: {
+                        requesterId_targetId: {
+                            requesterId: currentUserId,
+                            targetId: user.id,
+                        },
+                    },
+                })
+                : null,
         ]);
 
         return mapUser(user, {
             followersCount,
             followingCount,
             isFollowing: !!followRecord,
+            isFollowRequestPending: pendingRequest?.status === 'PENDING',
         });
     },
+    
     getFollowers: async (_: any, { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number }, context: any) => {
         // اگر کاربر لاگین نکرده، فقط لیست را نشان بده (نیازی به isFollowing نیست)
         const currentUserId = context.user?.userId || null;

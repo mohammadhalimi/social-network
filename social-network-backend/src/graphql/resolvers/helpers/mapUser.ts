@@ -4,6 +4,7 @@ interface FollowInfo {
     followersCount?: number;
     followingCount?: number;
     isFollowing?: boolean;
+    isFollowRequestPending?: boolean; // ✅ اضافه شد
 }
 
 export function mapUser(user: {
@@ -15,6 +16,7 @@ export function mapUser(user: {
     avatar: string | null;
     createdAt: Date;
     updatedAt: Date;
+    isPrivate?: boolean; // ✅ اضافه شد (اختیاری، چون بعضی select ها شاید این فیلد رو نیارن)
 },
     followInfo?: FollowInfo
 ) {
@@ -30,5 +32,7 @@ export function mapUser(user: {
         followersCount: followInfo?.followersCount ?? 0,
         followingCount: followInfo?.followingCount ?? 0,
         isFollowing: followInfo?.isFollowing ?? false,
+        isPrivate: user.isPrivate ?? false, // ✅ اضافه شد
+        isFollowRequestPending: followInfo?.isFollowRequestPending ?? false, // ✅ اضافه شد
     };
 }
