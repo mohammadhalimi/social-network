@@ -1,7 +1,7 @@
-// resolvers/user/follow.resolvers.ts
+// src/graphql/resolvers/user/follow.resolvers.ts
 import prisma from '../../../lib/prisma';
-import { createNotification } from '../helpers/notify';
 import { requireAuth } from '../try-catch/requireAuth';
+import { createNotification } from '../helpers/notify';
 
 export const followResolvers = {
     followUser: async (_: any, { userId }: { userId: string }, context: any) => {
@@ -16,30 +16,70 @@ export const followResolvers = {
             throw new Error('کاربر یافت نشد.');
         }
 
-        // ✅ جلوگیری از خطای duplicate اگه قبلاً فالو کرده
+        // ✅ اگر حساب خصوصی است، درخواست فالو بساز
+        if (targetUser.isPrivate) {
+            const existingRequest = await prisma.followRequest.findUnique({
+                where: { requesterId_targetId: { requesterId: currentUserId, targetId: userId } },
+            });
+
+            // ✅ اگر قبلاً پذیرفته شده، یعنی فالو هست
+            if (existingRequest?.status === 'ACCEPTED') {
+                return {
+                    success: true,
+                    message: 'شما این کاربر را دنبال می‌کنید.',
+                    isFollowing: true,
+                    isPending: false,
+                    followersCount: await prisma.follow.count({ where: { followingId: userId } }),
+                };
+            }
+
+            // ✅ اگر PENDING است، دوباره نساز
+            if (existingRequest?.status === 'PENDING') {
+                throw new Error('درخواست شما قبلاً ارسال شده و در انتظار تأیید است.');
+            }
+
+            // ✅ ایجاد درخواست جدید (یا تبدیل REJECTED به PENDING)
+            const followRequest = await prisma.followRequest.upsert({
+                where: { requesterId_targetId: { requesterId: currentUserId, targetId: userId } },
+                create: { requesterId: currentUserId, targetId: userId, status: 'PENDING' },
+                update: { status: 'PENDING' },
+            });
+
+            await createNotification({
+                recipientId: userId,
+                actorId: currentUserId,
+                type: 'FOLLOW_REQUEST',
+                followRequestId: followRequest.id,
+            });
+
+            return {
+                success: true,
+                message: 'درخواست دنبال کردن ارسال شد.',
+                isFollowing: false,
+                isPending: true,
+                followersCount: await prisma.follow.count({ where: { followingId: userId } }),
+            };
+        }
+
+        // ✅ حساب عمومی: فالوی مستقیم
         await prisma.follow.upsert({
-            where: {
-                followerId_followingId: {
-                    followerId: currentUserId,
-                    followingId: userId,
-                },
-            },
-            create: {
-                followerId: currentUserId,
-                followingId: userId,
-            },
+            where: { followerId_followingId: { followerId: currentUserId, followingId: userId } },
+            create: { followerId: currentUserId, followingId: userId },
             update: {},
         });
 
-        const followersCount = await prisma.follow.count({
-            where: { followingId: userId },
+        await createNotification({
+            recipientId: userId,
+            actorId: currentUserId,
+            type: 'FOLLOW',
         });
 
         return {
             success: true,
             message: 'با موفقیت دنبال شد.',
             isFollowing: true,
-            followersCount,
+            isPending: false,
+            followersCount: await prisma.follow.count({ where: { followingId: userId } }),
         };
     },
 
@@ -47,24 +87,19 @@ export const followResolvers = {
         const currentUserId = requireAuth(context, 'برای لغو دنبال کردن باید وارد شوید.');
 
         await prisma.follow.deleteMany({
-            where: {
-                followerId: currentUserId,
-                followingId: userId,
-            },
+            where: { followerId: currentUserId, followingId: userId },
         });
 
-        const followersCount = await prisma.follow.count({
-            where: { followingId: userId },
-        });
+        const followersCount = await prisma.follow.count({ where: { followingId: userId } });
 
         return {
             success: true,
             message: 'دنبال کردن لغو شد.',
             isFollowing: false,
+            isPending: false,
             followersCount,
         };
     },
-
 
     // ✅ جدید: لغو درخواست فالوی در حال انتظار
     cancelFollowRequest: async (_: any, { targetUserId }: { targetUserId: string }, context: any) => {

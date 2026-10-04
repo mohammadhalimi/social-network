@@ -109,7 +109,7 @@ if (require.main === module) {
   const httpServer = http.createServer(app);
   initializeSocket(httpServer);
 
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`🚀 سرور در حال اجراست:`);
     console.log(`📡 GraphQL API: http://localhost:${PORT}/graphql`);
     console.log(`🎨 محیط تست: http://localhost:${PORT}/playground`);
