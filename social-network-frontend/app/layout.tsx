@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Vazirmatn } from 'next/font/google';
 import './globals.css'
-import { Providers } from './providers';
+import { Providers } from './providers/providers';
 const vazir = Vazirmatn({
   subsets: ['arabic', 'latin'],
   display: 'swap',
