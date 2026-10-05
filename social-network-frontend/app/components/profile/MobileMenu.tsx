@@ -54,7 +54,7 @@ export const MobileMenu = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-x-4 top-20 z-50"
+            className="lg:hidden fixed inset-x-4 top-20 z-900"
         >
             <div className="bg-card rounded-2xl shadow-xl border border-border p-5">
                 <div className="flex items-center gap-4 pb-4 mb-3 border-b border-border">

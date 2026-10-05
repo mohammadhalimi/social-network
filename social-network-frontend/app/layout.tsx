@@ -1,7 +1,9 @@
+import './globals.css'
 import type { Metadata } from 'next'
 import { Vazirmatn } from 'next/font/google';
-import './globals.css'
 import { Providers } from './providers/providers';
+import { Header } from './components/layout/Header'; // ✅ اضافه شد
+
 const vazir = Vazirmatn({
   subsets: ['arabic', 'latin'],
   display: 'swap',
@@ -20,6 +22,7 @@ export default function RootLayout({
     <html lang="fa" dir="rtl" >
       <body className={vazir.className}>
         <Providers>
+          <Header />
           {children}
         </Providers>
       </body>

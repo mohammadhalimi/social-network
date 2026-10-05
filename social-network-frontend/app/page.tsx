@@ -91,21 +91,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      {/* هدر (فیکس) - مثل اینستاگرام */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-[#dbdbdb] z-50">
-        <div className="max-w-4xl mx-auto px-4 flex items-center justify-between h-16">
-          <h1 className="text-xl font-semibold text-[#262626]">شبکه اجتماعی</h1>
-          <div className="flex items-center gap-2">
-            <button className="text-sm text-[#262626] font-medium px-3 py-1.5 rounded-lg hover:bg-[#f2f2f2] transition">
-              ورود
-            </button>
-            <button className="text-sm bg-[#0095f6] text-white font-medium px-4 py-1.5 rounded-lg hover:bg-[#1877f2] transition">
-              ثبت‌نام
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* محتوای اصلی */}
       <main className="pt-20 pb-8 max-w-4xl mx-auto px-4">
         {/* ✅ گرید ۳ ستونه در دسکتاپ، ۲ ستونه در تبلت، ۱ ستونه در موبایل */}
