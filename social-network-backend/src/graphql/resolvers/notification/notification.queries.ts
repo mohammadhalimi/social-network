@@ -37,12 +37,12 @@ export const notificationQueries = {
                 actor: mapUser(n.actor),
                 followRequest: n.followRequest
                     ? {
-                          id: n.followRequest.id,
-                          status: n.followRequest.status,
-                          createdAt: n.followRequest.createdAt.toISOString(),
-                          requester: mapUser(n.followRequest.requester),
-                          target: mapUser(n.followRequest.target),
-                      }
+                        id: n.followRequest.id,
+                        status: n.followRequest.status,
+                        createdAt: n.followRequest.createdAt.toISOString(),
+                        requester: mapUser(n.followRequest.requester),
+                        target: mapUser(n.followRequest.target),
+                    }
                     : null,
             })),
             totalCount,
@@ -50,4 +50,48 @@ export const notificationQueries = {
             hasMore: offset + notifications.length < totalCount,
         };
     },
+    getPendingFollowRequests: async (
+        _: any,
+        { limit = 20, offset = 0 }: { limit: number; offset: number },
+        context: any
+    ) => {
+        const userId = requireAuth(context, 'برای مشاهده‌ی درخواست‌ها باید وارد شوید.');
+
+        const [requests, totalCount] = await Promise.all([
+            prisma.followRequest.findMany({
+                where: { targetId: userId, status: 'PENDING' },
+                include: {
+                    requester: true,
+                    target: true,
+                },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                skip: offset,
+            }),
+            prisma.followRequest.count({
+                where: { targetId: userId, status: 'PENDING' },
+            }),
+        ]);
+
+        return {
+            notifications: requests.map((r) => ({
+                id: r.id,
+                type: 'FOLLOW_REQUEST',
+                isRead: false,
+                createdAt: r.createdAt.toISOString(),
+                actor: mapUser(r.requester),
+                followRequest: {
+                    id: r.id,
+                    status: r.status,
+                    createdAt: r.createdAt.toISOString(),
+                    requester: mapUser(r.requester),
+                    target: mapUser(r.target),
+                },
+            })),
+            totalCount,
+            unreadCount: totalCount,
+            hasMore: offset + requests.length < totalCount,
+        };
+    },
+
 };

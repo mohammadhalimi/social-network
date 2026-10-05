@@ -48,6 +48,7 @@ export const notificationTypeDefs = `
 
   type Query {
     getNotifications(limit: Int, offset: Int): NotificationsResult!
+    getPendingFollowRequests(limit: Int, offset: Int): NotificationsResult!
   }
 
   type Mutation {
