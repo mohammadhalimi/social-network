@@ -245,3 +245,32 @@ export const REJECT_FOLLOW_REQUEST: TypedDocumentNode<
     }
   }
 `;
+
+// =============================================
+// ✅ Mutation: تغییر وضعیت خصوصی/عمومی
+// =============================================
+
+export interface UpdatePrivacyResponse {
+    updatePrivacy: {
+        success: boolean;
+        message: string;
+        isPrivate: boolean;
+    };
+}
+
+export interface UpdatePrivacyVariables {
+    isPrivate: boolean;
+}
+
+export const UPDATE_PRIVACY: TypedDocumentNode<
+    UpdatePrivacyResponse,
+    UpdatePrivacyVariables
+> = gql`
+  mutation UpdatePrivacy($isPrivate: Boolean!) {
+    updatePrivacy(isPrivate: $isPrivate) {
+      success
+      message
+      isPrivate
+    }
+  }
+`;

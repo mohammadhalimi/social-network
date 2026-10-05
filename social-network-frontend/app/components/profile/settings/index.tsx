@@ -1,5 +1,5 @@
 import { ChangeTheme } from "./ChangeTheme";
-
+import { PrivacyToggle } from "./PrivacyToggle";
 export default function Settings() {
 
 
@@ -32,7 +32,17 @@ export default function Settings() {
        ">
         ظاهر و تنظیمات برنامه را مدیریت کنید
       </p>
-      <ChangeTheme />
+      {/* ✅ بخش حریم خصوصی */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-bold text-primary mb-3">حریم خصوصی</h2>
+        <PrivacyToggle />
+      </div>
+
+      {/* ✅ بخش ظاهر */}
+      <div className="space-y-4 mt-6">
+        <h2 className="text-sm font-bold text-primary mb-3">ظاهر</h2>
+        <ChangeTheme />
+      </div>
     </div>
   );
 }

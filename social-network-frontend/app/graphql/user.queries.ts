@@ -39,7 +39,8 @@ export interface GetUserByUsernameResponse {
     followersCount: number;   // ✅ اضافه شد
     followingCount: number;   // ✅ اضافه شد
     isFollowing: boolean;     // ✅ اضافه شد
-
+    isPrivate: boolean;               // ✅ اضافه شد
+    isFollowRequestPending: boolean;  // ✅ اضافه شد
   };
 }
 
@@ -54,6 +55,7 @@ export interface FollowResponse {
   message: string;
   isFollowing: boolean;
   followersCount: number;
+  isPending: boolean;
 }
 
 export interface FollowUserResponse {
@@ -106,6 +108,8 @@ export const GET_USER_BY_USERNAME: TypedDocumentNode<GetUserByUsernameResponse, 
       followersCount
       followingCount
       isFollowing
+      isPrivate
+      isFollowRequestPending
     }
   }
 `;
@@ -164,6 +168,42 @@ export const GET_FOLLOWING: TypedDocumentNode<any, any> = gql`
       }
       totalCount
       hasMore
+    }
+  }
+`;
+
+// =============================================
+//  ✅ کوئری دریافت کاربر لاگین‌شده (me)
+// =============================================
+
+export interface MeResponse {
+  me: {
+    id: string;
+    email: string;
+    username: string;
+    fullName: string;
+    bio: string | null;
+    avatar: string | null;
+    createdAt: string;
+    updatedAt: string;
+    isPrivate: boolean;
+    isFollowRequestPending: boolean;
+  } | null;
+}
+
+export const ME_QUERY: TypedDocumentNode<MeResponse, {}> = gql`
+  query Me {
+    me {
+      id
+      email
+      username
+      fullName
+      bio
+      avatar
+      createdAt
+      updatedAt
+      isPrivate
+      isFollowRequestPending
     }
   }
 `;
