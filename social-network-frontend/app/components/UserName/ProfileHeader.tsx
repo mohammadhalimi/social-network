@@ -166,6 +166,7 @@ export const ProfileHeader = ({
                             <FollowButton
                                 userId={user.id}
                                 initialIsFollowing={user.isFollowing}
+                                initialIsPending={user.isFollowRequestPending}  // ✅ جدید
                                 onFollowChange={(_, newCount) => onFollowChange(newCount)}
                             />
                         )}

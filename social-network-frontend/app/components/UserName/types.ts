@@ -11,4 +11,6 @@ export interface ProfileUser {
     followersCount: number;
     followingCount: number;
     isFollowing: boolean;
+    isPrivate: boolean; 
+    isFollowRequestPending : boolean;
 }

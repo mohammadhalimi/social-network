@@ -125,6 +125,7 @@ export const FOLLOW_USER: TypedDocumentNode<FollowUserResponse, FollowUserVariab
       message
       isFollowing
       followersCount
+      isPending
     }
   }
 `;
@@ -136,6 +137,7 @@ export const UNFOLLOW_USER: TypedDocumentNode<UnfollowUserResponse, UnfollowUser
       message
       isFollowing
       followersCount
+      isPending
     }
   }
 `;
@@ -149,6 +151,7 @@ export const GET_FOLLOWERS: TypedDocumentNode<any, any> = gql`
         fullName
         avatar
         isFollowing
+        isFollowRequestPending
       }
       totalCount
       hasMore
@@ -165,6 +168,7 @@ export const GET_FOLLOWING: TypedDocumentNode<any, any> = gql`
         fullName
         avatar
         isFollowing
+        isFollowRequestPending
       }
       totalCount
       hasMore

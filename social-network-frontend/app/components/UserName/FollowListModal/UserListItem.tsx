@@ -14,7 +14,7 @@ interface UserListItemProps {
 
 }
 
-export const UserListItem = React.memo(({ user, onClose, onFollowChange}: UserListItemProps) => {
+export const UserListItem = React.memo(({ user, onClose, onFollowChange }: UserListItemProps) => {
     return (
         <div
             className="
@@ -103,6 +103,7 @@ export const UserListItem = React.memo(({ user, onClose, onFollowChange}: UserLi
             <FollowButton
                 userId={user.id}
                 initialIsFollowing={user.isFollowing}
+                initialIsPending={user.isFollowRequestPending}  // ✅ جدید
                 onFollowChange={onFollowChange}
             />
         </div>

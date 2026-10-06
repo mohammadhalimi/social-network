@@ -4,6 +4,7 @@ export interface FollowUser {
     fullName: string;
     avatar: string | null;
     isFollowing: boolean;
+    isFollowRequestPending?: boolean;
 }
 
 export interface FollowListModalProps {

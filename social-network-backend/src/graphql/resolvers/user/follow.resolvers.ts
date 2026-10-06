@@ -16,29 +16,30 @@ export const followResolvers = {
             throw new Error('کاربر یافت نشد.');
         }
 
-        // ✅ اگر حساب خصوصی است، درخواست فالو بساز
+        // ✅ همیشه مستقیم از روی جدول Follow چک کن، نه از روی status قدیمی FollowRequest
+        const existingFollow = await prisma.follow.findUnique({
+            where: { followerId_followingId: { followerId: currentUserId, followingId: userId } },
+        });
+
+        if (existingFollow) {
+            return {
+                success: true,
+                message: 'شما این کاربر را دنبال می‌کنید.',
+                isFollowing: true,
+                isPending: false,
+                followersCount: await prisma.follow.count({ where: { followingId: userId } }),
+            };
+        }
+
         if (targetUser.isPrivate) {
             const existingRequest = await prisma.followRequest.findUnique({
                 where: { requesterId_targetId: { requesterId: currentUserId, targetId: userId } },
             });
 
-            // ✅ اگر قبلاً پذیرفته شده، یعنی فالو هست
-            if (existingRequest?.status === 'ACCEPTED') {
-                return {
-                    success: true,
-                    message: 'شما این کاربر را دنبال می‌کنید.',
-                    isFollowing: true,
-                    isPending: false,
-                    followersCount: await prisma.follow.count({ where: { followingId: userId } }),
-                };
-            }
-
-            // ✅ اگر PENDING است، دوباره نساز
             if (existingRequest?.status === 'PENDING') {
                 throw new Error('درخواست شما قبلاً ارسال شده و در انتظار تأیید است.');
             }
 
-            // ✅ ایجاد درخواست جدید (یا تبدیل REJECTED به PENDING)
             const followRequest = await prisma.followRequest.upsert({
                 where: { requesterId_targetId: { requesterId: currentUserId, targetId: userId } },
                 create: { requesterId: currentUserId, targetId: userId, status: 'PENDING' },
@@ -61,7 +62,7 @@ export const followResolvers = {
             };
         }
 
-        // ✅ حساب عمومی: فالوی مستقیم
+        // حساب عمومی: فالوی مستقیم
         await prisma.follow.upsert({
             where: { followerId_followingId: { followerId: currentUserId, followingId: userId } },
             create: { followerId: currentUserId, followingId: userId },

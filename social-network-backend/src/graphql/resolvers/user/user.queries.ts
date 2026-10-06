@@ -129,9 +129,12 @@ export const userQueries = {
             isFollowRequestPending: pendingRequest?.status === 'PENDING',
         });
     },
-    
-    getFollowers: async (_: any, { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number }, context: any) => {
-        // اگر کاربر لاگین نکرده، فقط لیست را نشان بده (نیازی به isFollowing نیست)
+
+    getFollowers: async (
+        _: any,
+        { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number },
+        context: any
+    ) => {
         const currentUserId = context.user?.userId || null;
 
         const where = {
@@ -157,21 +160,40 @@ export const userQueries = {
             prisma.follow.count({ where }),
         ]);
 
+        // ✅ isFollowing map
         const isFollowingMap = new Map<string, boolean>();
+        // ✅ isFollowRequestPending map (جدید)
+        const isPendingMap = new Map<string, boolean>();
+
         if (currentUserId && followers.length > 0) {
-            const currentUserFollows = await prisma.follow.findMany({
-                where: {
-                    followerId: currentUserId,
-                    followingId: { in: followers.map(f => f.followerId) },
-                },
-            });
+            const targetUserIds = followers.map(f => f.followerId);
+
+            const [currentUserFollows, pendingRequests] = await Promise.all([
+                prisma.follow.findMany({
+                    where: {
+                        followerId: currentUserId,
+                        followingId: { in: targetUserIds },
+                    },
+                }),
+                // ✅ درخواست‌های در حال انتظار که کاربر فعلی برای این کاربران فرستاده
+                prisma.followRequest.findMany({
+                    where: {
+                        requesterId: currentUserId,
+                        targetId: { in: targetUserIds },
+                        status: 'PENDING',
+                    },
+                }),
+            ]);
+
             currentUserFollows.forEach(f => isFollowingMap.set(f.followingId, true));
+            pendingRequests.forEach(r => isPendingMap.set(r.targetId, true));
         }
 
         return {
             users: followers.map(f => ({
                 ...mapUser(f.follower),
                 isFollowing: isFollowingMap.get(f.followerId) || false,
+                isFollowRequestPending: isPendingMap.get(f.followerId) || false, // ✅ اضافه شد
             })),
             totalCount,
             hasMore: offset + followers.length < totalCount,
@@ -179,7 +201,11 @@ export const userQueries = {
     },
 
     // کوئری دریافت دنبال‌شونده‌ها (Following)
-    getFollowing: async (_: any, { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number }, context: any) => {
+    getFollowing: async (
+        _: any,
+        { userId, searchTerm, limit, offset }: { userId: string; searchTerm?: string; limit: number; offset: number },
+        context: any
+    ) => {
         const currentUserId = context.user?.userId || null;
 
         const where = {
@@ -205,21 +231,40 @@ export const userQueries = {
             prisma.follow.count({ where }),
         ]);
 
+        // ✅ isFollowing map
         const isFollowingMap = new Map<string, boolean>();
+        // ✅ isFollowRequestPending map (جدید)
+        const isPendingMap = new Map<string, boolean>();
+
         if (currentUserId && following.length > 0) {
-            const currentUserFollows = await prisma.follow.findMany({
-                where: {
-                    followerId: currentUserId,
-                    followingId: { in: following.map(f => f.followingId) },
-                },
-            });
+            const targetUserIds = following.map(f => f.followingId);
+
+            const [currentUserFollows, pendingRequests] = await Promise.all([
+                prisma.follow.findMany({
+                    where: {
+                        followerId: currentUserId,
+                        followingId: { in: targetUserIds },
+                    },
+                }),
+                // ✅ درخواست‌های در حال انتظار
+                prisma.followRequest.findMany({
+                    where: {
+                        requesterId: currentUserId,
+                        targetId: { in: targetUserIds },
+                        status: 'PENDING',
+                    },
+                }),
+            ]);
+
             currentUserFollows.forEach(f => isFollowingMap.set(f.followingId, true));
+            pendingRequests.forEach(r => isPendingMap.set(r.targetId, true));
         }
 
         return {
             users: following.map(f => ({
                 ...mapUser(f.following),
                 isFollowing: isFollowingMap.get(f.followingId) || false,
+                isFollowRequestPending: isPendingMap.get(f.followingId) || false, // ✅ اضافه شد
             })),
             totalCount,
             hasMore: offset + following.length < totalCount,
