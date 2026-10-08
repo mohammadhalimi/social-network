@@ -14,6 +14,7 @@ interface ProfileHeaderProps {
     user: ProfileUser;
     avatarUrl: string | null;
     isOwner: boolean;
+    canViewContent: boolean;  // ✅ جدید
     displayedFollowersCount: number;
     displayedFollowingCount: number;
     onAvatarClick: () => void;
@@ -23,12 +24,13 @@ interface ProfileHeaderProps {
     onCreateStory: () => void;
 }
 
-const LONG_PRESS_DURATION = 400; // میلی‌ثانیه
+const LONG_PRESS_DURATION = 400;
 
 export const ProfileHeader = ({
     user,
     avatarUrl,
     isOwner,
+    canViewContent,  // ✅ جدید
     displayedFollowersCount,
     displayedFollowingCount,
     onAvatarClick,
@@ -43,13 +45,15 @@ export const ProfileHeader = ({
     const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isLongPressRef = useRef(false);
 
+    // ✅ فقط اگر کاربر دسترسی دارد، استوری‌ها رو بگیر
     const { data, refetch } = useQuery(GET_USER_STORIES, {
         variables: { userId: user.id },
         fetchPolicy: 'cache-and-network',
+        skip: !canViewContent,  // ✅ جدید
     });
 
     const stories: Story[] = data?.getUserStories || [];
-    const hasStories = stories.length > 0;
+    const hasStories = canViewContent && stories.length > 0;  // ✅ جدید
     const hasUnviewedStory = stories.some(s => !s.isViewedByMe);
     const initialIndex = hasUnviewedStory ? stories.findIndex(s => !s.isViewedByMe) : 0;
 
@@ -72,15 +76,14 @@ export const ProfileHeader = ({
         }
 
         if (isLongPressRef.current) {
-            // نگه‌داشتن طولانی بود: عکس بزرگ رو ببند
             setIsLongPressing(false);
         } else {
-            // کلیک سریع بود: برو سراغ استوری
+            // فقط اگر استوری وجود داره، استوری رو باز کن
             if (hasStories) setViewerOpen(true);
         }
     }, [hasStories]);
 
-    // ✅ لغو فشار (مثلاً اگه انگشت/ماوس از روی المان خارج بشه)
+    // ✅ لغو فشار
     const handlePressCancel = useCallback(() => {
         if (pressTimerRef.current) {
             clearTimeout(pressTimerRef.current);
@@ -132,7 +135,6 @@ export const ProfileHeader = ({
                         </div>
                     </div>
 
-                    {/* ✅ دکمه‌ی + برای صاحب پروفایل */}
                     {isOwner && (
                         <button
                             onClick={(e) => {
@@ -166,7 +168,7 @@ export const ProfileHeader = ({
                             <FollowButton
                                 userId={user.id}
                                 initialIsFollowing={user.isFollowing}
-                                initialIsPending={user.isFollowRequestPending}  // ✅ جدید
+                                initialIsPending={user.isFollowRequestPending}
                                 onFollowChange={(_, newCount) => onFollowChange(newCount)}
                             />
                         )}
@@ -184,7 +186,6 @@ export const ProfileHeader = ({
                 </div>
             </div>
 
-            {/* ✅ نمایش موقت عکس بزرگ حین نگه‌داشتن (long-press) */}
             {isLongPressing && avatarUrl && (
                 <div className="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center pointer-events-none">
                     <div className="w-72 h-72 sm:w-96 sm:h-96 rounded-full overflow-hidden border-4 border-white/20 animate-in fade-in zoom-in duration-200">

@@ -1,4 +1,3 @@
-// app/user/[username]/components/UserProfileContent.tsx
 'use client';
 
 import { useState } from 'react';
@@ -8,6 +7,7 @@ import { ImagePreviewModal } from './ImagePreviewModal';
 import { ProfilePostsList } from '@/app/components/UserName/ProfilePostsList';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileInfo } from './ProfileInfo';
+import { PrivateProfileMessage } from './PrivateProfileMessage'; // ✅ جدید
 import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
 import { ProfileUser } from './types';
 import { useAppSelector } from '@/app/redux/hooks';
@@ -27,6 +27,12 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
 
     const currentUser = useAppSelector(state => state.auth.user);
     const isOwner = currentUser?.id === user.id;
+
+    // ✅ محاسبه دسترسی به محتوا
+    const canViewContent =
+        isOwner ||
+        !user.isPrivate ||
+        user.isFollowing;
 
     const { refetch } = useQuery(GET_USER_BY_USERNAME, {
         variables: { username: user.username },
@@ -78,7 +84,8 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 <ProfileHeader
                     user={user}
                     avatarUrl={avatarUrl}
-                    isOwner={isOwner} 
+                    isOwner={isOwner}
+                    canViewContent={canViewContent}  // ✅ جدید
                     displayedFollowersCount={displayedFollowersCount}
                     displayedFollowingCount={displayedFollowingCount}
                     onAvatarClick={() => setIsImageModalOpen(true)}
@@ -90,12 +97,22 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 <ProfileInfo user={user} />
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-soft">
-                <h1 className="text-lg font-bold text-primary mb-4">
-                    پست‌ها
-                </h1>
-                <ProfilePostsList userId={user.id} />
-            </div>
+            {/* ✅ اگر کاربر دسترسی ندارد → پیام خصوصی */}
+            {!canViewContent ? (
+                <PrivateProfileMessage
+                    isPrivate={user.isPrivate}
+                    isFollowing={user.isFollowing}
+                    isFollowRequestPending={user.isFollowRequestPending}
+                    isOwner={isOwner}
+                />
+            ) : (
+                <div className="bg-card border border-border rounded-2xl p-6 shadow-soft">
+                    <h1 className="text-lg font-bold text-primary mb-4">
+                        پست‌ها
+                    </h1>
+                    <ProfilePostsList userId={user.id} />
+                </div>
+            )}
         </>
     );
 };
