@@ -3,16 +3,22 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '@/app/redux/hooks';
+import { usePathname } from 'next/navigation';
 import { getAvatarUrl } from '@/app/lib/utils/avatar';
-import { NotificationBell } from '../notification/NotificationBell';
 import { toggleMobileMenu } from '@/app/redux/uiSlice';
+import { useAppSelector, useAppDispatch } from '@/app/redux/hooks';
+import { NotificationBell } from '../notification/NotificationBell';
+
+
 
 export const Header = () => {
+    const pathname = usePathname();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const { isMobileMenuOpen } = useAppSelector((state) => state.ui);
     const avatarUrl = user?.avatar ? getAvatarUrl(user.avatar) : null;
+
+    const showMobileMenuButton = user && pathname === '/profile';
 
     return (
         <header
@@ -33,7 +39,7 @@ export const Header = () => {
             ">
             <div className="flex items-center gap-3">
                 {/* ✅ دکمه منوی موبایل */}
-                {user && (
+                {showMobileMenuButton && (
                     <button
                         onClick={() => dispatch(toggleMobileMenu())}
                         className="
