@@ -28,8 +28,8 @@ model User {
   // ✅ روابط جدید مربوط به استوری
   stories         Story[]
   storyViews      StoryView[]
-  closeFriendsOf  CloseFriend[] @relation("CloseFriendsOwner")   // لیستی که خودم مدیریت می‌کنم
-  closeFriendedBy CloseFriend[] @relation("CloseFriendsMember")  // کسانی که منو به‌عنوان close friend گذاشتن
+  closeFriendsOf  CloseFriend[] @relation("CloseFriendsOwner")
+  closeFriendedBy CloseFriend[] @relation("CloseFriendsMember")
 
   isPrivate Boolean @default(false)
 
@@ -42,7 +42,7 @@ model User {
 
 model Post {
   id        String   @id @default(cuid())
-  content   String   @db.Text   // محتوای JSON
+  content   String   @db.Text
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -50,6 +50,9 @@ model Post {
   isPublished Boolean @default(true)
   comments  Comment[]
   likes     Like[]
+
+  // ✅ جدید: رابطه‌ی معکوس با Notification
+  notifications Notification[]
 }
 
 model Comment {
@@ -65,6 +68,9 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   likes     CommentLike[]
+
+  // ✅ جدید: رابطه‌ی معکوس با Notification
+  notifications Notification[]
 }
 
 model Like {
@@ -90,10 +96,10 @@ model CommentLike {
 model Follow {
   id          String   @id @default(cuid())
 
-  followerId  String   // کسی که فالو می‌کنه
+  followerId  String
   follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
 
-  followingId String   // کسی که فالو می‌شه
+  followingId String
   following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime @default(now())
@@ -102,7 +108,7 @@ model Follow {
 }
 
 // =============================================
-// ✅ مدل‌های جدید: Story
+// ✅ مدل‌های مربوط به Story
 // =============================================
 
 enum StoryVisibility {
@@ -116,10 +122,10 @@ model Story {
   userId     String
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   mediaUrl   String
-  mediaType  String          // "image" | "video"
+  mediaType  String
   visibility StoryVisibility @default(FOLLOWERS)
   createdAt  DateTime        @default(now())
-  expiresAt  DateTime        // createdAt + مدت انتخابی کاربر
+  expiresAt  DateTime
   views      StoryView[]
 }
 
@@ -134,20 +140,24 @@ model StoryView {
   @@unique([storyId, viewerId])
 }
 
-// ✅ مدل جدید: دوستان نزدیک
+// ✅ مدل دوستان نزدیک
 model CloseFriend {
   id String @id @default(cuid())
 
-  ownerId String // کسی که این لیست رو مدیریت می‌کنه
+  ownerId String
   owner   User   @relation("CloseFriendsOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  friendId String // کاربری که به‌عنوان دوست نزدیک انتخاب شده
+  friendId String
   friend   User   @relation("CloseFriendsMember", fields: [friendId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@unique([ownerId, friendId])
 }
+
+// =============================================
+// ✅ مدل‌های مربوط به FollowRequest و Notification
+// =============================================
 
 enum FollowRequestStatus {
   PENDING
@@ -169,10 +179,15 @@ model FollowRequest {
   @@unique([requesterId, targetId])
 }
 
+// ✅ گسترش NotificationType
 enum NotificationType {
   FOLLOW
   FOLLOW_REQUEST
   FOLLOW_REQUEST_ACCEPTED
+  LIKE           // ✅ جدید: لایک روی پست
+  COMMENT        // ✅ جدید: کامنت روی پست
+  REPLY          // ✅ جدید: ریپلای روی کامنت
+  COMMENT_LIKE   // ✅ جدید: لایک روی کامنت
 }
 
 model Notification {
@@ -185,5 +200,12 @@ model Notification {
   isRead          Boolean           @default(false)
   followRequestId String?
   followRequest   FollowRequest?    @relation(fields: [followRequestId], references: [id], onDelete: Cascade)
+  
+  // ✅ جدید: فیلدهای مربوط به پست و کامنت
+  postId          String?
+  post            Post?             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId       String?
+  comment         Comment?          @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
   createdAt       DateTime          @default(now())
 }
