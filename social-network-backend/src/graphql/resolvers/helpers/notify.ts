@@ -6,8 +6,10 @@ import { emitToUser } from '../../../socket';
 interface CreateNotificationParams {
     recipientId: string;
     actorId: string;
-    type: 'FOLLOW' | 'FOLLOW_REQUEST' | 'FOLLOW_REQUEST_ACCEPTED';
+    type: 'FOLLOW' | 'FOLLOW_REQUEST' | 'FOLLOW_REQUEST_ACCEPTED' | 'LIKE' | 'COMMENT' | 'REPLY' | 'COMMENT_LIKE';
     followRequestId?: string;
+    postId?: string;      // ✅ جدید
+    commentId?: string;   // ✅ جدید
 }
 
 export async function createNotification({
@@ -15,10 +17,55 @@ export async function createNotification({
     actorId,
     type,
     followRequestId,
+    postId,
+    commentId,
 }: CreateNotificationParams) {
-    // ✅ include کردن followRequest با requester و target
+    // ✅ جلوگیری از نوتیف به خود
+    if (recipientId === actorId) {
+        return null;
+    }
+
+    // ✅ جلوگیری از نوتیف تکراری برای LIKE و COMMENT_LIKE
+    if (type === 'LIKE' && postId) {
+        const existing = await prisma.notification.findFirst({
+            where: {
+                recipientId,
+                actorId,
+                type: 'LIKE',
+                postId,
+            },
+        });
+
+        if (existing) {
+            return null; // نوتیف تکراری نساز
+        }
+    }
+
+    if (type === 'COMMENT_LIKE' && commentId) {
+        const existing = await prisma.notification.findFirst({
+            where: {
+                recipientId,
+                actorId,
+                type: 'COMMENT_LIKE',
+                commentId,
+            },
+        });
+
+        if (existing) {
+            return null; // نوتیف تکراری نساز
+        }
+    }
+
+    // ✅ ساخت نوتیف
     const notification = await prisma.notification.create({
-        data: { recipientId, actorId, type, followRequestId },
+        data: {
+            recipientId,
+            actorId,
+            type,
+            followRequestId,
+            postId,
+            commentId,
+        },
         include: {
             actor: true,
             followRequest: {
@@ -41,7 +88,8 @@ export async function createNotification({
         isRead: notification.isRead,
         createdAt: notification.createdAt.toISOString(),
         actor: mapUser(notification.actor),
-        // ✅ followRequest رو هم بفرست
+        postId: notification.postId,        // ✅ جدید
+        commentId: notification.commentId,  // ✅ جدید
         followRequest: notification.followRequest
             ? {
                   id: notification.followRequest.id,
