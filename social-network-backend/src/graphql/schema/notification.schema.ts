@@ -9,6 +9,10 @@ export const notificationTypeDefs = `
     FOLLOW
     FOLLOW_REQUEST
     FOLLOW_REQUEST_ACCEPTED
+    LIKE
+    COMMENT
+    REPLY
+    COMMENT_LIKE
   }
 
   type FollowRequest {
@@ -24,6 +28,8 @@ export const notificationTypeDefs = `
     actor: User!
     type: NotificationType!
     isRead: Boolean!
+    postId: ID
+    commentId: ID
     followRequest: FollowRequest
     createdAt: String!
   }
