@@ -103,29 +103,40 @@ export const NotificationItem = ({ notification, onClose }: NotificationItemProp
     };
 
     // ✅ کلیک روی نوتیف
-    const handleClick = async () => {
-        if (!notification.isRead) {
-            await markAsRead({ variables: { notificationId: notification.id } });
-        }
+const handleClick = async () => {
+    console.log('🔔 === CLICK DEBUG ===');
+    console.log('1. Notification type:', notification.type);
+    console.log('2. Notification postId:', notification.postId);
+    console.log('3. Notification commentId:', notification.commentId);
+    console.log('4. Full notification:', notification);
 
-        // ✅ برای نوتیف‌های پست: باز کردن مودال پست
-        if (
-            notification.type === 'LIKE' ||
-            notification.type === 'COMMENT' ||
-            notification.type === 'REPLY' ||
-            notification.type === 'COMMENT_LIKE'
-        ) {
-            if (notification.postId) {
-                dispatch(openPostModal(notification.postId));
-            }
-            onClose();
-            return;
-        }
+    if (!notification.isRead) {
+        await markAsRead({ variables: { notificationId: notification.id } });
+    }
 
-        // ✅ برای نوتیف‌های فالو: رفتن به پروفایل کاربر
-        router.push(`/${notification.actor.username}`);
+    if (
+        notification.type === 'LIKE' ||
+        notification.type === 'COMMENT' ||
+        notification.type === 'REPLY' ||
+        notification.type === 'COMMENT_LIKE'
+    ) {
+        console.log('5. Matched post-type notification');
+        console.log('6. About to dispatch with postId:', notification.postId);
+
+        if (notification.postId) {
+            dispatch(openPostModal(notification.postId));
+            console.log('7. ✅ Dispatch called successfully');
+        } else {
+            console.warn('7. ⚠️ postId is null or undefined, skipping dispatch');
+        }
         onClose();
-    };
+        return;
+    }
+
+    console.log('8. Not a post-type notification, going to profile');
+    router.push(`/${notification.actor.username}`);
+    onClose();
+};
 
     // ✅ قبول درخواست
     const handleAccept = async (e: React.MouseEvent) => {

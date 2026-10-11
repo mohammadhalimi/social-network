@@ -44,6 +44,8 @@ export const useNotifications = () => {
                     isRead: payload.isRead,
                     createdAt: payload.createdAt,
                     actor: payload.actor,
+                    postId: payload.postId,        // ✅ این خط رو اضافه کن
+                    commentId: payload.commentId,  // ✅ این خط رو اضافه کن
                     followRequest: payload.followRequest || null,
                 };
 
