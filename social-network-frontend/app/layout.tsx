@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Vazirmatn } from 'next/font/google';
 import { Providers } from './providers/providers';
 import { Header } from './components/layout/Header'; // ✅ اضافه شد
+import { PostModalRenderer } from './components/modals/PostModalRenderer';
 
 const vazir = Vazirmatn({
   subsets: ['arabic', 'latin'],
@@ -24,6 +25,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <PostModalRenderer />
         </Providers>
       </body>
     </html>
