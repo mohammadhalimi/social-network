@@ -34,6 +34,8 @@ export const notificationQueries = {
                 type: n.type,
                 isRead: n.isRead,
                 createdAt: n.createdAt.toISOString(),
+                postId: n.postId,          // ✅ اضافه کن
+                commentId: n.commentId,    // ✅ اضافه کن
                 actor: mapUser(n.actor),
                 followRequest: n.followRequest
                     ? {

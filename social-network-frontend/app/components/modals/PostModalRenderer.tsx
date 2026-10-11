@@ -11,6 +11,7 @@ import { CommentForm } from '@/app/components/UserName/CommentForm';
 export const PostModalRenderer = () => {
     const dispatch = useAppDispatch();
     const postId = useAppSelector((state) => state.ui.postModalId);
+    console.log('🎬 PostModalRenderer render, postId:', postId);
 
     // ✅ فقط وقتی postId وجود داره، Query بزن
     const { data, loading, error } = useQuery(GET_POST_BY_ID, {
@@ -18,6 +19,7 @@ export const PostModalRenderer = () => {
         skip: !postId,
         fetchPolicy: 'network-only',
     });
+    console.log('🎬 Query result:', { loading, hasData: !!data?.getPost, error });
 
     const handleClose = () => {
         dispatch(closePostModal());
