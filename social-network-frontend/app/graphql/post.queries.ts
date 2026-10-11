@@ -430,3 +430,46 @@ export const UNLIKE_COMMENT: TypedDocumentNode<UnlikeCommentResponse, UnlikeComm
     }
   }
 `;
+
+// =============================================
+// ✅ 9. کوئری دریافت یک پست با ID (برای مودال سراسری)
+// =============================================
+
+export interface GetPostByIdResponse {
+  getPost: {
+    id: string;
+    content: string;
+    createdAt: string;
+    updatedAt?: string;
+    isPublished?: boolean;
+    likesCount: number;
+    commentsCount: number;
+    isLiked: boolean;
+    user: IUser;
+  } | null;
+}
+
+export interface GetPostByIdVariables {
+  postId: string;
+}
+
+export const GET_POST_BY_ID: TypedDocumentNode<GetPostByIdResponse, GetPostByIdVariables> = gql`
+  query GetPostById($postId: ID!) {
+    getPost(postId: $postId) {
+      id
+      content
+      createdAt
+      updatedAt
+      isPublished
+      likesCount
+      commentsCount
+      isLiked
+      user {
+        id
+        username
+        fullName
+        avatar
+      }
+    }
+  }
+`;
