@@ -6,38 +6,48 @@ import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 // ✅ Types & Interfaces
 // =============================================
 
-export type NotificationType = 'FOLLOW' | 'FOLLOW_REQUEST' | 'FOLLOW_REQUEST_ACCEPTED';
+export type NotificationType =
+    | 'FOLLOW'
+    | 'FOLLOW_REQUEST'
+    | 'FOLLOW_REQUEST_ACCEPTED'
+    | 'LIKE'
+    | 'COMMENT'
+    | 'REPLY'
+    | 'COMMENT_LIKE';
+
 export type FollowRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 
 export interface IUserBasic {
-  id: string;
-  username: string;
-  fullName: string;
-  avatar: string | null;
+    id: string;
+    username: string;
+    fullName: string;
+    avatar: string | null;
 }
 
 export interface IFollowRequest {
-  id: string;
-  status: FollowRequestStatus;
-  createdAt: string;
-  requester: IUserBasic;
-  target: IUserBasic;
+    id: string;
+    status: FollowRequestStatus;
+    createdAt: string;
+    requester: IUserBasic;
+    target: IUserBasic;
 }
 
 export interface INotification {
-  id: string;
-  type: NotificationType;
-  isRead: boolean;
-  createdAt: string;
-  actor: IUserBasic;
-  followRequest: IFollowRequest | null;
+    id: string;
+    type: NotificationType;
+    isRead: boolean;
+    createdAt: string;
+    actor: IUserBasic;
+    postId: string | null;      // ✅ جدید
+    commentId: string | null;   // ✅ جدید
+    followRequest: IFollowRequest | null;
 }
 
 export interface INotificationsResult {
-  notifications: INotification[];
-  unreadCount: number;
-  totalCount: number;
-  hasMore: boolean;
+    notifications: INotification[];
+    unreadCount: number;
+    totalCount: number;
+    hasMore: boolean;
 }
 
 // =============================================
@@ -45,12 +55,12 @@ export interface INotificationsResult {
 // =============================================
 
 export interface GetNotificationsResponse {
-  getNotifications: INotificationsResult;
+    getNotifications: INotificationsResult;
 }
 
 export interface GetNotificationsVariables {
-  limit?: number;
-  offset?: number;
+    limit?: number;
+    offset?: number;
 }
 
 export const GET_NOTIFICATIONS: TypedDocumentNode<GetNotificationsResponse, GetNotificationsVariables> = gql`
@@ -61,6 +71,8 @@ export const GET_NOTIFICATIONS: TypedDocumentNode<GetNotificationsResponse, GetN
         type
         isRead
         createdAt
+        postId
+        commentId
         actor {
           id
           username
@@ -97,12 +109,12 @@ export const GET_NOTIFICATIONS: TypedDocumentNode<GetNotificationsResponse, GetN
 // =============================================
 
 export interface GetPendingFollowRequestsResponse {
-  getPendingFollowRequests: INotificationsResult;
+    getPendingFollowRequests: INotificationsResult;
 }
 
 export const GET_PENDING_FOLLOW_REQUESTS: TypedDocumentNode<
-  GetPendingFollowRequestsResponse,
-  GetNotificationsVariables
+    GetPendingFollowRequestsResponse,
+    GetNotificationsVariables
 > = gql`
   query GetPendingFollowRequests($limit: Int, $offset: Int) {
     getPendingFollowRequests(limit: $limit, offset: $offset) {
@@ -111,6 +123,8 @@ export const GET_PENDING_FOLLOW_REQUESTS: TypedDocumentNode<
         type
         isRead
         createdAt
+        postId
+        commentId
         actor {
           id
           username
@@ -147,19 +161,19 @@ export const GET_PENDING_FOLLOW_REQUESTS: TypedDocumentNode<
 // =============================================
 
 export interface MarkNotificationReadResponse {
-  markNotificationRead: {
-    success: boolean;
-    message: string;
-  };
+    markNotificationRead: {
+        success: boolean;
+        message: string;
+    };
 }
 
 export interface MarkNotificationReadVariables {
-  notificationId: string;
+    notificationId: string;
 }
 
 export const MARK_NOTIFICATION_READ: TypedDocumentNode<
-  MarkNotificationReadResponse,
-  MarkNotificationReadVariables
+    MarkNotificationReadResponse,
+    MarkNotificationReadVariables
 > = gql`
   mutation MarkNotificationRead($notificationId: ID!) {
     markNotificationRead(notificationId: $notificationId) {
@@ -174,15 +188,15 @@ export const MARK_NOTIFICATION_READ: TypedDocumentNode<
 // =============================================
 
 export interface MarkAllNotificationsReadResponse {
-  markAllNotificationsRead: {
-    success: boolean;
-    message: string;
-  };
+    markAllNotificationsRead: {
+        success: boolean;
+        message: string;
+    };
 }
 
 export const MARK_ALL_NOTIFICATIONS_READ: TypedDocumentNode<
-  MarkAllNotificationsReadResponse,
-  {}
+    MarkAllNotificationsReadResponse,
+    {}
 > = gql`
   mutation MarkAllNotificationsRead {
     markAllNotificationsRead {
@@ -197,19 +211,19 @@ export const MARK_ALL_NOTIFICATIONS_READ: TypedDocumentNode<
 // =============================================
 
 export interface AcceptFollowRequestResponse {
-  acceptFollowRequest: {
-    success: boolean;
-    message: string;
-  };
+    acceptFollowRequest: {
+        success: boolean;
+        message: string;
+    };
 }
 
 export interface AcceptFollowRequestVariables {
-  requestId: string;
+    requestId: string;
 }
 
 export const ACCEPT_FOLLOW_REQUEST: TypedDocumentNode<
-  AcceptFollowRequestResponse,
-  AcceptFollowRequestVariables
+    AcceptFollowRequestResponse,
+    AcceptFollowRequestVariables
 > = gql`
   mutation AcceptFollowRequest($requestId: ID!) {
     acceptFollowRequest(requestId: $requestId) {
@@ -224,22 +238,49 @@ export const ACCEPT_FOLLOW_REQUEST: TypedDocumentNode<
 // =============================================
 
 export interface RejectFollowRequestResponse {
-  rejectFollowRequest: {
-    success: boolean;
-    message: string;
-  };
+    rejectFollowRequest: {
+        success: boolean;
+        message: string;
+    };
 }
 
 export interface RejectFollowRequestVariables {
-  requestId: string;
+    requestId: string;
 }
 
 export const REJECT_FOLLOW_REQUEST: TypedDocumentNode<
-  RejectFollowRequestResponse,
-  RejectFollowRequestVariables
+    RejectFollowRequestResponse,
+    RejectFollowRequestVariables
 > = gql`
   mutation RejectFollowRequest($requestId: ID!) {
     rejectFollowRequest(requestId: $requestId) {
+      success
+      message
+    }
+  }
+`;
+
+// =============================================
+// ✅ Mutation: لغو درخواست فالو
+// =============================================
+
+export interface CancelFollowRequestResponse {
+    cancelFollowRequest: {
+        success: boolean;
+        message: string;
+    };
+}
+
+export interface CancelFollowRequestVariables {
+    targetUserId: string;
+}
+
+export const CANCEL_FOLLOW_REQUEST: TypedDocumentNode<
+    CancelFollowRequestResponse,
+    CancelFollowRequestVariables
+> = gql`
+  mutation CancelFollowRequest($targetUserId: ID!) {
+    cancelFollowRequest(targetUserId: $targetUserId) {
       success
       message
     }
@@ -251,54 +292,26 @@ export const REJECT_FOLLOW_REQUEST: TypedDocumentNode<
 // =============================================
 
 export interface UpdatePrivacyResponse {
-  updatePrivacy: {
-    success: boolean;
-    message: string;
-    isPrivate: boolean;
-  };
+    updatePrivacy: {
+        success: boolean;
+        message: string;
+        isPrivate: boolean;
+    };
 }
 
 export interface UpdatePrivacyVariables {
-  isPrivate: boolean;
+    isPrivate: boolean;
 }
 
 export const UPDATE_PRIVACY: TypedDocumentNode<
-  UpdatePrivacyResponse,
-  UpdatePrivacyVariables
+    UpdatePrivacyResponse,
+    UpdatePrivacyVariables
 > = gql`
   mutation UpdatePrivacy($isPrivate: Boolean!) {
     updatePrivacy(isPrivate: $isPrivate) {
       success
       message
       isPrivate
-    }
-  }
-`;
-
-// =============================================
-// ✅ Mutation: CANCEL_FOLLOW_REQUEST
-// =============================================
-
-
-export interface CancelFollowRequestResponse {
-  cancelFollowRequest: {
-    success: boolean;
-    message: string;
-  };
-}
-
-export interface CancelFollowRequestVariables {
-  targetUserId: string;
-}
-
-export const CANCEL_FOLLOW_REQUEST: TypedDocumentNode<
-  CancelFollowRequestResponse,
-  CancelFollowRequestVariables
-> = gql`
-  mutation CancelFollowRequest($targetUserId: ID!) {
-    cancelFollowRequest(targetUserId: $targetUserId) {
-      success
-      message
     }
   }
 `;
