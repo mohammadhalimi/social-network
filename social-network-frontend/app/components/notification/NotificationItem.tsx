@@ -6,7 +6,15 @@ import { useMutation } from '@apollo/client/react';
 import { formatDistanceToNow } from 'date-fns';
 import { faIR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
-import { UserPlus, Check, X, UserCheck } from 'lucide-react';
+import {
+    UserPlus,
+    Check,
+    X,
+    UserCheck,
+    Heart,
+    MessageCircle,
+    Reply,
+} from 'lucide-react';
 import {
     INotification,
     MARK_NOTIFICATION_READ,
@@ -15,6 +23,8 @@ import {
     GET_NOTIFICATIONS,
 } from '@/app/graphql/notification.queries';
 import { getAvatarUrl } from '@/app/lib/utils/avatar';
+import { useAppDispatch } from '@/app/redux/hooks';
+import { openPostModal } from '@/app/redux/uiSlice';
 
 interface NotificationItemProps {
     notification: INotification;
@@ -23,6 +33,7 @@ interface NotificationItemProps {
 
 export const NotificationItem = ({ notification, onClose }: NotificationItemProps) => {
     const router = useRouter();
+    const dispatch = useAppDispatch();
 
     const [markAsRead] = useMutation(MARK_NOTIFICATION_READ, {
         errorPolicy: 'all',
@@ -56,6 +67,14 @@ export const NotificationItem = ({ notification, onClose }: NotificationItemProp
                 return 'درخواست دنبال کردن فرستاد';
             case 'FOLLOW_REQUEST_ACCEPTED':
                 return 'درخواست شما را پذیرفت';
+            case 'LIKE':
+                return 'پست شما را لایک کرد';
+            case 'COMMENT':
+                return 'برای پست شما کامنت گذاشت';
+            case 'REPLY':
+                return 'به کامنت شما پاسخ داد';
+            case 'COMMENT_LIKE':
+                return 'کامنت شما را لایک کرد';
             default:
                 return '';
         }
@@ -70,6 +89,14 @@ export const NotificationItem = ({ notification, onClose }: NotificationItemProp
                 return <UserPlus size={14} className="text-blue-500" />;
             case 'FOLLOW_REQUEST_ACCEPTED':
                 return <UserCheck size={14} className="text-primary" />;
+            case 'LIKE':
+                return <Heart size={14} className="text-red-500 fill-red-500" />;
+            case 'COMMENT':
+                return <MessageCircle size={14} className="text-blue-500" />;
+            case 'REPLY':
+                return <Reply size={14} className="text-purple-500" />;
+            case 'COMMENT_LIKE':
+                return <Heart size={14} className="text-pink-500 fill-pink-500" />;
             default:
                 return null;
         }
@@ -80,7 +107,22 @@ export const NotificationItem = ({ notification, onClose }: NotificationItemProp
         if (!notification.isRead) {
             await markAsRead({ variables: { notificationId: notification.id } });
         }
-        // ✅ رفتن به پروفایل کاربر
+
+        // ✅ برای نوتیف‌های پست: باز کردن مودال پست
+        if (
+            notification.type === 'LIKE' ||
+            notification.type === 'COMMENT' ||
+            notification.type === 'REPLY' ||
+            notification.type === 'COMMENT_LIKE'
+        ) {
+            if (notification.postId) {
+                dispatch(openPostModal(notification.postId));
+            }
+            onClose();
+            return;
+        }
+
+        // ✅ برای نوتیف‌های فالو: رفتن به پروفایل کاربر
         router.push(`/${notification.actor.username}`);
         onClose();
     };
