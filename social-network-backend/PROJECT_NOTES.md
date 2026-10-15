@@ -333,7 +333,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - [x] `profile.resolvers.test.ts`
 - [x] `user.queries.test.ts`
 - [x] `requireAuth.test.ts`
-- [ ] `privacy.resolvers.test.ts` (TODO)
+- [x] `privacy.resolvers.test.ts`
 
 ### Post Resolvers
 - [x] `comment.resolvers.test.ts`
@@ -371,7 +371,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 | Layer | Tests | Status |
 | :--- | :---: | :---: |
 | Helpers | 5/7 | 🟡 Partial |
-| User Resolvers | 5/6 | 🟡 Partial |
+| User Resolvers | 6/6 | ✅ Complete |
 | Post Resolvers | 4/4 | ✅ Complete |
 | Story Resolvers | 2/2 | ✅ Complete |
 | Notification Resolvers | 0/2 | ❌ Missing |
@@ -379,7 +379,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 | Routes | 2/2 | ✅ Complete |
 | Modules | 2/2 | ✅ Complete |
 | Socket | 1/1 | ✅ Complete |
-| **TOTAL** | **25/30** | 🟡 |
+| **TOTAL** | **26/30** | 🟡 |
 
 ### Helpers (Data Access)
 - [x] `checkStoryAccess.test.ts`
@@ -510,4 +510,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Completed notification feature (LIKE, COMMENT, REPLY, COMMENT_LIKE) + postId/commentId in resolvers. Refactored to Layered Architecture.
+2026-10-15 — Added privacy.resolvers tests + socket tests + updated test coverage summary
