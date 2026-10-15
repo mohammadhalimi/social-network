@@ -325,7 +325,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - [x] `response.test.ts`
 - [x] `storyDuration.test.ts`
 - [x] `notify.test.ts`
-- [ ] `checkProfileAccess.test.ts` (TODO)
+- [x] `checkProfileAccess.test.ts`
 
 ### User Resolvers
 - [x] `auth.resolvers.test.ts`
@@ -495,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Added notify tests (12 tests); notification.mutations tests (7 tests); notification.queries tests (8 tests); expanded follow.resolvers tests (16 tests)
+2026-10-15 — Completed all helper tests (checkStoryAccess, formatPost, mapUser, response, storyDuration, notify, checkProfileAccess). Added notification.queries/mutations tests. Expanded follow.resolvers tests.
