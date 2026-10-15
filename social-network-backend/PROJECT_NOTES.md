@@ -497,8 +497,7 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Fixed `requireAuth.test.ts`:
-  - Corrected two wrong expectations (`{ user: {} }` and `{ user: { userId: '' } }` now correctly expect a thrown error).
-  - Added coverage for falsy `userId` values (null/undefined/0/false).
-  - Added test for custom message applied to all error cases.
-  - Aligned tests with the implementation (guard requires both `context.user` and a truthy `userId`).
+2026-10-15 — Fixed `auth.resolvers.test.ts` after `mapUser` was extended:
+  - Added `isPrivate` and `isFollowRequestPending` to `mockUser` in both `register` and `login` tests.
+  - Updated expected `user` shape to include the two new fields.
+  - Aligned tests with current `mapUser` output.

@@ -63,6 +63,7 @@ describe('authResolvers', () => {
             avatar: null,
             createdAt: new Date(),
             updatedAt: new Date(),
+            isPrivate: false,
         };
 
         const mockToken = 'fake-jwt-token';
@@ -94,6 +95,8 @@ describe('authResolvers', () => {
                     followersCount: 0,      // ✅ اضافه شد
                     followingCount: 0,      // ✅ اضافه شد
                     isFollowing: false,     // ✅ اضافه شد
+                    isPrivate: false,
+                    isFollowRequestPending: false,
                 },
                 token: mockToken,
             });
@@ -132,6 +135,7 @@ describe('authResolvers', () => {
             updatedAt: new Date(),
             resetToken: null,              // ✅ اضافه کن
             resetTokenExpiresAt: null,
+            isPrivate: false,
         };
 
         const mockToken = 'fake-jwt-token';
@@ -161,6 +165,8 @@ describe('authResolvers', () => {
                     followersCount: 0,      // ✅ اضافه شد
                     followingCount: 0,      // ✅ اضافه شد
                     isFollowing: false,     // ✅ اضافه شد
+                    isFollowRequestPending: false,
+                    isPrivate:false,
                 },
                 token: mockToken,
             });
