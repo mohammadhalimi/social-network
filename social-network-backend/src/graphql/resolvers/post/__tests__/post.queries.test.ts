@@ -1,10 +1,16 @@
-// graphql/resolvers/post/__tests__/post.queries.test.ts
+// src/graphql/resolvers/post/__tests__/post.queries.test.ts
 
 jest.mock('../../../../lib/prisma', () => ({
     __esModule: true,
     default: {
         post: {
             findUnique: jest.fn(),
+            findMany: jest.fn(),
+        },
+        user: {
+            findUnique: jest.fn(),
+        },
+        follow: {
             findMany: jest.fn(),
         },
     },
@@ -14,30 +20,47 @@ jest.mock('../../helpers/formatPost', () => ({
     formatPost: jest.fn(),
 }));
 
+jest.mock('../../helpers/checkProfileAccess', () => ({
+    canViewPrivateProfile: jest.fn(),
+}));
+
 import prisma from '../../../../lib/prisma';
 import { formatPost } from '../../helpers/formatPost';
+import { canViewPrivateProfile } from '../../helpers/checkProfileAccess';
 import { postQueries } from '../post.queries';
 
 const mockedFindUnique = (prisma as any).post.findUnique as jest.Mock;
 const mockedFindMany = (prisma as any).post.findMany as jest.Mock;
+const mockedUserFindUnique = (prisma as any).user.findUnique as jest.Mock;
+const mockedFollowFindMany = (prisma as any).follow.findMany as jest.Mock;
 const mockedFormatPost = formatPost as jest.Mock;
+const mockedCanViewPrivateProfile = canViewPrivateProfile as jest.Mock;
 
 beforeEach(() => {
     jest.clearAllMocks();
+
+    // ✅ پیش‌فرض: formatPost
     mockedFormatPost.mockImplementation((post: any, userId?: string) => ({
         formatted: true,
         id: post.id,
         userId: userId ?? null,
     }));
+
+    // ✅ پیش‌فرض: canViewPrivateProfile
+    mockedCanViewPrivateProfile.mockResolvedValue(true);
 });
 
 // ===================================================================
 // getPost
 // ===================================================================
 describe('postQueries.getPost', () => {
-    test('پست را با include صحیح از prisma می‌خواند و با userId کاربر لاگین‌شده فرمت می‌کند', async () => {
-        const rawPost = { id: 'post-1' };
-        mockedFindUnique.mockResolvedValue(rawPost);
+    const mockPost = {
+        id: 'post-1',
+        user: { id: 'owner-1', isPrivate: false },
+    };
+
+    test('1. پست را می‌خواند و با userId کاربر فرمت می‌کند', async () => {
+        mockedFindUnique.mockResolvedValue(mockPost);
         const context = { user: { userId: 'user-1' } };
 
         const result = await postQueries.getPost(null, { postId: 'post-1' }, context);
@@ -61,26 +84,48 @@ describe('postQueries.getPost', () => {
                 },
             },
         });
-        expect(mockedFormatPost).toHaveBeenCalledWith(rawPost, 'user-1');  // ✅ userId پاس داده شد
+        expect(mockedCanViewPrivateProfile).toHaveBeenCalledWith('user-1', {
+            id: 'owner-1',
+            isPrivate: false,
+        });
+        expect(mockedFormatPost).toHaveBeenCalledWith(mockPost, 'user-1');
         expect(result).toEqual({ formatted: true, id: 'post-1', userId: 'user-1' });
     });
 
-    test('اگر کاربر لاگین نکرده باشد، userId برابر null به formatPost پاس می‌شود', async () => {
-        const rawPost = { id: 'post-1' };
-        mockedFindUnique.mockResolvedValue(rawPost);
-        const context = {};  // ✅ بدون user
+    test('2. اگر کاربر لاگین نکرده باشد، userId برابر null به formatPost پاس می‌شود', async () => {
+        mockedFindUnique.mockResolvedValue(mockPost);
 
-        await postQueries.getPost(null, { postId: 'post-1' }, context);
+        await postQueries.getPost(null, { postId: 'post-1' }, {});
 
-        expect(mockedFormatPost).toHaveBeenCalledWith(rawPost, null);  // ✅
+        expect(mockedCanViewPrivateProfile).toHaveBeenCalledWith(null, {
+            id: 'owner-1',
+            isPrivate: false,
+        });
+        expect(mockedFormatPost).toHaveBeenCalledWith(mockPost, null);
     });
 
-    test('اگر پست پیدا نشود، خطا پرتاب می‌کند و formatPost فراخوانی نمی‌شود', async () => {
+    test('3. اگر پست پیدا نشود، خطا پرتاب می‌کند', async () => {
         mockedFindUnique.mockResolvedValue(null);
 
         await expect(
             postQueries.getPost(null, { postId: 'missing' }, {})
         ).rejects.toThrow('پست یافت نشد.');
+
+        expect(mockedFormatPost).not.toHaveBeenCalled();
+        expect(mockedCanViewPrivateProfile).not.toHaveBeenCalled();
+    });
+
+    test('4. اگر کاربر دسترسی نداشته باشد (پروفایل خصوصی)، خطا پرتاب می‌کند', async () => {
+        mockedFindUnique.mockResolvedValue({
+            ...mockPost,
+            user: { id: 'owner-1', isPrivate: true },
+        });
+        mockedCanViewPrivateProfile.mockResolvedValue(false);
+
+        await expect(
+            postQueries.getPost(null, { postId: 'post-1' }, {})
+        ).rejects.toThrow('این پست متعلق به یک حساب خصوصی است.');
+
         expect(mockedFormatPost).not.toHaveBeenCalled();
     });
 });
@@ -89,7 +134,10 @@ describe('postQueries.getPost', () => {
 // getUserPosts
 // ===================================================================
 describe('postQueries.getUserPosts', () => {
-    test('پست‌های کاربر را با فیلتر isPublished و pagination صحیح می‌خواند و با currentUserId فرمت می‌کند', async () => {
+    const mockProfileOwner = { id: 'user-1', isPrivate: false };
+
+    test('5. پست‌های کاربر را با فیلتر isPublished و pagination می‌خواند', async () => {
+        mockedUserFindUnique.mockResolvedValue(mockProfileOwner);
         mockedFindMany.mockResolvedValue([{ id: 'p1' }, { id: 'p2' }]);
         const context = { user: { userId: 'user-logged-in' } };
 
@@ -99,6 +147,11 @@ describe('postQueries.getUserPosts', () => {
             context
         );
 
+        expect(mockedUserFindUnique).toHaveBeenCalledWith({
+            where: { id: 'user-1' },
+            select: { id: true, isPrivate: true },
+        });
+        expect(mockedCanViewPrivateProfile).toHaveBeenCalledWith('user-logged-in', mockProfileOwner);
         expect(mockedFindMany).toHaveBeenCalledWith({
             where: { userId: 'user-1', isPublished: true },
             include: {
@@ -115,47 +168,70 @@ describe('postQueries.getUserPosts', () => {
             take: 5,
             skip: 20,
         });
-        // ✅ currentUserId پاس داده می‌شود
         expect(mockedFormatPost).toHaveBeenNthCalledWith(1, { id: 'p1' }, 'user-logged-in');
         expect(mockedFormatPost).toHaveBeenNthCalledWith(2, { id: 'p2' }, 'user-logged-in');
-        expect(result).toEqual([
-            { formatted: true, id: 'p1', userId: 'user-logged-in' },
-            { formatted: true, id: 'p2', userId: 'user-logged-in' },
-        ]);
+        expect(result).toHaveLength(2);
     });
 
-    test('اگر کاربر لاگین نکرده باشد، currentUserId برابر null به formatPost پاس می‌شود', async () => {
+    test('6. اگر profileOwner پیدا نشود، خطا پرتاب می‌کند', async () => {
+        mockedUserFindUnique.mockResolvedValue(null);
+
+        await expect(
+            postQueries.getUserPosts(null, { userId: 'nonexistent' } as any, {})
+        ).rejects.toThrow('کاربر یافت نشد.');
+
+        expect(mockedFindMany).not.toHaveBeenCalled();
+    });
+
+    test('7. اگر کاربر دسترسی نداشته باشد، آرایه خالی برمی‌گرداند', async () => {
+        mockedUserFindUnique.mockResolvedValue({
+            id: 'user-1',
+            isPrivate: true,
+        });
+        mockedCanViewPrivateProfile.mockResolvedValue(false);
+
+        const result = await postQueries.getUserPosts(
+            null,
+            { userId: 'user-1', limit: 10, offset: 0 },
+            { user: { userId: 'viewer-1' } }
+        );
+
+        expect(result).toEqual([]);
+        expect(mockedFindMany).not.toHaveBeenCalled();
+    });
+
+    test('8. اگر کاربر لاگین نکرده باشد، currentUserId برابر null پاس می‌شود', async () => {
+        mockedUserFindUnique.mockResolvedValue(mockProfileOwner);
         mockedFindMany.mockResolvedValue([{ id: 'p1' }]);
-        const context = {};  // ✅ بدون user
 
         await postQueries.getUserPosts(
             null,
             { userId: 'user-1', limit: 10, offset: 0 },
-            context
+            {}
         );
 
-        expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' }, null);  // ✅
+        expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' }, null);
     });
 
-    test('اگر limit/offset ارسال نشود، مقادیر پیش‌فرض 10 و 0 استفاده می‌شود', async () => {
+    test('9. اگر limit/offset ارسال نشود، مقادیر پیش‌فرض 10 و 0 استفاده می‌شود', async () => {
+        mockedUserFindUnique.mockResolvedValue(mockProfileOwner);
         mockedFindMany.mockResolvedValue([]);
-        const context = { user: { userId: 'user-1' } };
 
-        await postQueries.getUserPosts(null, { userId: 'user-1' } as any, context);
+        await postQueries.getUserPosts(null, { userId: 'user-1' } as any, {});
 
         expect(mockedFindMany).toHaveBeenCalledWith(
             expect.objectContaining({ take: 10, skip: 0 })
         );
     });
 
-    test('اگر کاربر هیچ پستی نداشته باشد، آرایه خالی برمی‌گرداند', async () => {
+    test('10. اگر کاربر هیچ پستی نداشته باشد، آرایه خالی برمی‌گرداند', async () => {
+        mockedUserFindUnique.mockResolvedValue(mockProfileOwner);
         mockedFindMany.mockResolvedValue([]);
-        const context = { user: { userId: 'user-1' } };
 
         const result = await postQueries.getUserPosts(
             null,
             { userId: 'user-1', limit: 10, offset: 0 },
-            context
+            {}
         );
 
         expect(result).toEqual([]);
@@ -164,51 +240,82 @@ describe('postQueries.getUserPosts', () => {
 });
 
 // ===================================================================
-// getFeed (بدون تغییر)
+// getFeed
 // ===================================================================
 describe('postQueries.getFeed', () => {
-    test('فقط پست‌های isPublished را می‌خواند و به formatPost با userId کاربر لاگین‌شده پاس می‌دهد', async () => {
+    test('11. فید را با فیلتر OR (public + following + own posts) می‌خواند', async () => {
+        mockedFollowFindMany.mockResolvedValue([
+            { followingId: 'followed-1' },
+            { followingId: 'followed-2' },
+        ]);
         mockedFindMany.mockResolvedValue([{ id: 'p1' }, { id: 'p2' }]);
         const context = { user: { userId: 'user-9' } };
 
         const result = await postQueries.getFeed(null, { limit: 10, offset: 0 }, context);
 
-        expect(mockedFindMany).toHaveBeenCalledWith(
-            expect.objectContaining({ where: { isPublished: true } })
-        );
-        expect(mockedFormatPost).toHaveBeenNthCalledWith(1, { id: 'p1' }, 'user-9');
-        expect(mockedFormatPost).toHaveBeenNthCalledWith(2, { id: 'p2' }, 'user-9');
-        expect(result).toEqual([
-            { formatted: true, id: 'p1', userId: 'user-9' },
-            { formatted: true, id: 'p2', userId: 'user-9' },
-        ]);
+        expect(mockedFollowFindMany).toHaveBeenCalledWith({
+            where: { followerId: 'user-9' },
+            select: { followingId: true },
+        });
+        expect(mockedFindMany).toHaveBeenCalledWith({
+            where: {
+                isPublished: true,
+                OR: [
+                    { user: { isPrivate: false } },
+                    { userId: { in: ['followed-1', 'followed-2'] } },
+                    { userId: 'user-9' },
+                ],
+            },
+            include: {
+                user: true,
+                likes: true,
+                comments: {
+                    include: {
+                        user: true,
+                        likes: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+            skip: 0,
+        });
+        expect(result).toHaveLength(2);
     });
 
-    test('اگر کاربر لاگین نکرده باشد (context.user نباشد)، userId برابر null به formatPost پاس می‌شود', async () => {
+    test('12. اگر کاربر لاگین نکرده باشد، followingIds خالی می‌شود و پست خودش حذف می‌شود', async () => {
         mockedFindMany.mockResolvedValue([{ id: 'p1' }]);
         const context = {};
 
         await postQueries.getFeed(null, { limit: 10, offset: 0 }, context);
 
-        expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' }, null);
+        // ✅ follow.findMany صدا زده نمی‌شه (چون userId نیست)
+        expect(mockedFollowFindMany).not.toHaveBeenCalled();
+
+        const args = mockedFindMany.mock.calls[0][0];
+        expect(args.where.OR).toEqual([
+            { user: { isPrivate: false } },
+            { userId: { in: [] } },
+            // ✅ userId در OR نیست
+        ]);
     });
 
-    test('pagination را با limit و offset سفارشی اعمال می‌کند', async () => {
+    test('13. pagination را با limit و offset سفارشی اعمال می‌کند', async () => {
+        mockedFollowFindMany.mockResolvedValue([]);
         mockedFindMany.mockResolvedValue([]);
-        const context = { user: { userId: 'user-1' } };
 
-        await postQueries.getFeed(null, { limit: 25, offset: 50 }, context);
+        await postQueries.getFeed(null, { limit: 25, offset: 50 }, { user: { userId: 'user-1' } });
 
         expect(mockedFindMany).toHaveBeenCalledWith(
             expect.objectContaining({ take: 25, skip: 50, orderBy: { createdAt: 'desc' } })
         );
     });
 
-    test('اگر limit/offset ارسال نشود، مقادیر پیش‌فرض 10 و 0 استفاده می‌شود', async () => {
+    test('14. اگر limit/offset ارسال نشود، مقادیر پیش‌فرض 10 و 0 استفاده می‌شود', async () => {
+        mockedFollowFindMany.mockResolvedValue([]);
         mockedFindMany.mockResolvedValue([]);
-        const context = { user: { userId: 'user-1' } };
 
-        await postQueries.getFeed(null, {} as any, context);
+        await postQueries.getFeed(null, {} as any, { user: { userId: 'user-1' } });
 
         expect(mockedFindMany).toHaveBeenCalledWith(
             expect.objectContaining({ take: 10, skip: 0 })

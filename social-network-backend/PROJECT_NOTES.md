@@ -495,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Expanded story.queries tests (18 tests) covering privacy check, visibility, close friends, and viewer tracking
+2026-10-15 — Expanded post.queries tests (14 tests) covering privacy check, feed filter, and pagination
