@@ -121,6 +121,8 @@ describe('mapUser', () => {
                 'followersCount',
                 'followingCount',
                 'isFollowing',
+                'isFollowRequestPending',
+                'isPrivate'
             ].sort()
         );
     });

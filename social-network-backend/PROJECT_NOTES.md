@@ -497,7 +497,6 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Fixed `auth.resolvers.test.ts` after `mapUser` was extended:
-  - Added `isPrivate` and `isFollowRequestPending` to `mockUser` in both `register` and `login` tests.
-  - Updated expected `user` shape to include the two new fields.
-  - Aligned tests with current `mapUser` output.
+2026-10-15 — Fixed `profile.resolvers.test.ts` after `mapUser` was extended:
+  - Added `isPrivate` to `mockUpdatedUser` and expected `user` shape.
+  - Aligned tests with current `mapUser` output (isFollowRequestPending now comes from `followInfo`, not `user`).

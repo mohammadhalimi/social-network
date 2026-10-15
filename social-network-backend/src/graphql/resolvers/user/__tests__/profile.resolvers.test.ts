@@ -28,6 +28,8 @@ describe('profileResolvers', () => {
         updatedAt: new Date(),
         resetToken: null,              // ✅ اضافه کن
         resetTokenExpiresAt: null,
+        isPrivate:false,
+        isFollowRequestPending:false,
     };
 
     beforeEach(() => {
@@ -73,6 +75,8 @@ describe('profileResolvers', () => {
                     followersCount: 0,      // ✅ اضافه شد
                     followingCount: 0,      // ✅ اضافه شد
                     isFollowing: false,     // ✅ اضافه شد
+                    isPrivate:false,
+                    isFollowRequestPending:false
                 },
             });
         });
@@ -135,6 +139,8 @@ describe('profileResolvers', () => {
                     followersCount: 0,      // ✅ اضافه شد
                     followingCount: 0,      // ✅ اضافه شد
                     isFollowing: false,     // ✅ اضافه شد
+                    isPrivate:false,
+                    isFollowRequestPending:false,
                 },
             });
         });
