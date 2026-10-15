@@ -495,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Completed all helper tests (checkStoryAccess, formatPost, mapUser, response, storyDuration, notify, checkProfileAccess). Added notification.queries/mutations tests. Expanded follow.resolvers tests.
+2026-10-15 — Expanded story.queries tests (18 tests) covering privacy check, visibility, close friends, and viewer tracking
