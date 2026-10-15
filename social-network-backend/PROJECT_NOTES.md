@@ -495,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Expanded post.queries tests (14 tests) covering privacy check, feed filter, and pagination
+2026-10-15 — Expanded user.queries tests (23 tests) covering search prioritization, private profile, follow request pending, and pagination
