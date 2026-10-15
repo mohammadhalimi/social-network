@@ -366,21 +366,6 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 ### Socket
 - [x] `socket/index.test.ts`
 
-## Test Coverage Summary
-
-| Layer | Tests | Status |
-| :--- | :---: | :---: |
-| Helpers | 5/7 | 🟡 Partial |
-| User Resolvers | 6/6 | ✅ Complete |
-| Post Resolvers | 4/4 | ✅ Complete |
-| Story Resolvers | 2/2 | ✅ Complete |
-| Notification Resolvers | 0/2 | ❌ Missing |
-| Services | 4/4 | ✅ Complete |
-| Routes | 2/2 | ✅ Complete |
-| Modules | 2/2 | ✅ Complete |
-| Socket | 1/1 | ✅ Complete |
-| **TOTAL** | **26/30** | 🟡 |
-
 ### Helpers (Data Access)
 - [x] `checkStoryAccess.test.ts`
 - [x] `formatPost.test.ts`
@@ -510,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Added privacy.resolvers tests + socket tests + updated test coverage summary
+2026-10-15 — Expanded follow.resolvers tests (16 tests) covering FollowRequest flow; updated PROJECT_NOTES.md with test coverage summary
