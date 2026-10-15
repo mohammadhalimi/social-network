@@ -362,4 +362,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Added Feature-Based Architecture documentation
+2026-10-15 — Added socket tests + full test coverage summary in PROJECT_NOTES.md

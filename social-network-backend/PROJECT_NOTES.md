@@ -170,31 +170,31 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 
 2.[Presentation] like.resolvers.ts ← likePost
 
-    Calls requireAuth(context) ← get userId
+....Calls requireAuth(context) ← get userId
 
-    Calls prisma.post.findUnique ← check post exists
+....Calls prisma.post.findUnique ← check post exists
 
-    Calls prisma.like.findUnique ← check existing like
+....Calls prisma.like.findUnique ← check existing like
 
-    Calls prisma.like.create ← create like
+....Calls prisma.like.create ← create like
 
-    Calls createNotification (helper) ← notify post owner
+....Calls createNotification (helper) ← notify post owner
 ↓
 
 3.[Data Access] prisma.like.create
 
-    Prisma Client executes SQL
+....Prisma Client executes SQL
 
-    PostgreSQL stores record
+....PostgreSQL stores record
 ↓
 
 4.[Cross-Cutting] createNotification
 
-    prisma.notification.create
+....prisma.notification.create
 
-    emitToUser(recipientId, 'notification:new', payload)
+....emitToUser(recipientId, 'notification:new', payload)
 
-    Socket.IO sends to recipient's sockets
+....Socket.IO sends to recipient's sockets
 ↓
 
 5.Response returned to client
@@ -317,6 +317,69 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - [x] storyCleanupJob — hourly + on startup
 
 ## Tests Written
+
+### Helpers
+- [x] `checkStoryAccess.test.ts`
+- [x] `formatPost.test.ts`
+- [x] `mapUser.test.ts`
+- [x] `response.test.ts`
+- [x] `storyDuration.test.ts`
+- [ ] `notify.test.ts` (TODO)
+- [ ] `checkProfileAccess.test.ts` (TODO)
+
+### User Resolvers
+- [x] `auth.resolvers.test.ts`
+- [x] `follow.resolvers.test.ts`
+- [x] `profile.resolvers.test.ts`
+- [x] `user.queries.test.ts`
+- [x] `requireAuth.test.ts`
+- [ ] `privacy.resolvers.test.ts` (TODO)
+
+### Post Resolvers
+- [x] `comment.resolvers.test.ts`
+- [x] `like.resolvers.test.ts`
+- [x] `post.mutations.test.ts`
+- [x] `post.queries.test.ts`
+
+### Story Resolvers
+- [x] `story.mutations.test.ts`
+- [x] `story.queries.test.ts`
+
+### Notification Resolvers
+- [ ] `notification.queries.test.ts` (TODO)
+- [ ] `notification.mutations.test.ts` (TODO)
+
+### Services
+- [x] `post-media.service.test.ts`
+- [x] `story-cleanup.service.test.ts`
+- [x] `story-media.service.test.ts`
+- [x] `upload.test.ts`
+
+### Routes
+- [x] `post-media.route.test.ts`
+- [x] `story-media.route.test.ts`
+
+### Modules
+- [x] `auth.service.test.ts`
+- [x] `profile.service.test.ts`
+
+### Socket
+- [x] `socket/index.test.ts`
+
+## Test Coverage Summary
+
+| Layer | Tests | Status |
+| :--- | :---: | :---: |
+| Helpers | 5/7 | 🟡 Partial |
+| User Resolvers | 5/6 | 🟡 Partial |
+| Post Resolvers | 4/4 | ✅ Complete |
+| Story Resolvers | 2/2 | ✅ Complete |
+| Notification Resolvers | 0/2 | ❌ Missing |
+| Services | 4/4 | ✅ Complete |
+| Routes | 2/2 | ✅ Complete |
+| Modules | 2/2 | ✅ Complete |
+| Socket | 1/1 | ✅ Complete |
+| **TOTAL** | **25/30** | 🟡 |
 
 ### Helpers (Data Access)
 - [x] `checkStoryAccess.test.ts`
