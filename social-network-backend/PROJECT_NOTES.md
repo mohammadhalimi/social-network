@@ -347,7 +347,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 
 ### Notification Resolvers
 - [x] `notification.queries.test.ts`
-- [ ] `notification.mutations.test.ts`
+- [x] `notification.mutations.test.ts`
 
 ### Services
 - [x] `post-media.service.test.ts`
@@ -495,4 +495,4 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Added notification.queries tests (8 tests) covering getNotifications pagination, mapping, and edge cases; expanded follow.resolvers tests to 16 tests covering full FollowRequest flow
+2026-10-15 — Added notification.mutations tests (7 tests); notification.queries tests (8 tests); expanded follow.resolvers tests (16 tests)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1792072592672" clover="3.2.0">
-  <project timestamp="1792072592672" name="All files">
-    <metrics statements="870" coveredstatements="8" conditionals="435" coveredconditionals="4" methods="145" coveredmethods="2" elements="1450" coveredelements="14" complexity="0" loc="870" ncloc="870" packages="16" files="43" classes="43"/>
+<coverage generated="1792073172139" clover="3.2.0">
+  <project timestamp="1792073172139" name="All files">
+    <metrics statements="870" coveredstatements="12" conditionals="435" coveredconditionals="4" methods="145" coveredmethods="2" elements="1450" coveredelements="18" complexity="0" loc="870" ncloc="870" packages="16" files="43" classes="43"/>
     <package name="src">
       <metrics statements="28" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="env.ts" path="E:\project-code\social_network\social-network-backend\src\env.ts">
@@ -167,32 +167,32 @@
       </file>
     </package>
     <package name="src.graphql.resolvers.notification">
-      <metrics statements="24" coveredstatements="8" conditionals="10" coveredconditionals="4" methods="6" coveredmethods="2"/>
+      <metrics statements="24" coveredstatements="12" conditionals="10" coveredconditionals="4" methods="6" coveredmethods="2"/>
       <file name="notification.mutations.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\notification\notification.mutations.ts">
-        <metrics statements="12" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="11" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-      </file>
-      <file name="notification.queries.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\notification\notification.queries.ts">
-        <metrics statements="12" coveredstatements="8" conditionals="6" coveredconditionals="4" methods="4" coveredmethods="2"/>
+        <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="12" count="8" type="stmt"/>
-        <line num="14" count="7" type="stmt"/>
-        <line num="31" count="7" type="stmt"/>
-        <line num="32" count="4" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="4" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="11" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="22" count="3" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+      </file>
+      <file name="notification.queries.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\notification\notification.queries.ts">
+        <metrics statements="12" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
         <line num="60" count="0" type="stmt"/>
         <line num="62" count="0" type="stmt"/>
         <line num="78" count="0" type="stmt"/>
