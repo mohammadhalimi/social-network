@@ -404,6 +404,8 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - [x] `auth.service.test.ts`
 - [x] `profile.service.test.ts`
 
+### Try-Catch
+
 ## Key Implementation Details
 
 ### Prisma (Data Access)
@@ -495,4 +497,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Expanded user.queries tests (23 tests) covering search prioritization, private profile, follow request pending, and pagination
+2026-10-15 — Fixed `requireAuth.test.ts`:
+  - Corrected two wrong expectations (`{ user: {} }` and `{ user: { userId: '' } }` now correctly expect a thrown error).
+  - Added coverage for falsy `userId` values (null/undefined/0/false).
+  - Added test for custom message applied to all error cases.
+  - Aligned tests with the implementation (guard requires both `context.user` and a truthy `userId`).

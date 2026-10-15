@@ -1,3 +1,5 @@
+// src/graphql/resolvers/try-catch/__test__/requireAuth.test.ts
+
 import { requireAuth } from '../requireAuth';
 
 describe('requireAuth', () => {
@@ -34,21 +36,43 @@ describe('requireAuth', () => {
         expect(() => requireAuth({ user: 0 })).toThrow();
     });
 
-    test('اگر context.user یک آبجکت خالی باشد (truthy)، خطا نمی‌دهد و userId (undefined) را برمی‌گرداند', () => {
-        // نکته: پیاده‌سازی فعلی فقط وجود context.user را چک می‌کند، نه وجود
-        // فیلد userId داخل آن. این تست رفتار فعلی را مستند می‌کند؛ اگر انتظار
-        // دارید در نبود userId هم خطا داده شود، این نکته‌ای برای بازبینی
-        // پیاده‌سازی requireAuth است، نه باگ در تست.
+    test('اگر context.user یک آبجکت خالی باشد، خطا می‌دهد (چون userId ندارد)', () => {
         const context: any = { user: {} };
 
-        const result = requireAuth(context);
-
-        expect(result).toBeUndefined();
+        expect(() => requireAuth(context)).toThrow('برای ادامه باید وارد شوید.');
     });
 
-    test('userId های مختلف را دقیقاً همان‌طور که هستند برمی‌گرداند', () => {
+    test('اگر userId خالی (empty string) باشد، خطا می‌دهد', () => {
+        expect(() => requireAuth({ user: { userId: '' } })).toThrow(
+            'برای ادامه باید وارد شوید.'
+        );
+    });
+
+    test('اگر userId مقدار falsy مثل null/undefined/0/false داشته باشد، خطا می‌دهد', () => {
+        expect(() => requireAuth({ user: { userId: null } })).toThrow();
+        expect(() => requireAuth({ user: { userId: undefined } })).toThrow();
+        expect(() => requireAuth({ user: { userId: 0 } })).toThrow();
+        expect(() => requireAuth({ user: { userId: false } })).toThrow();
+    });
+
+    test('userId های معتبر را دقیقاً همان‌طور که هستند برمی‌گرداند', () => {
         expect(requireAuth({ user: { userId: 'abc' } })).toBe('abc');
-        expect(requireAuth({ user: { userId: '' } })).toBe('');
         expect(requireAuth({ user: { userId: 'admin-999' } })).toBe('admin-999');
+        expect(requireAuth({ user: { userId: '550e8400-e29b-41d4-a716-446655440000' } })).toBe(
+            '550e8400-e29b-41d4-a716-446655440000'
+        );
+    });
+
+    test('پیام سفارشی روی همه حالت‌های خطا اعمال می‌شود', () => {
+        const customMessage = 'شما اجازه دسترسی ندارید.';
+
+        expect(() => requireAuth({ user: null }, customMessage)).toThrow(customMessage);
+        expect(() => requireAuth({ user: {} }, customMessage)).toThrow(customMessage);
+        expect(() => requireAuth({ user: { userId: '' } }, customMessage)).toThrow(
+            customMessage
+        );
+        expect(() => requireAuth({ user: { userId: undefined } }, customMessage)).toThrow(
+            customMessage
+        );
     });
 });
