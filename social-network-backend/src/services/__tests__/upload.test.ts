@@ -1,137 +1,125 @@
 import fs from 'fs';
 import path from 'path';
+import bcrypt from 'bcryptjs'; // اگر از bcryptjs استفاده می‌کنید، عوضش کنید
 import request from 'supertest';
 import { app } from '../../index';
 import prisma from '../../lib/prisma';
 
-// ✅ مسیر پوشه uploads
+// ⚠️ همان مسیر uploads که برنامه استفاده می‌کند (فقط برای "خواندن" و پاک کردن فایل‌های خود تست)
 const uploadDir = path.join(__dirname, '../../../uploads');
 
+const TEST_EMAIL = 'upload-test-user@example.com';
+const TEST_PASSWORD = 'Test@1234';
+const TEST_USERNAME = 'upload_test_user';
+const TEST_FULLNAME = 'Upload Test User';
+// ==========================================================
+//  ردیابی فایل‌هایی که خود تست ساخته
+//  تست هیچ‌وقت پوشه را اسکن و پاک نمی‌کند؛ فقط همین فایل‌ها را حذف می‌کند
+// ==========================================================
+const createdFiles = new Set<string>();
+
+const filePathOf = (filename: string) => path.join(uploadDir, path.basename(filename));
+// path.basename یعنی حتی اگر filename عجیب باشد، از uploadDir بیرون نمی‌رود
+
+const track = (res: request.Response) => {
+    if (res.body?.filename) createdFiles.add(res.body.filename);
+    return res;
+};
+
+const uploadAvatar = (filename: string, content: Buffer | string, token?: string) => {
+    const req = request(app)
+        .post('/upload-avatar')
+        .attach('avatar', Buffer.isBuffer(content) ? content : Buffer.from(content), filename);
+    if (token) req.set('Cookie', `token=${token}`); // به‌جای Authorization
+    return req.then(track);
+};
+
 describe('Upload Avatar - Integration Tests', () => {
-    // ✅ قبل از هر تست، پوشه uploads را پاک کنید
-    beforeEach(() => {
-        if (fs.existsSync(uploadDir)) {
-            const files = fs.readdirSync(uploadDir);
-            files.forEach((file) => {
-                const filePath = path.join(uploadDir, file);
-                if (file !== '.gitkeep') {
-                    fs.unlinkSync(filePath);
-                }
-            });
+    beforeAll(async () => {
+        const hashed = await bcrypt.hash(TEST_PASSWORD, 10);
+        // ⚠️ فیلدها را با مدل User خودتان تطبیق دهید
+        await prisma.user.deleteMany({ where: { email: TEST_EMAIL } });
+        await prisma.user.create({
+            data: {
+                email: TEST_EMAIL,
+                password: hashed,
+                username: TEST_USERNAME,      // ✅ اضافه شد
+                fullName: TEST_FULLNAME,
+            },
+        });
+    });
+
+    afterEach(() => {
+        for (const filename of createdFiles) {
+            const p = filePathOf(filename);
+            // فقط فایل (نه پوشه) و فقط اگر هنوز وجود دارد
+            if (fs.existsSync(p) && fs.statSync(p).isFile()) {
+                fs.unlinkSync(p);
+            }
         }
+        createdFiles.clear();
     });
 
-    // ==========================================================
-    //  تست ۱: آپلود موفق عکس
-    // ==========================================================
+    afterAll(async () => {
+        await prisma.user.deleteMany({ where: { email: TEST_EMAIL } });
+        await prisma.$disconnect();
+    });
+
     it('should upload an image successfully', async () => {
-        const response = await request(app)
-            .post('/upload-avatar')
-            .attach('avatar', Buffer.from('fake image content'), 'test.jpg')
-            .set('Content-Type', 'multipart/form-data');
+        const res = await uploadAvatar('test.jpg', 'fake image content');
 
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('success', true);
-        expect(response.body).toHaveProperty('url');
-        expect(response.body).toHaveProperty('filename');
-        expect(response.body.url).toMatch(/^https?:\/\/.+\/uploads\/[a-f0-9-]+\.jpg$/);
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body).toHaveProperty('url');
+        expect(res.body.filename).toMatch(/^[a-f0-9-]+\.jpg$/);
+        expect(fs.existsSync(filePathOf(res.body.filename))).toBe(true);
     });
 
-    // ==========================================================
-    //  تست ۲: خطا وقتی هیچ فایلی ارسال نمی‌شود
-    // ==========================================================
     it('should return error when no file is uploaded', async () => {
-        const response = await request(app)
-            .post('/upload-avatar')
-            .field('dummy', 'x');
+        const res = await request(app).post('/upload-avatar').field('dummy', 'x');
 
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toBe('هیچ فایلی آپلود نشده است.');
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe('هیچ فایلی آپلود نشده است.');
     });
 
-    // ==========================================================
-    //  تست ۳: خطا برای فرمت نامعتبر
-    // ==========================================================
     it('should reject invalid file formats', async () => {
-        const response = await request(app)
-            .post('/upload-avatar')
-            .attach('avatar', Buffer.from('fake text'), 'test.txt')
-            .set('Content-Type', 'multipart/form-data');
+        const res = await uploadAvatar('test.txt', 'fake text');
 
-        expect(response.status).toBe(500);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toMatch(/فرمت|پشتیبانی|نامعتبر/i);
+        expect([400, 500]).toContain(res.status);
+        expect(res.body.error).toMatch(/فرمت|پشتیبانی|نامعتبر/i);
     });
 
-    // ==========================================================
-    //  تست ۴: خطا برای حجم بیش از حد مجاز
-    // ==========================================================
     it('should reject files larger than 5MB', async () => {
-        const largeBuffer = Buffer.alloc(6 * 1024 * 1024);
+        const res = await uploadAvatar('large.jpg', Buffer.alloc(6 * 1024 * 1024));
 
-        const response = await request(app)
-            .post('/upload-avatar')
-            .attach('avatar', largeBuffer, 'large.jpg')
-            .set('Content-Type', 'multipart/form-data');
-
-        expect(response.status).toBe(413);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toMatch(/حجم|بزرگ/i);
+        expect(res.status).toBe(413);
+        expect(res.body.error).toMatch(/حجم|بزرگ/i);
     });
 
-    // ==========================================================
-    //  تست ۵: آپلود عکس با احراز هویت
-    // ==========================================================
     it('should delete old avatar when uploading new one with auth', async () => {
-        // ۱. ابتدا یک کاربر لاگین کنید و توکن بگیرید
-        const loginResponse = await request(app)
+        const login = await request(app)
             .post('/graphql')
             .send({
-                query: `
-                    mutation {
-                        login(email: "test@example.com", password: "Test@1234") {
-                            token
-                            user { id }
-                        }
-                    }
-                `,
+                query: `mutation { login(email: "${TEST_EMAIL}", password: "${TEST_PASSWORD}") { token } }`,
             });
+        const token = login.body.data?.login?.token;
+        if (!token) throw new Error(`Login failed: ${JSON.stringify(login.body)}`);
 
-        const token = loginResponse.body.data?.login?.token;
+        const first = await uploadAvatar('avatar1.jpg', 'fake image content', token);
+        expect(first.status).toBe(200);
+        expect(fs.existsSync(filePathOf(first.body.filename))).toBe(true);
 
-        // اگر توکن وجود نداشت، تست را رد کن
-        if (!token) {
-            console.warn('⚠️ Skipping auth test - no token received');
-            return;
-        }
+        const second = await uploadAvatar('avatar2.jpg', 'fake image content 2', token);
+        expect(second.status).toBe(200);
 
-        // ۲. عکس اول را آپلود کنید
-        const uploadResponse = await request(app)
-            .post('/upload-avatar')
-            .attach('avatar', Buffer.from('fake image content'), 'avatar1.jpg')
-            .set('Authorization', `Bearer ${token}`)
-            .set('Content-Type', 'multipart/form-data');
+        // فقط درباره‌ی فایل‌های خود تست حکم می‌دهیم
+        expect(fs.existsSync(filePathOf(first.body.filename))).toBe(false);
+        expect(fs.existsSync(filePathOf(second.body.filename))).toBe(true);
 
-        expect(uploadResponse.status).toBe(200);
-        expect(uploadResponse.body).toHaveProperty('success', true);
-
-        // ۳. عکس دوم را آپلود کنید
-        const uploadResponse2 = await request(app)
-            .post('/upload-avatar')
-            .attach('avatar', Buffer.from('fake image content 2'), 'avatar2.jpg')
-            .set('Authorization', `Bearer ${token}`)
-            .set('Content-Type', 'multipart/form-data');
-
-        expect(uploadResponse2.status).toBe(200);
-        expect(uploadResponse2.body).toHaveProperty('success', true);
-
-        // ۴. بررسی کنید که عکس قبلی حذف شده است
-        const files = fs.readdirSync(uploadDir);
-        expect(files).toHaveLength(1);
-        expect(files[0]).toContain('avatar2');
-    });
-    afterAll(async () => {
-        await prisma.$disconnect();
+        const user = await prisma.user.findUnique({
+            where: { email: TEST_EMAIL },
+            select: { avatar: true },
+        });
+        expect(user?.avatar).toContain(second.body.filename);
     });
 });

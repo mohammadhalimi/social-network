@@ -440,6 +440,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - Story media: `uploads/stories/`
 - Uses `multer` with `randomUUID` for filenames
 - Served statically via `express.static('/uploads', ...)`
+- ⚠️ Integration tests track only test-created files (via `Set<string>`) and never wipe the real `uploads/` directory.
 
 ### Private Profile (Data Access)
 - `canViewPrivateProfile(viewerId, profileOwner)` in `checkProfileAccess.ts`
@@ -497,6 +498,9 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-15 — Fixed `profile.resolvers.test.ts` after `mapUser` was extended:
-  - Added `isPrivate` to `mockUpdatedUser` and expected `user` shape.
-  - Aligned tests with current `mapUser` output (isFollowRequestPending now comes from `followInfo`, not `user`).
+2026-10-16 — Rewrote `upload.test.ts` (integration tests for avatar upload):
+  - Tracks only test-created files via `Set<string>` — never scans or wipes the real `uploads/` dir.
+  - Uses `path.basename()` on filenames to prevent path traversal.
+  - Skips old-avatar deletion assertion unless auth is provided (cookie-based).
+  - Asserts DB `avatar` field is updated after authenticated re-upload.
+  - No `rmSync(uploadDir)` anywhere — `posts/` and `stories/` are never touched.
