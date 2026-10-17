@@ -22,6 +22,10 @@ jest.mock('../../try-catch/requireAuth', () => ({
     requireAuth: jest.fn(),
 }));
 
+jest.mock('../../helpers/notify', () => ({
+    createNotification: jest.fn(),
+}));
+
 import prisma from '../../../../lib/prisma';
 import { mapUser } from '../../helpers/mapUser';
 import { requireAuth } from '../../try-catch/requireAuth';

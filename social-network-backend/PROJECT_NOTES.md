@@ -498,9 +498,7 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-16 — Rewrote `upload.test.ts` (integration tests for avatar upload):
-  - Tracks only test-created files via `Set<string>` — never scans or wipes the real `uploads/` dir.
-  - Uses `path.basename()` on filenames to prevent path traversal.
-  - Skips old-avatar deletion assertion unless auth is provided (cookie-based).
-  - Asserts DB `avatar` field is updated after authenticated re-upload.
-  - No `rmSync(uploadDir)` anywhere — `posts/` and `stories/` are never touched.
+2026-10-17 — Refactored `comment.resolvers.ts` to use `formatComment` helper:
+  - Extracted comment formatting logic into `formatComment` in `formatPost.ts`.
+  - `createdAt`/`updatedAt` now returned as ISO strings (aligns with GraphQL schema and `mapUser`/`formatPost`).
+  - Tests updated to expect ISO string dates and mock `createNotification` to isolate resolver logic.

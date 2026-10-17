@@ -2,7 +2,7 @@
 // کامنت و ریپلای روی پست
 
 import prisma from '../../../lib/prisma';
-import { mapUser } from '../helpers/mapUser';
+import { formatComment } from '../helpers/formatPost';
 import { requireAuth } from '../try-catch/requireAuth';
 import { createNotification } from '../helpers/notify';
 
@@ -48,13 +48,7 @@ export const commentResolvers = {
         return {
             success: true,
             message: 'کامنت با موفقیت ثبت شد.',
-            comment: {
-                ...comment,
-                user: mapUser(comment.user),
-                likesCount: comment.likes.length,
-                isLiked: comment.likes.some((like: any) => like.userId === userId),
-                replies: [],
-            },
+            comment: formatComment(comment, userId),
         };
     },
 
@@ -104,13 +98,7 @@ export const commentResolvers = {
         return {
             success: true,
             message: 'ریپلی با موفقیت ثبت شد.',
-            comment: {
-                ...reply,
-                user: mapUser(reply.user),
-                likesCount: reply.likes.length,
-                isLiked: reply.likes.some((like: any) => like.userId === userId),
-                replies: [],
-            },
+            comment: formatComment(reply, userId),
         };
     },
 
