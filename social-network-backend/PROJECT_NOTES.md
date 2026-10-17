@@ -498,7 +498,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-17 — Refactored `comment.resolvers.ts` to use `formatComment` helper:
-  - Extracted comment formatting logic into `formatComment` in `formatPost.ts`.
-  - `createdAt`/`updatedAt` now returned as ISO strings (aligns with GraphQL schema and `mapUser`/`formatPost`).
-  - Tests updated to expect ISO string dates and mock `createNotification` to isolate resolver logic.
+2026-10-17 — Fixed date format inconsistency in comment resolvers and completed unit tests:
+  - `comment.resolvers.ts`: `commentOnPost` and `replyToComment` now return `formatComment(...)` (existing helper in `formatPost.ts`) instead of spreading the raw Prisma object.
+  - `createdAt`/`updatedAt` are now ISO strings, consistent with `formatPost` and the GraphQL schema (`String!`). Previously raw `Date` objects were returned.
+  - `comment.resolvers.test.ts`: expects ISO string dates; `createNotification` is mocked to isolate resolver logic (removes `console.error` noise from the real `notify.ts`).
+  - `like.resolvers.test.ts`: added `post`/`comment` mocks and `createNotification` mock (fixes 4 failing tests), plus tests for missing post/comment, notification arguments, and notification failure (`catch`) paths. `like.resolvers.ts` coverage is now 100%.
