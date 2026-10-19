@@ -260,6 +260,9 @@ story/
 - [x] `authSlice.test.ts`
 - [x] `themeSlice.test.ts`
 
+### Providers
+- [x] `SocketProvider.test.tsx` (9 tests) — socket creation, events, cleanup, URL prop
+
 ## Coding Rules
 
 ### General
@@ -301,6 +304,16 @@ story/
 
 ## Key Implementation Details
 
+### Socket
+- `SocketProvider` with `credentials: 'include'`.
+- `useSocket` hook returns `{ socket, isConnected }`.
+- URL from `url` prop > `NEXT_PUBLIC_API_URL` > `http://localhost:4000`.
+- `SOCKET_URL` read inside `useEffect` (not module-level) for testability.
+- Events: `connect`, `disconnect`, `connect_error`.
+- Cleanup: `socket.disconnect()` on unmount.
+- Event `notification:new` for new notifications.
+- `console.log` only in development (`NODE_ENV === 'development'`).
+
 ### Apollo Client
 - `credentials: 'include'` to send cookies.
 - `fetchPolicy: 'network-only'` in `apollo-client.ts`.
@@ -327,6 +340,7 @@ story/
 
 ## Environment Variables (.env.local)
 - `NEXT_PUBLIC_API_URL` — Backend URL (default: http://localhost:4000)
+  - Used by Apollo Client AND SocketProvider.
 
 ## Useful Commands
 
@@ -362,4 +376,12 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
+2026-10-19 — Added `SocketProvider` tests (9 tests):
+  - `useSocket` default values outside provider.
+  - Socket creation with env URL + custom URL prop.
+  - connect/disconnect/connect_error event handling.
+  - Cleanup on unmount + no re-create on re-render.
+  - All required event handlers registered.
+  - `SocketProvider` refactored: `url` prop, `SOCKET_URL` inside `useEffect`, conditional `console.log` in dev only.
+
 2026-10-15 — Added socket tests + full test coverage summary in PROJECT_NOTES.md
