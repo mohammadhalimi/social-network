@@ -248,6 +248,7 @@ story/
 - [x] `ForgotPasswordPage.test.tsx`
 - [x] `ResetPasswordPage.test.tsx`
 - [x] `Settings.test.tsx`
+- [x] `NotificationBell.test.tsx`
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -303,6 +304,13 @@ story/
 - Coverage: `npm test -- --coverage`
 
 ## Key Implementation Details
+
+### Notification
+- `NotificationBell`: button with `aria-label="اعلان‌ها"` and `aria-expanded`.
+- `NotificationBadge`: shows `unreadCount`.
+- `NotificationDropdown`: rendered only when `isOpen`, receives `notifications`, `unreadCount`, `loading`, `onClose`.
+- Outside click detection via `mousedown` on `document`, cleanup on unmount.
+- `useNotifications` hook: Apollo Cache + Socket (`notification:new`).
 
 ### Socket
 - `SocketProvider` with `credentials: 'include'`.
@@ -376,12 +384,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-19 — Added `SocketProvider` tests (9 tests):
-  - `useSocket` default values outside provider.
-  - Socket creation with env URL + custom URL prop.
-  - connect/disconnect/connect_error event handling.
-  - Cleanup on unmount + no re-create on re-render.
-  - All required event handlers registered.
-  - `SocketProvider` refactored: `url` prop, `SOCKET_URL` inside `useEffect`, conditional `console.log` in dev only.
-
-2026-10-15 — Added socket tests + full test coverage summary in PROJECT_NOTES.md
+2026-10-20 — Added `NotificationBell` tests (12 tests, 100% coverage):
+  - Render: bell icon, badge with unreadCount, dropdown hidden initially.
+  - Toggle: open/close on button click, aria-expanded updates.
+  - Outside click: closes dropdown, does not close on inside click.
+  - Event listener: only added when open, removed on unmount.
+  - Props: passes notifications, unreadCount, loading, onClose to dropdown.
+  - Refactor: added `aria-label` and `aria-expanded` to button, early return in useEffect.
