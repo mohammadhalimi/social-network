@@ -249,6 +249,7 @@ story/
 - [x] `ResetPasswordPage.test.tsx`
 - [x] `Settings.test.tsx`
 - [x] `NotificationBell.test.tsx`
+- [x] `NotificationDropdown.test.tsx`
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -384,10 +385,11 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-20 — Added `NotificationBell` tests (12 tests, 100% coverage):
-  - Render: bell icon, badge with unreadCount, dropdown hidden initially.
-  - Toggle: open/close on button click, aria-expanded updates.
-  - Outside click: closes dropdown, does not close on inside click.
-  - Event listener: only added when open, removed on unmount.
-  - Props: passes notifications, unreadCount, loading, onClose to dropdown.
-  - Refactor: added `aria-label` and `aria-expanded` to button, early return in useEffect.
+2026-10-20 — Added `NotificationDropdown` tests (12 tests, 93.75% coverage):
+  - Loading state: spinner shown, empty state hidden.
+  - Empty state: "هنوز اعلانی ندارید" when no notifications.
+  - List: renders notifications, shows only first 5 (MAX_IN_DROPDOWN).
+  - "View all" link: hidden when <= 5, shown when > 5, calls onClose on click.
+  - "Mark all as read": shown when unreadCount > 0, hidden when 0, calls mutation.
+  - NotificationItem: receives onClose.
+  - Refactor: added test-id to "view all" link for jsdom navigation warning.
