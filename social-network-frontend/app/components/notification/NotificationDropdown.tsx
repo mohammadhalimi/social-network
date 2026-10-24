@@ -12,7 +12,7 @@ import {
     MARK_ALL_NOTIFICATIONS_READ,
     GET_NOTIFICATIONS,
 } from '@/app/graphql/notification.queries';
-import { NotificationItem } from './NotificationItem';
+import { NotificationItem } from './NotificationItemIndex';
 
 interface NotificationDropdownProps {
     notifications: INotification[];

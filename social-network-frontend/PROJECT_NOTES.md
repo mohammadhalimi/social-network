@@ -250,7 +250,10 @@ story/
 - [x] `Settings.test.tsx`
 - [x] `NotificationBell.test.tsx`
 - [x] `NotificationDropdown.test.tsx`
-
+- [x] `NotificationItem` tests:
+  - `useNotificationItem.test.tsx` (19 tests, 100% coverage)
+  - `index.test.tsx` (15 tests)
+  
 ### GraphQL
 - [x] `post.queries.test.ts`
 - [x] `story.queries.test.ts`
@@ -385,11 +388,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-20 — Added `NotificationDropdown` tests (12 tests, 93.75% coverage):
-  - Loading state: spinner shown, empty state hidden.
-  - Empty state: "هنوز اعلانی ندارید" when no notifications.
-  - List: renders notifications, shows only first 5 (MAX_IN_DROPDOWN).
-  - "View all" link: hidden when <= 5, shown when > 5, calls onClose on click.
-  - "Mark all as read": shown when unreadCount > 0, hidden when 0, calls mutation.
-  - NotificationItem: receives onClose.
-  - Refactor: added test-id to "view all" link for jsdom navigation warning.
+2026-10-24 — Refactored `NotificationItem` into 3 files + tests (34 tests, 100% hook coverage):
+  - `NotificationItem/index.tsx` — layout + icon switch.
+  - `NotificationItem/constants.ts` — `MESSAGE_MAP`, `POST_NOTIFICATION_TYPES`.
+  - `NotificationItem/useNotificationItem.ts` — `handleClick`, `handleAccept`, `handleReject`.
+  - Added `data-testid` for testability.
+  - Tests: `useNotificationItem.test.tsx` (19 tests, 100% coverage) + `index.test.tsx` (15 tests).
+  - Standardized folder to `NotificationItem/index.tsx`.

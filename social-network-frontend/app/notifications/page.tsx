@@ -11,7 +11,7 @@ import {
     MARK_ALL_NOTIFICATIONS_READ,
     INotification,
 } from '@/app/graphql/notification.queries';
-import { NotificationItem } from '@/app/components/notification/NotificationItem';
+import { NotificationItem } from '@/app/components/notification/NotificationItemIndex';
 
 const PAGE_SIZE = 15; // ✅ هر بار ۱۵ نوتیف
 
