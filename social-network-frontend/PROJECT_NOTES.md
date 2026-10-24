@@ -248,6 +248,7 @@ story/
 - [x] `ForgotPasswordPage.test.tsx`
 - [x] `ResetPasswordPage.test.tsx`
 - [x] `Settings.test.tsx`
+- [x] `MobileMenu.test.tsx` (14 tests, 100% coverage)
 - [x] `Header.test.tsx` (15 tests, 100% coverage)
 - [x] `NotificationBell.test.tsx`
 - [x] `NotificationDropdown.test.tsx`
@@ -389,8 +390,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-24 — Added `Header` tests (15 tests, 100% coverage):
-  - Guest state: welcome fallback, no bell, no profile link, no mobile menu button.
-  - Logged in: fullName in welcome, NotificationBell, profile link (avatar/first letter).
-  - Mobile menu: renders only on `/profile` + logged in, Menu/X icon toggling, dispatch on click.
-  - Home link: correct href.
+2026-10-24 — Added `MobileMenu` tests (14 tests, 88.23% coverage):
+  - Visibility: returns null when `isOpen=false`, renders when open.
+  - User info: fullName/username, fallback (`کاربر مهمان`, `@—`), avatar/first letter.
+  - Profile link: renders only when username exists, correct href.
+  - Story button: calls `onOpenStoryModal` on click.
+  - Menu items: all 6 render, click calls `setActiveTab`, active class applies.
+  - Logout: calls `handleLogout` on click.
