@@ -50,7 +50,7 @@ export const Header = () => {
                         transition-colors
                         cursor-pointer
                         "
-                        aria-label="Toggle menu"
+                        aria-label="منوی موبایل"
                     >
                         {isMobileMenuOpen ? (
                             <X className="w-5 h-5 text-primary" />

@@ -248,12 +248,13 @@ story/
 - [x] `ForgotPasswordPage.test.tsx`
 - [x] `ResetPasswordPage.test.tsx`
 - [x] `Settings.test.tsx`
+- [x] `Header.test.tsx` (15 tests, 100% coverage)
 - [x] `NotificationBell.test.tsx`
 - [x] `NotificationDropdown.test.tsx`
 - [x] `NotificationItem` tests:
   - `useNotificationItem.test.tsx` (19 tests, 100% coverage)
   - `index.test.tsx` (15 tests)
-  
+
 ### GraphQL
 - [x] `post.queries.test.ts`
 - [x] `story.queries.test.ts`
@@ -388,10 +389,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-24 — Refactored `NotificationItem` into 3 files + tests (34 tests, 100% hook coverage):
-  - `NotificationItem/index.tsx` — layout + icon switch.
-  - `NotificationItem/constants.ts` — `MESSAGE_MAP`, `POST_NOTIFICATION_TYPES`.
-  - `NotificationItem/useNotificationItem.ts` — `handleClick`, `handleAccept`, `handleReject`.
-  - Added `data-testid` for testability.
-  - Tests: `useNotificationItem.test.tsx` (19 tests, 100% coverage) + `index.test.tsx` (15 tests).
-  - Standardized folder to `NotificationItem/index.tsx`.
+2026-10-24 — Added `Header` tests (15 tests, 100% coverage):
+  - Guest state: welcome fallback, no bell, no profile link, no mobile menu button.
+  - Logged in: fullName in welcome, NotificationBell, profile link (avatar/first letter).
+  - Mobile menu: renders only on `/profile` + logged in, Menu/X icon toggling, dispatch on click.
+  - Home link: correct href.
