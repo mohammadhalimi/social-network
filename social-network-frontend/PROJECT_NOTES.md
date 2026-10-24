@@ -311,6 +311,11 @@ story/
 
 ## Key Implementation Details
 
+### Logout
+- `useLogout` hook: Apollo `LOGOUT` mutation + Redux `logout()` + redirect.
+- Backend clears `HTTP-only` cookie via `res.clearCookie`.
+- No `document.cookie` or `localStorage` needed.
+
 ### Notification
 - `NotificationBell`: button with `aria-label="اعلان‌ها"` and `aria-expanded`.
 - `NotificationBadge`: shows `unreadCount`.
@@ -390,10 +395,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-24 — Added `MobileMenu` tests (14 tests, 88.23% coverage):
-  - Visibility: returns null when `isOpen=false`, renders when open.
-  - User info: fullName/username, fallback (`کاربر مهمان`, `@—`), avatar/first letter.
-  - Profile link: renders only when username exists, correct href.
-  - Story button: calls `onOpenStoryModal` on click.
-  - Menu items: all 6 render, click calls `setActiveTab`, active class applies.
-  - Logout: calls `handleLogout` on click.
+2026-10-24 — Added `ProfilePage` integration tests (13 tests, 91.93% coverage):
+  - Render: Sidebar, ProfileContent, MobileMenu.
+  - Tab change via Sidebar & MobileMenu (with Redux close dispatch).
+  - Story modal: open via Sidebar/MobileMenu, close, success toast.
+  - MobileMenu isOpen from Redux.
+  - handleLogout: calls mutation, dispatches, redirects; error handling.
+  - Added `useLogout` hook (100% coverage).

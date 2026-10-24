@@ -142,7 +142,8 @@ export const LOGIN: TypedDocumentNode<LoginResponse, LoginVariables> = gql`
   }
 `;
 
-export const LOGOUT = gql`
+// ✅ Mutation خروج
+export const LOGOUT: TypedDocumentNode<LogoutResponse, {}> = gql`
   mutation Logout {
     logout {
       success
