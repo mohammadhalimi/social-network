@@ -260,7 +260,11 @@ story/
 - [x] `FollowButton` tests:
   - `useFollowButton.test.tsx` (~10 tests)
   - `index.test.tsx` (~6 tests)
-
+- [x] `ProfileHeader` tests:
+  - `useProfileHeader.test.tsx` (10 tests)
+  - `ProfileAvatar.test.tsx` (7 tests)
+  - `ProfileHeader.test.tsx` (5 integration tests)
+  
 ### GraphQL
 - [x] `post.queries.test.ts`
 - [x] `story.queries.test.ts`
@@ -400,10 +404,9 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-29 — Refactored `FollowButton` into 3 files + tests (~16 tests):
-  - `FollowButton/constants.ts`: `FollowState` type + `FOLLOW_STATE_CONFIG` (text, icon, classes).
-  - `FollowButton/useFollowButton.ts`: state management (replaced 2 booleans with 1 `FollowState`), mutations, `handleClick`.
-  - `FollowButton/index.tsx`: pure UI (button + icon + text).
-  - Added `key={user.id}` in parent to force remount on user change (fixes stale state).
-  - Added `data-testid="follow-button"` + `data-state` + `data-loading`.
-  - Removed nested ternaries in favor of config lookup.
+2026-10-29 — Refactored `ProfileHeader` into 3 files + tests (~18 tests):
+  - `ProfileHeader/useProfileHeader.ts` (state + long-press + stories) — 10 tests, 97.67% coverage.
+  - `ProfileHeader/ProfileAvatar.tsx` (avatar + story ring + plus button) — 7 tests, 100% coverage.
+  - `ProfileHeader/index.tsx` (layout + children) — 5 integration tests.
+  - `handlePressStart` no longer takes `hasAvatar` param (reads `avatarUrl` from hook).
+  - Added `data-testid` (avatar-container, add-story-button).
