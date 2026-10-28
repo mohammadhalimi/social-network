@@ -256,6 +256,7 @@ story/
   - `useNotificationItem.test.tsx` (19 tests, 100% coverage)
   - `index.test.tsx` (15 tests)
 - [x] `PrivacyToggle.test.tsx` (~12 tests)
+- [x] `ChangeTheme.test.tsx` (8 tests)
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -396,10 +397,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-29 — Added `PrivacyToggle` tests (~12 tests):
-  - Loading state: spinner shown.
-  - Public/private: icon (Globe/Lock), text, description, `data-private`.
-  - Toggle: calls mutation with opposite value (public↔private).
-  - Toast: success, error (mutation error, success=false, thrown error).
-  - Refactor: removed `useState(isUpdating)`, using Apollo mutation `loading`.
-  - Added `data-testid` (privacy-toggle, lock-icon, globe-icon) + `data-private`.
+2026-10-29 — Added `ChangeTheme` tests (8 tests):
+  - Light theme: Sun icon, "تم روشن" text, `data-theme="light"`.
+  - Dark theme: Moon icon, "تم تاریک" text, `data-theme="dark"`.
+  - Toggle: dispatches `toggleTheme` action on click (both themes).
+  - Refactor: added `data-testid` (moon-icon, sun-icon) + `data-theme` on button.

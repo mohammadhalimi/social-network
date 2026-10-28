@@ -40,6 +40,7 @@ export const ChangeTheme = () => {
                     ">
                         {theme === 'dark' ? (
                             <Moon
+                               data-testid="moon-icon"
                                 className="
                                 w-5
                                 h-5
@@ -47,6 +48,7 @@ export const ChangeTheme = () => {
                             "/>
                         ) : (
                             <Sun
+                                data-testid="sun-icon"
                                 className="
                                 w-5
                                 h-5
@@ -87,6 +89,7 @@ export const ChangeTheme = () => {
                         hover:cursor-pointer"
                         aria-label="تغییر تم"
                         data-testid="theme-toggle"
+                        data-theme={theme}
                     >
                         <span
                             className={`
