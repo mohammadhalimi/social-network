@@ -257,6 +257,9 @@ story/
   - `index.test.tsx` (15 tests)
 - [x] `PrivacyToggle.test.tsx` (~12 tests)
 - [x] `ChangeTheme.test.tsx` (8 tests)
+- [x] `FollowButton` tests:
+  - `useFollowButton.test.tsx` (~10 tests)
+  - `index.test.tsx` (~6 tests)
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -397,8 +400,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-29 — Added `ChangeTheme` tests (8 tests):
-  - Light theme: Sun icon, "تم روشن" text, `data-theme="light"`.
-  - Dark theme: Moon icon, "تم تاریک" text, `data-theme="dark"`.
-  - Toggle: dispatches `toggleTheme` action on click (both themes).
-  - Refactor: added `data-testid` (moon-icon, sun-icon) + `data-theme` on button.
+2026-10-29 — Refactored `FollowButton` into 3 files + tests (~16 tests):
+  - `FollowButton/constants.ts`: `FollowState` type + `FOLLOW_STATE_CONFIG` (text, icon, classes).
+  - `FollowButton/useFollowButton.ts`: state management (replaced 2 booleans with 1 `FollowState`), mutations, `handleClick`.
+  - `FollowButton/index.tsx`: pure UI (button + icon + text).
+  - Added `key={user.id}` in parent to force remount on user change (fixes stale state).
+  - Added `data-testid="follow-button"` + `data-state` + `data-loading`.
+  - Removed nested ternaries in favor of config lookup.

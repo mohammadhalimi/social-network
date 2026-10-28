@@ -166,10 +166,12 @@ export const ProfileHeader = ({
 
                         {!isOwner && (
                             <FollowButton
+                                key={user.id}
                                 userId={user.id}
                                 initialIsFollowing={user.isFollowing}
                                 initialIsPending={user.isFollowRequestPending}
                                 onFollowChange={(_, newCount) => onFollowChange(newCount)}
+
                             />
                         )}
                     </div>
