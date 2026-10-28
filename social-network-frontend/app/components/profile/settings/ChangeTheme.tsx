@@ -11,60 +11,59 @@ export const ChangeTheme = () => {
     const handleToggleTheme = () => {
         dispatch(toggleTheme());
     };
-    
+
     return (
 
         <div
             className="
-      space-y-6
+            space-y-6
       ">
             <div
                 className="
-            bg-background/50
-            dark:bg-gray-800/50
-            rounded-xl
-            p-5
-            border
-            border-border/50
+                bg-background/50
+                rounded-xl
+                p-5
+                border
+                border-border/50
             ">
                 <div
                     className="
-                flex
-                items-center
-                justify-between
+                    flex
+                    items-center
+                    justify-between
                 ">
                     <div
                         className="
-                    flex
-                    items-center
-                    gap-3
+                        flex
+                        items-center
+                        gap-3
                     ">
                         {theme === 'dark' ? (
                             <Moon
                                 className="
-                            w-5
-                            h-5
-                            text-primary
+                                w-5
+                                h-5
+                                text-primary
                             "/>
                         ) : (
                             <Sun
                                 className="
-                            w-5
-                            h-5
-                            text-primary
+                                w-5
+                                h-5
+                                text-primary
                             "/>
                         )}
                         <div>
                             <p
                                 className="
-                            font-medium
-                            text-primary
+                                font-medium
+                                text-primary
                             ">تم
                             </p>
                             <p
                                 className="
-                            text-sm
-                            text-secondary
+                                text-sm
+                                text-secondary
                             ">
                                 {theme === 'dark' ? 'تم تاریک' : 'تم روشن'}
                             </p>
@@ -79,7 +78,6 @@ export const ChangeTheme = () => {
                         h-8
                         rounded-full
                         bg-gray-200
-                        dark:bg-gray-700
                         transition-colors
                         duration-300
                         flex-shrink-0
@@ -92,24 +90,22 @@ export const ChangeTheme = () => {
                     >
                         <span
                             className={`
-                absolute
-                top-1
-                left-1
-                w-6
-                h-6
-                rounded-full
-                bg-white
-                shadow-md
-                transition-all
-                duration-300
-                  ${theme
-                                    ===
-                                    'dark'
-                                    ?
-                                    'translate-x-6'
-                                    :
-                                    'translate-x-0'}
-                `}
+                            absolute
+                            top-1
+                            left-1
+                            w-6
+                            h-6
+                            rounded-full
+                            bg-white
+                            shadow-md
+                            transition-all
+                            duration-300
+                            ${theme === 'dark'
+                            ?
+                            'translate-x-6'
+                            :
+                            'translate-x-0'}
+                            `}
                         />
                     </button>
                 </div>

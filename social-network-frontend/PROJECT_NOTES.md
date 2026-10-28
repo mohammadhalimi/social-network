@@ -255,6 +255,7 @@ story/
 - [x] `NotificationItem` tests:
   - `useNotificationItem.test.tsx` (19 tests, 100% coverage)
   - `index.test.tsx` (15 tests)
+- [x] `PrivacyToggle.test.tsx` (~12 tests)
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -395,10 +396,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-24 — Added `ProfilePage` integration tests (13 tests, 91.93% coverage):
-  - Render: Sidebar, ProfileContent, MobileMenu.
-  - Tab change via Sidebar & MobileMenu (with Redux close dispatch).
-  - Story modal: open via Sidebar/MobileMenu, close, success toast.
-  - MobileMenu isOpen from Redux.
-  - handleLogout: calls mutation, dispatches, redirects; error handling.
-  - Added `useLogout` hook (100% coverage).
+2026-10-29 — Added `PrivacyToggle` tests (~12 tests):
+  - Loading state: spinner shown.
+  - Public/private: icon (Globe/Lock), text, description, `data-private`.
+  - Toggle: calls mutation with opposite value (public↔private).
+  - Toast: success, error (mutation error, success=false, thrown error).
+  - Refactor: removed `useState(isUpdating)`, using Apollo mutation `loading`.
+  - Added `data-testid` (privacy-toggle, lock-icon, globe-icon) + `data-private`.
