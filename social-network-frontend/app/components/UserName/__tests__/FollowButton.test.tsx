@@ -2,15 +2,20 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { FollowButton } from '../FollowButton';
 
 const mockHandleClick = jest.fn();
+const mockOnFollowChange = jest.fn();
 let mockState: 'not-following' | 'pending' | 'following' = 'not-following';
 let mockIsLoading = false;
 
 jest.mock('../FollowButton/useFollowButton', () => ({
-    useFollowButton: () => ({
-        state: mockState,
-        isLoading: mockIsLoading,
-        handleClick: mockHandleClick,
-    }),
+    useFollowButton: (props: any) => {
+        // ✅ ذخیره پراپ برای بررسی
+        if (props.onFollowChange) mockOnFollowChange.mockImplementation(props.onFollowChange);
+        return {
+            state: mockState,
+            isLoading: mockIsLoading,
+            handleClick: mockHandleClick,
+        };
+    },
 }));
 
 describe('FollowButton (UI)', () => {

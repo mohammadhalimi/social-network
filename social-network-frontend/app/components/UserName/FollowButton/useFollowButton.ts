@@ -11,7 +11,7 @@ interface UseFollowButtonProps {
     userId: string;
     initialIsFollowing: boolean;
     initialIsPending?: boolean;
-    onFollowChange?: (isFollowing: boolean, followersCount: number) => void;
+    onFollowChange?: (newState: 'not-following' | 'pending' | 'following', followersCount?: number) => void;
 }
 
 export const useFollowButton = ({
@@ -20,6 +20,7 @@ export const useFollowButton = ({
     initialIsPending = false,
     onFollowChange,
 }: UseFollowButtonProps) => {
+    
     const [state, setState] = useState<FollowState>(
         initialIsPending ? 'pending' : initialIsFollowing ? 'following' : 'not-following'
     );
@@ -47,6 +48,7 @@ export const useFollowButton = ({
                 if (data?.cancelFollowRequest.success) {
                     setState('not-following');
                     toast.success('درخواست لغو شد');
+                    onFollowChange?.('not-following'); 
                 } else {
                     toast.error(data?.cancelFollowRequest.message || 'خطا در لغو درخواست');
                 }
@@ -63,7 +65,8 @@ export const useFollowButton = ({
                 }
                 if (data?.unfollowUser.success) {
                     setState('not-following');
-                    onFollowChange?.(false, data.unfollowUser.followersCount);
+                    // ✅ اصلاح شد:
+                    onFollowChange?.('not-following', data.unfollowUser.followersCount);
                 } else {
                     toast.error(data?.unfollowUser.message || 'خطا در لغو دنبال کردن');
                 }
@@ -81,12 +84,11 @@ export const useFollowButton = ({
                 if (data.followUser.isPending) {
                     setState('pending');
                     toast.success('درخواست دنبال کردن ارسال شد');
+                    onFollowChange?.('pending'); // ✅ خبر بده
                 } else {
                     setState('following');
-                    onFollowChange?.(true, data.followUser.followersCount);
+                    onFollowChange?.('following', data.followUser.followersCount); // ✅ خبر بده
                 }
-            } else {
-                toast.error(data?.followUser.message || 'خطا در دنبال کردن');
             }
         } catch (error: any) {
             toast.error(error.message || 'خطایی رخ داد');

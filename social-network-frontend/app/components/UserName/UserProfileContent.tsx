@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProfileUser } from './types';
 import { ProfileInfo } from './ProfileInfo';
 import { useQuery } from '@apollo/client/react';
 import { ProfileHeader } from './ProfileHeader';
 import { useAppSelector } from '@/app/redux/hooks';
 import { FollowListModal } from './FollowListModal';
+import { FollowState } from './FollowButton/constants';
 import { ImagePreviewModal } from './ImagePreviewModal';
 import { CreateStoryModal } from '../story/CreateStoryModal';
 import { PrivateProfileMessage } from './PrivateProfileMessage';
@@ -24,7 +25,9 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
     const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
     const [followersCount, setFollowersCount] = useState<number | null>(null);
     const [followingCount, setFollowingCount] = useState<number | null>(null);
-
+    const [followStatus, setFollowStatus] = useState<FollowState>(
+        user.isFollowRequestPending ? 'pending' : user.isFollowing ? 'following' : 'not-following'
+    );
     const currentUser = useAppSelector(state => state.auth.user);
     const isOwner = currentUser?.id === user.id;
 
@@ -41,13 +44,22 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
     const displayedFollowersCount = followersCount ?? user.followersCount;
     const displayedFollowingCount = followingCount ?? user.followingCount;
 
-    const handleFollowChange = () => {
-        refetch().then(({ data }) => {
-            if (data?.getUserByUsername) {
-                setFollowersCount(data.getUserByUsername.followersCount);
-                setFollowingCount(data.getUserByUsername.followingCount);
-            }
-        });
+    useEffect(() => {
+        setFollowStatus(user.isFollowRequestPending ? 'pending' : user.isFollowing ? 'following' : 'not-following');
+        setFollowersCount(null);
+        setFollowingCount(null);
+    }, [user.id]);
+
+    // ✅ استفاده از state
+    const isFollowing = followStatus === 'following';
+    const isFollowRequestPending = followStatus === 'pending';
+
+    // ✅ این تابع دیگه refetch نمی‌خواد! فقط state رو عوض می‌کنه.
+    const handleFollowChange = (status: FollowState, newCount?: number) => {
+        setFollowStatus(status);
+        if (newCount !== undefined) {
+            setFollowersCount(newCount);
+        }
     };
 
     return (
@@ -66,7 +78,21 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                     type={modalType}
                     isOpen={true}
                     onClose={() => setModalType(null)}
-                    onFollowChange={handleFollowChange}
+                    // ✅ اینجا یه تابع بدون آرگومان بده که فقط دیتا رو رفرش کنه
+                    onFollowChange={() => {
+                        // برای اینکه وضعیت جدید رو بگیریم، دیتا رو دوباره از سرور می‌خونیم
+                        refetch().then(({ data }) => {
+                            if (data?.getUserByUsername) {
+                                const fresh = data.getUserByUsername;
+                                setFollowersCount(fresh.followersCount);
+                                setFollowingCount(fresh.followingCount);
+                                setFollowStatus(
+                                    fresh.isFollowRequestPending ? 'pending' :
+                                        fresh.isFollowing ? 'following' : 'not-following'
+                                );
+                            }
+                        });
+                    }}
                 />
             )}
 
@@ -93,12 +119,13 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                     user={user}
                     avatarUrl={avatarUrl}
                     isOwner={isOwner}
-                    canViewContent={canViewContent}  // ✅ جدید
+                    canViewContent={canViewContent}
                     displayedFollowersCount={displayedFollowersCount}
                     displayedFollowingCount={displayedFollowingCount}
                     onFollowersClick={() => setModalType('followers')}
                     onFollowingClick={() => setModalType('following')}
-                    onFollowChange={(newCount) => setFollowersCount(newCount)}
+                    // ✅ اینجا مستقیم handleFollowChange رو پاس بده
+                    onFollowChange={handleFollowChange}
                     onCreateStory={() => setIsStoryModalOpen(true)}
                 />
                 <ProfileInfo user={user} />
@@ -106,8 +133,8 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
             {!canViewContent ? (
                 <PrivateProfileMessage
                     isPrivate={user.isPrivate}
-                    isFollowing={user.isFollowing}
-                    isFollowRequestPending={user.isFollowRequestPending}
+                    isFollowing={isFollowing} // ✅ از state
+                    isFollowRequestPending={isFollowRequestPending} // ✅ از state
                     isOwner={isOwner}
                 />
             ) : (

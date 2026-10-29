@@ -21,7 +21,7 @@ jest.mock('../../story/StoryViewerModal', () => ({
 // ✅ mock FollowButton
 jest.mock('@/app/components/UserName/FollowButton', () => ({
     FollowButton: ({ onFollowChange }: any) => (
-        <button data-testid="follow-button" onClick={() => onFollowChange(true, 42)}>
+        <button data-testid="follow-button" onClick={() => onFollowChange('following', 42)}>
             follow
         </button>
     ),
@@ -72,6 +72,15 @@ describe('ProfileHeader (integration)', () => {
         });
     });
 
+    it('passes onFollowChange to FollowButton correctly', () => {
+        render(<ProfileHeader {...defaultProps} />);
+        
+        fireEvent.click(screen.getByTestId('follow-button'));
+        
+        // ✅ چک کن که onFollowChange با status فراخوانی شده
+        expect(defaultProps.onFollowChange).toHaveBeenCalledWith('following', 42);
+    });
+    
     it('renders user info + counts', () => {
         render(<ProfileHeader {...defaultProps} />);
         expect(screen.getByText('علی رضایی')).toBeInTheDocument();

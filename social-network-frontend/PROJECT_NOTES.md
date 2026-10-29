@@ -264,7 +264,11 @@ story/
   - `useProfileHeader.test.tsx` (10 tests)
   - `ProfileAvatar.test.tsx` (7 tests)
   - `ProfileHeader.test.tsx` (5 integration tests)
-  
+- [x] `UserProfileContent.test.tsx` (4 tests) — instant UI updates for follow/pending status.
+- [x] `useFollowButton.test.tsx` (10 tests) — emits `FollowState`, handles cancel request.
+- [x] `FollowButton/index.test.tsx` (4 tests) — renders UI based on `FollowState`.
+- [x] `ProfileHeader/index.test.tsx` (5 tests) — layout + FollowButton integration.
+
 ### GraphQL
 - [x] `post.queries.test.ts`
 - [x] `story.queries.test.ts`
@@ -404,10 +408,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-29 — Refactored `ProfileHeader` into 3 files + tests (~18 tests):
-  - `ProfileHeader/useProfileHeader.ts` (state + long-press + stories) — 10 tests, 97.67% coverage.
-  - `ProfileHeader/ProfileAvatar.tsx` (avatar + story ring + plus button) — 7 tests, 100% coverage.
-  - `ProfileHeader/index.tsx` (layout + children) — 5 integration tests.
-  - Removed `onAvatarClick` (long-press circular preview is the only avatar enlargement).
-  - Long-press activates a full-screen circular avatar overlay (Instagram-like).
-  - Added `data-testid` (avatar-container, add-story-button).
+2026-10-29 — Fixed profile follow state not updating instantly (UX bug):
+  - `UserProfileContent` now manages `followStatus` locally (`FollowState`).
+  - `useFollowButton` and `FollowButton` now emit `FollowState` (`following` / `pending` / `not-following`) via `onFollowChange`.
+  - Fixed missing `onFollowChange` call in the "cancel request" branch.
+  - Replaced `refetch` for follow-state with local state sync for instant UI updates (like Instagram).

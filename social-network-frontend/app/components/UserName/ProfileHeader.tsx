@@ -3,10 +3,12 @@
 import Image from 'next/image';
 import { ProfileUser } from './types';
 import { Calendar } from 'lucide-react';
+import { FollowState } from './FollowButton/constants';
 import { StoryViewerModal } from '../story/StoryViewerModal';
 import { ProfileAvatar } from './ProfileHeader/ProfileAvatar';
 import { useProfileHeader } from './ProfileHeader/useProfileHeader';
 import { FollowButton } from '@/app/components/UserName/FollowButton';
+
 
 interface ProfileHeaderProps {
     user: ProfileUser;
@@ -17,7 +19,7 @@ interface ProfileHeaderProps {
     displayedFollowingCount: number;
     onFollowersClick: () => void;
     onFollowingClick: () => void;
-    onFollowChange: (newCount: number) => void;
+    onFollowChange: (status: FollowState, newCount?: number) => void;
     onCreateStory: () => void;
 }
 
@@ -135,7 +137,7 @@ export const ProfileHeader = ({
                                 userId={user.id}
                                 initialIsFollowing={user.isFollowing}
                                 initialIsPending={user.isFollowRequestPending}
-                                onFollowChange={(_, newCount) => onFollowChange(newCount)}
+                                onFollowChange={onFollowChange} 
                             />
                         )}
                     </div>

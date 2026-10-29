@@ -60,7 +60,7 @@ describe('useFollowButton', () => {
     });
 
     // follow (public)
-    it('follow (public): → following + onFollowChange', async () => {
+    it('follow (public): → following + onFollowChange("following")', async () => {
         followMock.mockResolvedValue({
             data: { followUser: { success: true, followersCount: 10, isPending: false } },
         });
@@ -72,7 +72,8 @@ describe('useFollowButton', () => {
         await act(async () => { await result.current.handleClick(); });
 
         expect(result.current.state).toBe('following');
-        expect(onFollowChange).toHaveBeenCalledWith(true, 10);
+        // ✅ تایپ جدید
+        expect(onFollowChange).toHaveBeenCalledWith('following', 10);
     });
 
     // follow (private) → pending
@@ -91,7 +92,7 @@ describe('useFollowButton', () => {
     });
 
     // unfollow
-    it('unfollow: → not-following + onFollowChange', async () => {
+    it('unfollow: → not-following + onFollowChange("not-following")', async () => {
         unfollowMock.mockResolvedValue({
             data: { unfollowUser: { success: true, followersCount: 9 } },
         });
@@ -103,21 +104,25 @@ describe('useFollowButton', () => {
         await act(async () => { await result.current.handleClick(); });
 
         expect(result.current.state).toBe('not-following');
-        expect(onFollowChange).toHaveBeenCalledWith(false, 9);
+        // ✅ تایپ جدید
+        expect(onFollowChange).toHaveBeenCalledWith('not-following', 9);
     });
 
     // cancel
-    it('cancel request: → not-following + toast', async () => {
+    it('cancel request: → not-following + onFollowChange("not-following") + toast', async () => {
         cancelMock.mockResolvedValue({
             data: { cancelFollowRequest: { success: true } },
         });
+        const onFollowChange = jest.fn();
         const { result } = renderHook(() =>
-            useFollowButton({ userId: 'u1', initialIsFollowing: false, initialIsPending: true })
+            useFollowButton({ userId: 'u1', initialIsFollowing: false, initialIsPending: true, onFollowChange })
         );
 
         await act(async () => { await result.current.handleClick(); });
 
         expect(result.current.state).toBe('not-following');
+        // ✅ این تستی هست که باگ رو نشون می‌داد
+        expect(onFollowChange).toHaveBeenCalledWith('not-following');
         expect(toast.success).toHaveBeenCalledWith('درخواست لغو شد');
     });
 
