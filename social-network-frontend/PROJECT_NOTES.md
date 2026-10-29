@@ -408,5 +408,6 @@ Last Updated
   - `ProfileHeader/useProfileHeader.ts` (state + long-press + stories) — 10 tests, 97.67% coverage.
   - `ProfileHeader/ProfileAvatar.tsx` (avatar + story ring + plus button) — 7 tests, 100% coverage.
   - `ProfileHeader/index.tsx` (layout + children) — 5 integration tests.
-  - `handlePressStart` no longer takes `hasAvatar` param (reads `avatarUrl` from hook).
+  - Removed `onAvatarClick` (long-press circular preview is the only avatar enlargement).
+  - Long-press activates a full-screen circular avatar overlay (Instagram-like).
   - Added `data-testid` (avatar-container, add-story-button).

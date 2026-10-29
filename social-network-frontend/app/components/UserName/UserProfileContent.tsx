@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { ProfileUser } from './types';
+import { ProfileInfo } from './ProfileInfo';
 import { useQuery } from '@apollo/client/react';
+import { ProfileHeader } from './ProfileHeader';
+import { useAppSelector } from '@/app/redux/hooks';
 import { FollowListModal } from './FollowListModal';
 import { ImagePreviewModal } from './ImagePreviewModal';
-import { ProfilePostsList } from '@/app/components/UserName/ProfilePostsList';
-import { ProfileHeader } from './ProfileHeader';
-import { ProfileInfo } from './ProfileInfo';
-import { PrivateProfileMessage } from './PrivateProfileMessage'; // ✅ جدید
-import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
-import { ProfileUser } from './types';
-import { useAppSelector } from '@/app/redux/hooks';
 import { CreateStoryModal } from '../story/CreateStoryModal';
+import { PrivateProfileMessage } from './PrivateProfileMessage';
+import { GET_USER_BY_USERNAME } from '@/app/graphql/user.queries';
+import { ProfilePostsList } from '@/app/components/UserName/ProfilePostsList';
 
 interface UserProfileContentProps {
     user: ProfileUser;
@@ -28,7 +28,6 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
     const currentUser = useAppSelector(state => state.auth.user);
     const isOwner = currentUser?.id === user.id;
 
-    // ✅ محاسبه دسترسی به محتوا
     const canViewContent =
         isOwner ||
         !user.isPrivate ||
@@ -80,7 +79,16 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 />
             )}
 
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-soft mb-6">
+            <div
+                className="
+                bg-card
+                border
+                border-border
+                rounded-2xl
+                p-6
+                shadow-soft
+                mb-6
+            ">
                 <ProfileHeader
                     user={user}
                     avatarUrl={avatarUrl}
@@ -88,7 +96,6 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                     canViewContent={canViewContent}  // ✅ جدید
                     displayedFollowersCount={displayedFollowersCount}
                     displayedFollowingCount={displayedFollowingCount}
-                    onAvatarClick={() => setIsImageModalOpen(true)}
                     onFollowersClick={() => setModalType('followers')}
                     onFollowingClick={() => setModalType('following')}
                     onFollowChange={(newCount) => setFollowersCount(newCount)}
@@ -96,8 +103,6 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                 />
                 <ProfileInfo user={user} />
             </div>
-
-            {/* ✅ اگر کاربر دسترسی ندارد → پیام خصوصی */}
             {!canViewContent ? (
                 <PrivateProfileMessage
                     isPrivate={user.isPrivate}
@@ -106,8 +111,22 @@ export const UserProfileContent = ({ user, avatarUrl }: UserProfileContentProps)
                     isOwner={isOwner}
                 />
             ) : (
-                <div className="bg-card border border-border rounded-2xl p-6 shadow-soft">
-                    <h1 className="text-lg font-bold text-primary mb-4">
+                <div
+                    className="
+                    bg-card
+                    border
+                    border-border
+                    rounded-2xl
+                    p-6
+                    shadow-soft
+                ">
+                    <h1
+                        className="
+                        text-lg
+                        font-bold
+                        text-primary
+                        mb-4
+                    ">
                         پست‌ها
                     </h1>
                     <ProfilePostsList userId={user.id} />

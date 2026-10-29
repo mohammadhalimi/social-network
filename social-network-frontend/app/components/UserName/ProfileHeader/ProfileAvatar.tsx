@@ -95,10 +95,10 @@ export const ProfileAvatar = ({
                             />
                         ) : (
                             <span
-                            className="
-                            text-4xl
-                            font-bold
-                            text-white
+                                className="
+                                text-4xl
+                                font-bold
+                                text-white
                             ">
                                 {fullName?.[0] || '👤'}
                             </span>
