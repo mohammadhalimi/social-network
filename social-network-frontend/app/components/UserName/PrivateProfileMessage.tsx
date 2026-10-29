@@ -1,6 +1,9 @@
 'use client';
 
-import { Lock, Clock } from 'lucide-react';
+import {
+    Lock,
+    Clock
+} from 'lucide-react';
 
 interface PrivateProfileMessageProps {
     isPrivate: boolean;
@@ -23,16 +26,58 @@ export const PrivateProfileMessage = ({
     // ✅ حالت ۱: درخواست در حال انتظار
     if (isFollowRequestPending) {
         return (
-            <div className="bg-card border border-border rounded-2xl p-12 shadow-soft text-center">
-                <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                        <Clock className="w-8 h-8 text-yellow-500" />
+            <div
+                data-testid="private-message-pending"
+                className="
+                bg-card
+                border
+                border-border
+                rounded-2xl
+                p-12
+                shadow-soft
+                text-center
+            ">
+                <div
+                    className="
+                    flex
+                    justify-center
+                    mb-4
+                ">
+                    <div
+                        className="
+                        w-16
+                        h-16
+                        rounded-full
+                        bg-yellow-500/10
+                        flex items-center
+                        justify-center
+                    ">
+                        <Clock
+                            data-testid="icon-clock"
+                            className="
+                            w-8
+                            h-8
+                            text-yellow-500
+                        "/>
                     </div>
                 </div>
-                <h2 className="text-xl font-bold text-primary mb-2">
+                <h1
+                    className="
+                    text-xl
+                    font-bold
+                    text-primary
+                    mb-2
+                ">
                     درخواست شما در انتظار تأیید است
-                </h2>
-                <p className="text-sm text-secondary max-w-md mx-auto leading-relaxed">
+                </h1>
+                <p
+                    className="
+                    text-sm
+                    text-secondary
+                    max-w-md
+                    mx-auto
+                    leading-relaxed
+                ">
                     درخواست دنبال کردن شما برای این حساب ارسال شده است.
                     پس از تأیید صاحب حساب، می‌توانید پست‌ها و استوری‌های او را ببینید.
                 </p>
@@ -42,16 +87,59 @@ export const PrivateProfileMessage = ({
 
     // ✅ حالت ۲: پیج خصوصی، درخواستی نفرستاده
     return (
-        <div className="bg-card border border-border rounded-2xl p-12 shadow-soft text-center">
-            <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Lock className="w-8 h-8 text-primary" />
+        <div
+            data-testid="private-message-locked"
+            className="
+            bg-card
+            border
+            border-border
+            rounded-2xl
+            p-12
+            shadow-soft
+            text-center
+        ">
+            <div
+                className="
+                flex
+                justify-center
+                mb-4
+            ">
+                <div
+                    className="
+                    w-16
+                    h-16
+                    rounded-full
+                    bg-primary/10
+                    flex
+                    items-center
+                    justify-center
+                ">
+                    <Lock
+                        data-testid="icon-lock"
+                        className="
+                        w-8
+                        h-8
+                        text-primary
+                    "/>
                 </div>
             </div>
-            <h2 className="text-xl font-bold text-primary mb-2">
+            <h2
+                className="
+                text-xl
+                font-bold
+                text-primary
+                mb-2
+            ">
                 این حساب خصوصی است
             </h2>
-            <p className="text-sm text-secondary max-w-md mx-auto leading-relaxed">
+            <p
+                className="
+                text-sm
+                text-secondary
+                max-w-md
+                mx-auto
+                leading-relaxed
+            ">
                 برای دیدن پست‌ها و استوری‌های این حساب، ابتدا باید درخواست
                 دنبال کردن بفرستید و منتظر تأیید بمانید.
             </p>

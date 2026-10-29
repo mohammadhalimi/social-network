@@ -268,7 +268,7 @@ story/
 - [x] `useFollowButton.test.tsx` (10 tests) — emits `FollowState`, handles cancel request.
 - [x] `FollowButton/index.test.tsx` (4 tests) — renders UI based on `FollowState`.
 - [x] `ProfileHeader/index.test.tsx` (5 tests) — layout + FollowButton integration.
-
+- [x] `PrivateProfileMessage.test.tsx` (5 tests, 100% coverage)
 ### GraphQL
 - [x] `post.queries.test.ts`
 - [x] `story.queries.test.ts`
@@ -408,8 +408,8 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-10-29 — Fixed profile follow state not updating instantly (UX bug):
-  - `UserProfileContent` now manages `followStatus` locally (`FollowState`).
-  - `useFollowButton` and `FollowButton` now emit `FollowState` (`following` / `pending` / `not-following`) via `onFollowChange`.
-  - Fixed missing `onFollowChange` call in the "cancel request" branch.
-  - Replaced `refetch` for follow-state with local state sync for instant UI updates (like Instagram).
+2026-10-30 — Added `PrivateProfileMessage` tests (5 tests, 100% coverage):
+  - Returns null for owner, public account, or follower.
+  - Renders pending state (Clock icon + "در انتظار تأیید") when `isFollowRequestPending=true`.
+  - Renders locked state (Lock icon + "حساب خصوصی") by default.
+  - Added `data-testid` (private-message-pending/locked, icon-clock/lock).
