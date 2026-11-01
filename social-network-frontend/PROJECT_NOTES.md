@@ -230,6 +230,12 @@ story/
 - [x] `useFollowersPagination.test.tsx`
 - [x] `useCloseFriendsSelection.test.tsx`
 - [x] `useCreateStory.test.tsx`
+- [x] `useNotifications.test.tsx` (10 tests, 100% coverage)
+- [x] `useLogout.test.tsx` (3 tests, 100% coverage)
+- [x] `useFollowbuttons.test.tsx`
+- [x] `useProfileHeader.test.tsx`
+- [x] `useFollowerPagination.test.tsx`
+- [x] `useNotificationItem.test.tsx`
 
 ### Components
 - [x] `CommentItem.test.tsx`
@@ -272,6 +278,7 @@ story/
 - [x] `PrivateProfileMessage.test.tsx` (5 tests, 100% coverage)
 - [x] `PostModalRenderer.test.tsx` (8 tests, 100% coverage)
 - [x] `useNotifications.test.tsx` (10 tests, 100% coverage)
+- [x] `ViewPostModal.test.tsx` (16 tests, 80.59% coverage)
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -392,7 +399,7 @@ npm test -- --coverage  # Run with coverage
 # Build
 npm run build        # Production build
 npm start            # Start production server
-
+```
 Endpoints
 Frontend: http://localhost:3000
 
@@ -411,11 +418,9 @@ Future Features
 □ Saved Posts
 □ Direct Messages
 □ Groups
-Last Updated
-2026-11-01 — Added `useNotifications` tests (10 tests, 100% coverage):
-  - Initial state: empty notifications, unreadCount=0.
-  - Query data: returns notifications and unreadCount from cache.
-  - Socket registration: registers/removes `notification:new` listener, skips when socket is null.
-  - Socket event: updates Apollo cache with new notification + unreadCount (fallback logic).
-  - Refetch: exposed from useQuery.
-  - Removed `console.log` from `useNotifications`.
+
+## Last Updated
+2026-11-01 — Added hook tests (`useNotifications`, `useLogout`, `ViewPostModal`):
+  - `useNotifications.test.tsx` (10 tests, 100% coverage): socket registration/cleanup, cache update with unreadCount fallback.
+  - `useLogout.test.tsx` (3 tests, 100% coverage): calls mutation, dispatches logout, shows toast, redirects; handles errors.
+  - `ViewPostModal.test.tsx` (16 tests, 80.59% coverage): renders post, fetches comments, handles JSON blocks, children render prop.
