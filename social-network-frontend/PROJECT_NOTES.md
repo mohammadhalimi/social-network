@@ -283,8 +283,8 @@ story/
 
 ### GraphQL
 - [x] `post.queries.test.ts`
-- [x] `story.queries.test.ts`
-- [x] `user.queries.test.ts`
+- [x] `user.queries.test.ts` (all queries + `ME_QUERY`)
+- [x] `story.queries.test.ts` (all 8 operations)
 - [x] `auth.queries.test.ts`
 - [x] `profile.queries.test.ts`
 
@@ -421,7 +421,7 @@ Future Features
 □ Groups
 
 ## Last Updated
-2026-11-01 — Completed GraphQL query tests (`story.queries`, `user.queries`):
-  - `user.queries.test.ts`: Added `ME_QUERY` tests + `isPrivate`, `isFollowRequestPending`, `isPending` fields.
-  - `story.queries.test.ts`: Completed all 8 story operations (create, delete, view, get, close friends).
-  - Ensured all critical fields (privacy, pending requests) are covered in tests to prevent accidental removal.
+2026-11-01 — Fixed `Settings` tests + completed GraphQL query tests:
+  - `Settings.test.tsx`: mocked `PrivacyToggle` & `ChangeTheme` to isolate layout testing (avoids Apollo invariant errors).
+  - `user.queries.test.ts`: added `ME_QUERY`, `isPrivate`, `isFollowRequestPending`, `isPending`.
+  - `story.queries.test.ts`: completed all 8 story operations.

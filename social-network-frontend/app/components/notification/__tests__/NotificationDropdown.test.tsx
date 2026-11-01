@@ -13,7 +13,7 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 // ✅ mock کردن NotificationItem
-jest.mock('../NotificationItem', () => ({
+jest.mock('../NotificationItemIndex', () => ({
     NotificationItem: ({ notification, onClose }: any) => (
         <div
             data-testid={`notification-${notification.id}`}

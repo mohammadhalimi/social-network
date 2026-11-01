@@ -4,6 +4,7 @@
 Instagram-like social network backend API, built with **Layered Architecture**.
 
 ## Architecture: Layered
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Presentation Layer │
 │ (GraphQL Resolvers, Routes, Socket.IO Handlers) │
@@ -35,7 +36,7 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 │ Database │
 │ (PostgreSQL via Prisma 7) │
 └─────────────────────────────────────────────────────────┘
-
+```
 
 ### Layer Responsibilities
 
@@ -485,7 +486,7 @@ npm test -- <path>
 
 # Seeding
 npx tsx src/seed.ts
-
+```
 Endpoints
 GraphQL: http://localhost:4000/graphql
 
