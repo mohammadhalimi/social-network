@@ -271,6 +271,7 @@ story/
 - [x] `ProfileHeader/index.test.tsx` (5 tests) — layout + FollowButton integration.
 - [x] `PrivateProfileMessage.test.tsx` (5 tests, 100% coverage)
 - [x] `PostModalRenderer.test.tsx` (8 tests, 100% coverage)
+- [x] `useNotifications.test.tsx` (10 tests, 100% coverage)
 
 ### GraphQL
 - [x] `post.queries.test.ts`
@@ -411,10 +412,10 @@ Future Features
 □ Direct Messages
 □ Groups
 Last Updated
-2026-11-01 — Added `PostModalRenderer` tests (8 tests, 100% coverage):
-  - Renders nothing when `postId` is null (and query is skipped).
-  - Loading state: spinner shown (`data-testid="modal-loading"`).
-  - Error states: query error + missing post (with close button).
-  - Success state: renders `ViewPostModal` + `CommentForm`.
-  - Close: dispatches `closePostModal` from both error and success views.
-  - Removed `console.log` and added `data-testid` for testability.
+2026-11-01 — Added `useNotifications` tests (10 tests, 100% coverage):
+  - Initial state: empty notifications, unreadCount=0.
+  - Query data: returns notifications and unreadCount from cache.
+  - Socket registration: registers/removes `notification:new` listener, skips when socket is null.
+  - Socket event: updates Apollo cache with new notification + unreadCount (fallback logic).
+  - Refetch: exposed from useQuery.
+  - Removed `console.log` from `useNotifications`.

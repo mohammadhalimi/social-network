@@ -33,7 +33,7 @@ export const ViewPostModal = ({ post, isOpen, onClose, children }: ViewPostModal
         useLazyQuery(GET_POST_COMMENTS, {
             fetchPolicy: 'network-only',
         });
-    console.log('🎬 ViewPostModal render, isOpen:', isOpen, 'postId:', post?.id);
+    /// console.log('🎬 ViewPostModal render, isOpen:', isOpen, 'postId:', post?.id);
 
     useEffect(() => {
         if (isOpen && post?.id) {
