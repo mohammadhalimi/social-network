@@ -5,6 +5,7 @@ import {
     UNFOLLOW_USER,
     GET_FOLLOWERS,
     GET_FOLLOWING,
+    ME_QUERY,
 } from '../../graphql/user.queries';
 
 import {
@@ -210,6 +211,12 @@ describe('User Queries', () => {
         expect(fieldNames).toContain('followingCount');
         expect(fieldNames).toContain('isFollowing');
     });
+    it('GET_USER_BY_USERNAME query should request privacy fields', () => {
+        const definition = findOperation(GET_USER_BY_USERNAME.definitions, 'GetUserByUsername');
+        const fieldNames = getNestedFieldNames(definition!, 'getUserByUsername');
+        expect(fieldNames).toContain('isPrivate');
+        expect(fieldNames).toContain('isFollowRequestPending');
+    });
 
     // ==========================================================
     //  ✅ تست‌های جدید: FOLLOW_USER
@@ -253,6 +260,7 @@ describe('User Queries', () => {
             expect(fieldNames).toContain('message');
             expect(fieldNames).toContain('isFollowing');
             expect(fieldNames).toContain('followersCount');
+            expect(fieldNames).toContain('isPending');
         });
     });
 
@@ -298,6 +306,7 @@ describe('User Queries', () => {
             expect(fieldNames).toContain('message');
             expect(fieldNames).toContain('isFollowing');
             expect(fieldNames).toContain('followersCount');
+            expect(fieldNames).toContain('isPending');
         });
     });
 
@@ -357,6 +366,7 @@ describe('User Queries', () => {
             expect(userFieldNames).toContain('fullName');
             expect(userFieldNames).toContain('avatar');
             expect(userFieldNames).toContain('isFollowing');
+            expect(userFieldNames).toContain('isFollowRequestPending');
         });
     });
 
@@ -416,6 +426,43 @@ describe('User Queries', () => {
             expect(userFieldNames).toContain('fullName');
             expect(userFieldNames).toContain('avatar');
             expect(userFieldNames).toContain('isFollowing');
+            expect(userFieldNames).toContain('isFollowRequestPending');
+        });
+    });
+    // ==========================================================
+    //  ✅ تست‌های جدید: ME_QUERY
+    // ==========================================================
+    describe('ME_QUERY', () => {
+        it('should have correct structure', () => {
+            expect(ME_QUERY).toBeDefined();
+            expect(ME_QUERY.kind).toBe('Document');
+            expect(ME_QUERY.definitions.length).toBeGreaterThan(0);
+        });
+
+        it('should be named "Me"', () => {
+            const definition = findOperation(ME_QUERY.definitions, 'Me');
+            expect(definition).toBeDefined();
+            expect(definition?.operation).toBe('query');
+        });
+
+        it('should not have variables', () => {
+            const definition = findOperation(ME_QUERY.definitions, 'Me');
+            expect(definition?.variableDefinitions || []).toHaveLength(0);
+        });
+
+        it('should request all me fields including isPrivate', () => {
+            const definition = findOperation(ME_QUERY.definitions, 'Me');
+            const fieldNames = getNestedFieldNames(definition!, 'me');
+            expect(fieldNames).toContain('id');
+            expect(fieldNames).toContain('email');
+            expect(fieldNames).toContain('username');
+            expect(fieldNames).toContain('fullName');
+            expect(fieldNames).toContain('bio');
+            expect(fieldNames).toContain('avatar');
+            expect(fieldNames).toContain('createdAt');
+            expect(fieldNames).toContain('updatedAt');
+            expect(fieldNames).toContain('isPrivate');
+            expect(fieldNames).toContain('isFollowRequestPending');
         });
     });
 });

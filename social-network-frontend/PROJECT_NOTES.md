@@ -236,6 +236,7 @@ story/
 - [x] `useProfileHeader.test.tsx`
 - [x] `useFollowerPagination.test.tsx`
 - [x] `useNotificationItem.test.tsx`
+- [x] `useStoryViewer.test.tsx`
 
 ### Components
 - [x] `CommentItem.test.tsx`
@@ -420,7 +421,7 @@ Future Features
 □ Groups
 
 ## Last Updated
-2026-11-01 — Added hook tests (`useNotifications`, `useLogout`, `ViewPostModal`):
-  - `useNotifications.test.tsx` (10 tests, 100% coverage): socket registration/cleanup, cache update with unreadCount fallback.
-  - `useLogout.test.tsx` (3 tests, 100% coverage): calls mutation, dispatches logout, shows toast, redirects; handles errors.
-  - `ViewPostModal.test.tsx` (16 tests, 80.59% coverage): renders post, fetches comments, handles JSON blocks, children render prop.
+2026-11-01 — Completed GraphQL query tests (`story.queries`, `user.queries`):
+  - `user.queries.test.ts`: Added `ME_QUERY` tests + `isPrivate`, `isFollowRequestPending`, `isPending` fields.
+  - `story.queries.test.ts`: Completed all 8 story operations (create, delete, view, get, close friends).
+  - Ensured all critical fields (privacy, pending requests) are covered in tests to prevent accidental removal.
