@@ -3,6 +3,7 @@ import { mapUser } from './mapUser';
 export const formatPost = (post: any, userId?: string) => {
   const likes = post.likes || [];
   const comments = post.comments || [];
+  const isSaved = post.savedBy ? post.savedBy.length > 0 : false;
 
   return {
     ...post,
@@ -13,7 +14,7 @@ export const formatPost = (post: any, userId?: string) => {
     commentsCount: comments.length,
     isLiked: userId ? likes.some((like: any) => like.userId === userId) : false,
     comments: comments.map((comment: any) => formatComment(comment, userId)),
-    isSaved: post.isSaved ?? false,
+    isSaved: post.isSaved ?? isSaved,
   };
 };
 

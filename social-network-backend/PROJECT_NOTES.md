@@ -416,6 +416,11 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 
 ## Key Implementation Details
 
+### Saved Posts
+- `isSaved` field computed from `savedBy: { where: { userId } }` in Prisma.
+- `toggleSavePost` uses `SavedPostService` to create/delete records.
+- `getSavedPosts` returns only posts saved by the authenticated user.
+
 ### Prisma (Data Access)
 - Uses Prisma 7 with `@prisma/adapter-pg`
 - Client generated via `npx prisma generate`
@@ -506,10 +511,7 @@ Future Features
 □ Direct Messages
 □ Groups
 ## Last Updated
-2026-11-04 — Added Saved Posts (Backend API):
-  - Added `isSaved` field to `Post` type.
-  - Added `getSavedPosts` query + `SavedPostsResult` type.
-  - Added `toggleSavePost` mutation + `ToggleSavePostResponse` type.
-  - Created `SavedPostService` (toggle + list).
-  - Created `savedPostResolvers` (Query/Mutation).
-  - Updated `formatPost` to include `isSaved`.
+2026-11-04 — Completed Saved Posts (Backend):
+  - Added `savedBy` to Prisma `include` in all post queries/mutations.
+  - Updated `formatPost` to compute `isSaved` from `savedBy`.
+  - Verified `getSavedPosts` and `toggleSavePost` via Playground.

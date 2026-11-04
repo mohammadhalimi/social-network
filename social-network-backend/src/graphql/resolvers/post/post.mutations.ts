@@ -14,6 +14,7 @@ export const postMutations = {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId } },
                 comments: {
                     include: {
                         user: true,
@@ -47,6 +48,7 @@ export const postMutations = {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId } },
                 comments: {
                     include: {
                         user: true,
