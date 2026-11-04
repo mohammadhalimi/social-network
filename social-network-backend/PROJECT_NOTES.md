@@ -283,6 +283,8 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 - [x] getUserPosts (with private profile check)
 - [x] getPost (with private profile check)
 - [x] getFeed (with private profile filter)
+- [x] toggleSavePost (✅ new)
+- [x] getSavedPosts (✅ new)
 
 ### Comment
 - [x] commentOnPost (with notification)
@@ -503,8 +505,11 @@ Future Features
 □ Saved Posts
 □ Direct Messages
 □ Groups
-Last Updated
-2026-11-04 — Started Saved Posts feature (Backend):
-  - Added `SavedPost` model to Prisma schema.
-  - Added relations `savedPosts` to `User` and `savedBy` to `Post`.
-  - Ran migration `add_saved_posts`.
+## Last Updated
+2026-11-04 — Added Saved Posts (Backend API):
+  - Added `isSaved` field to `Post` type.
+  - Added `getSavedPosts` query + `SavedPostsResult` type.
+  - Added `toggleSavePost` mutation + `ToggleSavePostResponse` type.
+  - Created `SavedPostService` (toggle + list).
+  - Created `savedPostResolvers` (Query/Mutation).
+  - Updated `formatPost` to include `isSaved`.

@@ -13,6 +13,7 @@ export const formatPost = (post: any, userId?: string) => {
     commentsCount: comments.length,
     isLiked: userId ? likes.some((like: any) => like.userId === userId) : false,
     comments: comments.map((comment: any) => formatComment(comment, userId)),
+    isSaved: post.isSaved ?? false,
   };
 };
 

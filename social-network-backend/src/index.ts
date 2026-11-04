@@ -21,6 +21,7 @@ import { userResolvers } from './graphql/resolvers/user.resolvers';
 import { postResolvers } from './graphql/resolvers/post.resolvers';
 import { storyResolvers } from './graphql/resolvers/story.resolvers';
 import { notificationTypeDefs } from './graphql/schema/notification.schema';
+import { savedPostResolvers } from './graphql/resolvers/post/saved-post.resolvers';
 import { notificationResolvers } from './graphql/resolvers/notification.resolvers';
 
 // ✅ اضافه شد
@@ -48,12 +49,14 @@ const resolvers = {
     ...postResolvers.Query,
     ...storyResolvers.Query,
     ...notificationResolvers.Query,
+    ...savedPostResolvers.Query
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...postResolvers.Mutation,
     ...storyResolvers.Mutation,
     ...notificationResolvers.Mutation,
+    ...savedPostResolvers.Mutation
   },
 };
 

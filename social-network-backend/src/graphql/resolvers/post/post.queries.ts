@@ -70,6 +70,7 @@ export const postQueries = {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: currentUserId } },
                 comments: {
                     include: {
                         user: true,

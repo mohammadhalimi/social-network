@@ -10,6 +10,7 @@ export const postTypeDefs = `
     commentsCount: Int!
     isLiked: Boolean!
     comments: [Comment!]!
+    isSaved: Boolean!
   }
 
   type Comment {
@@ -48,6 +49,7 @@ export const postTypeDefs = `
     getPost(postId: ID!): Post
     getUserPosts(userId: String!, limit: Int, offset: Int): [Post!]!
     getFeed(limit: Int, offset: Int): [Post!]!
+    getSavedPosts(limit: Int, offset: Int): SavedPostsResult!
   }
 
   type Mutation {
@@ -64,5 +66,17 @@ export const postTypeDefs = `
     
     likeComment(commentId: ID!): LikeResponse!
     unlikeComment(commentId: ID!): LikeResponse!
+    toggleSavePost(postId: ID!): ToggleSavePostResponse!
+  }
+
+    type SavedPostsResult { # ✅ تایپ جدید برای خروجی
+    posts: [Post!]!
+    totalCount: Int!
+    hasMore: Boolean!
+  }
+    type ToggleSavePostResponse { # ✅ تایپ جدید برای خروجی
+    success: Boolean!
+    message: String!
+    isSaved: Boolean!
   }
 `;
