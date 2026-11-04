@@ -38,6 +38,7 @@ model User {
 
   notificationsReceived  Notification[]  @relation("NotificationRecipient")
   notificationsCaused    Notification[]  @relation("NotificationActor")
+  savedPosts            SavedPost[] 
 }
 
 model Post {
@@ -53,6 +54,7 @@ model Post {
 
   // ✅ جدید: رابطه‌ی معکوس با Notification
   notifications Notification[]
+  savedBy              SavedPost[]
 }
 
 model Comment {
@@ -208,4 +210,17 @@ model Notification {
   comment         Comment?          @relation(fields: [commentId], references: [id], onDelete: Cascade)
   
   createdAt       DateTime          @default(now())
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // ✅ جلوگیری از ذخیره تکراری
+  @@index([userId, createdAt]) // ✅ برای مرتب‌سازی و فیلتر سریع
 }
