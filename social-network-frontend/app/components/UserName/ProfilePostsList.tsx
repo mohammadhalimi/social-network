@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useQuery } from '@apollo/client/react';
 import { Loader2 } from 'lucide-react';
-import { GET_USER_POSTS } from '@/app/graphql/post.queries';
+import { useQuery } from '@apollo/client/react';
 import { ProfilePostCard } from './ProfilePostCard';
+import { GET_USER_POSTS } from '@/app/graphql/post.queries';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface ProfilePostsListProps {
     userId: string;
@@ -70,44 +70,105 @@ export const ProfilePostsList = ({ userId }: ProfilePostsListProps) => {
 
     if (loading && allPosts.length === 0) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <div
+                className="
+                flex
+                items-center
+                justify-center
+                py-12
+            ">
+                <Loader2
+                    className="
+                    w-8
+                    h-8
+                    text-primary
+                    animate-spin
+                "/>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center py-12">
-                <p className="text-red-500">خطا در دریافت پست‌ها</p>
+            <div
+                className="
+                text-center
+                py-12
+            ">
+                <p
+                    className="
+                    text-red-500
+                ">
+                    خطا در دریافت پست‌ها
+                </p>
             </div>
         );
     }
 
     if (allPosts.length === 0) {
         return (
-            <div className="text-center py-12 text-text-secondary">
-                <p className="text-lg">این کاربر هنوز پستی منتشر نکرده است</p>
+            <div
+                className="
+                text-center
+                py-12
+                text-text-secondary
+            ">
+                <p
+                    className="
+                    text-lg
+                ">
+                    این کاربر هنوز پستی منتشر نکرده است
+                </p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+            className="
+            space-y-6
+        ">
+            <div
+                className="
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                lg:grid-cols-3
+                gap-4
+            ">
                 {allPosts.map((post) => (
                     <ProfilePostCard key={post.id} post={post} />
                 ))}
             </div>
 
             {hasMore && (
-                <div ref={loadMoreRef} className="flex justify-center py-4">
-                    {loadingMore && <Loader2 className="w-6 h-6 text-primary animate-spin" />}
+                <div
+                    ref={loadMoreRef}
+                    className="
+                    flex
+                    justify-center
+                    py-4
+                ">
+                    {loadingMore
+                        &&
+                        <Loader2
+                            className="
+                            w-6
+                            h-6
+                            text-primary
+                            animate-spin
+                    "/>}
                 </div>
             )}
 
             {!hasMore && allPosts.length > 0 && (
-                <div className="text-center py-4 text-secondary text-sm">
+                <div
+                    className="
+                    text-center
+                    py-4
+                    text-secondary
+                    text-sm
+                ">
                     همه پست‌ها نمایش داده شدند ✅
                 </div>
             )}

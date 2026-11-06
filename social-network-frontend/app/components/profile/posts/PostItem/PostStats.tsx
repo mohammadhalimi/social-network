@@ -3,8 +3,6 @@
 import {
     Heart,
     MessageCircle,
-    ChevronDown,
-    ChevronUp
 } from 'lucide-react';
 
 interface PostStatsProps {

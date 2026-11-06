@@ -14,11 +14,11 @@ export const postQueries = {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId } },
                 comments: {
                     include: {
                         user: true,
                         likes: true,
-                        savedBy: { where: { userId } },
                         replies: {
                             include: {
                                 user: true,

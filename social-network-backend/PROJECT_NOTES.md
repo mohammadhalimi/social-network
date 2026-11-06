@@ -511,7 +511,10 @@ Future Features
 □ Direct Messages
 □ Groups
 ## Last Updated
-2026-11-04 — Completed Saved Posts (Backend):
-  - Added `savedBy` to Prisma `include` in all post queries/mutations.
-  - Updated `formatPost` to compute `isSaved` from `savedBy`.
-  - Verified `getSavedPosts` and `toggleSavePost` via Playground.
+2026-11-06 — Completed Saved Posts feature:
+  - Added `SavedPost` model and migration.
+  - Added `isSaved` to `Post` type.
+  - Added `getSavedPosts` query and `toggleSavePost` mutation.
+  - Updated `getPost`, `getUserPosts`, `getFeed` to include `savedBy`.
+  - Updated `formatPost` to compute `isSaved` and `commentsCount` (using `_count`).
+  - Updated `SavedPostService` to include `_count` for comments and likes.

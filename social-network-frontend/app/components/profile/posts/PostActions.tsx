@@ -4,11 +4,12 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation } from '@apollo/client/react';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
-import { LIKE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
+import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
+import { LIKE_POST, TOGGLE_SAVE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
 
 interface PostActionsProps {
     postId: string;
+    isSaved: boolean;
     isLiked: boolean;
     likesCount: number;
     commentsCount: number;
@@ -22,11 +23,26 @@ export const PostActions = ({
     likesCount: initialLikesCount,
     commentsCount,
     onCommentClick,
+    isSaved: initialIsSaved,
     onLikeUpdate,
 }: PostActionsProps) => {
     const [isLiked, setIsLiked] = useState(initialIsLiked);
     const [likesCount, setLikesCount] = useState(initialLikesCount);
-
+    const [isSaved, setIsSaved] = useState(initialIsSaved);
+    const [toggleSave] = useMutation(TOGGLE_SAVE_POST, {
+        errorPolicy: 'all',
+        // ✅ این بخش باعث میشه کش آپولو فوراً آپدیت بشه
+        update: (cache, { data }) => {
+            if (data?.toggleSavePost.success) {
+                cache.modify({
+                    id: cache.identify({ __typename: 'Post', id: postId }),
+                    fields: {
+                        isSaved: () => data.toggleSavePost.isSaved,
+                    },
+                });
+            }
+        },
+    });
     // ✅ تنظیم errorPolicy برای جلوگیری از پرتاب شدن خطا به بیرون
     const [likePost] = useMutation(LIKE_POST, {
         errorPolicy: 'all',
@@ -111,6 +127,20 @@ export const PostActions = ({
         } else {
             navigator.clipboard.writeText(window.location.href);
             toast.success('لینک کپی شد!');
+        }
+    };
+
+    const handleSave = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            const { data } = await toggleSave({ variables: { postId } });
+            if (data?.toggleSavePost.success) {
+                toast.success(data.toggleSavePost.message);
+                // ✅ آپدیت کردن State
+                setIsSaved(data.toggleSavePost.isSaved);
+            }
+        } catch (err) {
+            toast.error('خطا در ذخیره پست');
         }
     };
 
@@ -199,6 +229,28 @@ export const PostActions = ({
                     transition-all
                     group-hover:scale-110
                 "/>
+            </button>
+            <button
+                onClick={handleSave}
+                className="
+                flex
+                items-center
+                gap-2
+                text-sm
+                text-secondary
+                hover:text-primary
+                transition-colors
+                group
+                cursor-pointer
+                ">
+                <Bookmark
+                    className={`
+                    w-5 
+                    h-5 
+                    transition-all 
+                    group-hover:scale-110 
+                    ${isSaved ? 'fill-primary text-primary' : ''}
+                `} />
             </button>
         </div>
     );

@@ -4,30 +4,19 @@
 import { useState } from 'react';
 import { ConfirmModal } from './ConfirmModal';
 import { PostStats } from './PostItem/PostStats';
-import { useLazyQuery } from '@apollo/client/react';
 import { formatPersianDate } from '@/app/lib/formatDate';
 import { PostActionsBar } from './PostItem/PostActionsBar';
-import { GET_POST_COMMENTS } from '@/app/graphql/post.queries';
 import { PostPreviewMedia } from './PostItem/PostPreviewMedia';
 import {
     PostItemProps,
     PostPreviewData
 } from './PostItem/types';
-import { PostCommentsPreview } from './PostItem/PostCommentsPreview';
 
 export const PostItem = ({ post, onDelete, onEdit, onView }: PostItemProps) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showComments, setShowComments] = useState(false);
 
     const formattedDate = formatPersianDate(post.createdAt);
-
-    // ✅ کوئری تنبل (lazy) برای کامنت‌ها
-    const [fetchComments, { data: commentsData, loading: commentsLoading }] =
-        useLazyQuery(GET_POST_COMMENTS, {
-            fetchPolicy: 'cache-first',
-        });
-
-    const comments = commentsData?.getPost?.comments || [];
 
     // ✅ پارس کردن محتوای پست
     const previewData: PostPreviewData = (() => {
@@ -69,13 +58,6 @@ export const PostItem = ({ post, onDelete, onEdit, onView }: PostItemProps) => {
     const handleConfirmDelete = () => {
         onDelete(post.id);
         setShowDeleteConfirm(false);
-    };
-
-    const handleToggleComments = () => {
-        if (!showComments && !commentsData) {
-            fetchComments({ variables: { postId: post.id } });
-        }
-        setShowComments(prev => !prev);
     };
 
     return (

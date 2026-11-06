@@ -9,7 +9,8 @@ import {
     LogOut,
     Cog,
     LayoutGrid,
-    PenSquare
+    PenSquare,
+    Bookmark,
 } from 'lucide-react';
 
 const menuItems = [
@@ -19,6 +20,7 @@ const menuItems = [
     { id: 'create-post', label: 'نوشتن پست جدید', icon: PenSquare }, // ✅ جدید
     { id: 'change-password', label: 'تغییر رمز عبور', icon: Lock },
     { id: 'settings', label: 'تنظیمات', icon: Cog },
+    { id: 'saved', label: 'ذخیره‌شده‌ها', icon: Bookmark },
 ];
 
 interface SidebarProps {

@@ -144,6 +144,7 @@ export const ProfilePostCard = ({ post }: ProfilePostCardProps) => {
                             likesCount={post.likesCount}
                             commentsCount={post.commentsCount}
                             onCommentClick={() => setShowViewModal(true)}
+                            isSaved={post.isSaved}
                         />
                     </div>
                 </div>

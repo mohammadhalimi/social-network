@@ -10,6 +10,7 @@ import { CreatePost } from './posts/CreatePost';
 import { ViewPostModal } from './posts/ViewPostModal';
 import { EditPostModal } from './posts/EditPostModal';
 import { EditProfileForm } from './EditProfile/EditProfile';
+import { SavedPostsList } from '@/app/components/UserName/SavedPostsList';
 
 interface ProfileContentProps {
     user: any;
@@ -121,6 +122,8 @@ export const ProfileContent = ({ user, loading, activeTab }: ProfileContentProps
                 return <ChangePassword />;
             case 'settings':
                 return <Settings />;
+            case 'saved':
+                return <SavedPostsList />;
             case 'posts':
                 return (
                     <PostList

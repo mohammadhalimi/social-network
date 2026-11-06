@@ -421,7 +421,12 @@ Future Features
 □ Groups
 
 ## Last Updated
-2026-11-01 — Fixed `Settings` tests + completed GraphQL query tests:
-  - `Settings.test.tsx`: mocked `PrivacyToggle` & `ChangeTheme` to isolate layout testing (avoids Apollo invariant errors).
-  - `user.queries.test.ts`: added `ME_QUERY`, `isPrivate`, `isFollowRequestPending`, `isPending`.
-  - `story.queries.test.ts`: completed all 8 story operations.
+2026-11-06 — Completed Saved Posts feature:
+  - Added `isSaved` to `IPost` and all post queries.
+  - Added `TOGGLE_SAVE_POST` mutation and `GET_SAVED_POSTS` query.
+  - Added Bookmark button to `PostActions` (used in `ProfilePostCard` and `ViewPostModal`).
+  - Updated `ProfilePostCard` to pass `isSaved`.
+  - Created `SavedPostsList` using `ProfilePostCard` (with `_count` for comments).
+  - Added "ذخیره‌شده‌ها" tab to Sidebar and MobileMenu.
+  - Apollo Cache updates on save (via `cache.modify`) for instant UI.
+  - SavedPostsList filters out `isSaved: false` for instant removal from list.

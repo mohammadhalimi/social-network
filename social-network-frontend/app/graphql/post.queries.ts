@@ -24,6 +24,7 @@ export interface IPost {
   commentsCount: number;
   isLiked: boolean;
   user: IUser;
+  isSaved: boolean;
 }
 
 export interface IComment {
@@ -60,6 +61,7 @@ export const GET_USER_POSTS: TypedDocumentNode<GetUserPostsResponse, GetUserPost
       likesCount
       commentsCount
       isLiked
+      isSaved
       user {
         id
         username
@@ -95,6 +97,7 @@ export const CREATE_POST: TypedDocumentNode<CreatePostResponse, CreatePostVariab
         id
         content
         createdAt
+        isSaved
         user {
           id
           username
@@ -226,6 +229,7 @@ export const UPDATE_POST: TypedDocumentNode<UpdatePostResponse, UpdatePostVariab
         content
         createdAt
         updatedAt
+        isSaved
         user {
           id
           username
@@ -445,6 +449,7 @@ export interface GetPostByIdResponse {
     likesCount: number;
     commentsCount: number;
     isLiked: boolean;
+    isSaved: boolean;
     user: IUser;
   } | null;
 }
@@ -464,12 +469,75 @@ export const GET_POST_BY_ID: TypedDocumentNode<GetPostByIdResponse, GetPostByIdV
       likesCount
       commentsCount
       isLiked
+      isSaved
       user {
         id
         username
         fullName
         avatar
       }
+    }
+  }
+`;
+
+// ✅ میوتیشن ذخیره/حذف
+export interface ToggleSavePostResponse {
+  toggleSavePost: {
+    success: boolean;
+    message: string;
+    isSaved: boolean;
+  };
+}
+
+export interface ToggleSavePostVariables {
+  postId: string;
+}
+
+export const TOGGLE_SAVE_POST: TypedDocumentNode<ToggleSavePostResponse, ToggleSavePostVariables> = gql`
+  mutation ToggleSavePost($postId: ID!) {
+    toggleSavePost(postId: $postId) {
+      success
+      message
+      isSaved
+    }
+  }
+`;
+
+// ✅ کوئری دریافت لیست پست‌های ذخیره‌شده
+export interface GetSavedPostsResponse {
+  getSavedPosts: {
+    posts: IPost[];
+    totalCount: number;
+    hasMore: boolean;
+  };
+}
+
+export interface GetSavedPostsVariables {
+  limit?: number;
+  offset?: number;
+}
+
+export const GET_SAVED_POSTS: TypedDocumentNode<GetSavedPostsResponse, GetSavedPostsVariables> = gql`
+  query GetSavedPosts($limit: Int, $offset: Int) {
+    getSavedPosts(limit: $limit, offset: $offset) {
+      posts {
+        id
+        content
+        createdAt
+        updatedAt
+        likesCount
+        commentsCount
+        isLiked
+        isSaved
+        user {
+          id
+          username
+          fullName
+          avatar
+        }
+      }
+      totalCount
+      hasMore
     }
   }
 `;
