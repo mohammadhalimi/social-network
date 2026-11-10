@@ -1,4 +1,4 @@
-// graphql/resolvers/helpers/__tests__/formatPost.test.ts
+// src/graphql/resolvers/helpers/__tests__/formatPost.test.ts
 
 jest.mock('../mapUser', () => ({
     mapUser: jest.fn((user: any) => ({ mapped: true, sourceId: user?.id })),
@@ -49,6 +49,7 @@ describe('formatPost', () => {
         expect(result.likesCount).toBe(0);
         expect(result.commentsCount).toBe(0);
         expect(result.isLiked).toBe(false);
+        expect(result.isSaved).toBe(false); // ✅ جدید
         expect(result.comments).toEqual([]);
         expect(result.user).toEqual({ mapped: true, sourceId: 'u1' });
         expect(mockedMapUser).toHaveBeenCalledWith(post.user);
@@ -56,17 +57,14 @@ describe('formatPost', () => {
 
     test('فیلدهای اصلی پست را حفظ می‌کند (spread)', () => {
         const post = buildPost({ id: 'post-1', text: 'متن پست' });
-
         const result = formatPost(post);
 
         expect(result.id).toBe('post-1');
         expect(result.text).toBe('متن پست');
     });
 
-    // ✅ تست جدید: تبدیل createdAt و updatedAt به ISO
     test('createdAt و updatedAt را به رشته ISO تبدیل می‌کند', () => {
         const post = buildPost();
-
         const result = formatPost(post);
 
         expect(result.createdAt).toBe(ISO_DATE);
@@ -78,10 +76,7 @@ describe('formatPost', () => {
     test('likesCount و commentsCount را طبق طول آرایه‌ها محاسبه می‌کند', () => {
         const post = buildPost({
             likes: [{ userId: 'a' }, { userId: 'b' }, { userId: 'c' }],
-            comments: [
-                buildComment({ id: 'c1' }),
-                buildComment({ id: 'c2' }),
-            ],
+            comments: [buildComment({ id: 'c1' }), buildComment({ id: 'c2' })],
         });
 
         const result = formatPost(post);
@@ -91,33 +86,46 @@ describe('formatPost', () => {
     });
 
     test('اگر userId در بین لایک‌ها باشد، isLiked برابر true است', () => {
-        const post = buildPost({
-            likes: [{ userId: 'x' }, { userId: 'y' }],
-        });
-
+        const post = buildPost({ likes: [{ userId: 'x' }, { userId: 'y' }] });
         const result = formatPost(post, 'y');
 
         expect(result.isLiked).toBe(true);
     });
 
     test('اگر userId در بین لایک‌ها نباشد، isLiked برابر false است', () => {
-        const post = buildPost({
-            likes: [{ userId: 'x' }, { userId: 'y' }],
-        });
-
+        const post = buildPost({ likes: [{ userId: 'x' }, { userId: 'y' }] });
         const result = formatPost(post, 'z');
 
         expect(result.isLiked).toBe(false);
     });
 
     test('اگر userId ارسال نشود، isLiked همیشه false است حتی اگر لایک وجود داشته باشد', () => {
-        const post = buildPost({
-            likes: [{ userId: 'x' }],
-        });
-
+        const post = buildPost({ likes: [{ userId: 'x' }] });
         const result = formatPost(post);
 
         expect(result.isLiked).toBe(false);
+    });
+
+    // ✅ تست جدید: بررسی فیلد isSaved
+    test('اگر post.isSaved برابر true باشد، نتیجه هم true است', () => {
+        const post = buildPost({ isSaved: true });
+        const result = formatPost(post);
+
+        expect(result.isSaved).toBe(true);
+    });
+
+    test('اگر post.isSaved برابر false باشد، نتیجه هم false است', () => {
+        const post = buildPost({ isSaved: false });
+        const result = formatPost(post);
+
+        expect(result.isSaved).toBe(false);
+    });
+
+    test('اگر post.isSaved وجود نداشته باشد (undefined)، مقدار false می‌گیرد', () => {
+        const post = buildPost();
+        const result = formatPost(post);
+
+        expect(result.isSaved).toBe(false);
     });
 
     test('هر کامنت را با formatComment فرمت می‌کند و userId را عبور می‌دهد', () => {
@@ -137,7 +145,6 @@ describe('formatPost', () => {
 
     test('likes یا comments برابر null هم به آرایه خالی تبدیل می‌شود', () => {
         const post = buildPost({ likes: null, comments: null });
-
         const result = formatPost(post);
 
         expect(result.likesCount).toBe(0);
@@ -152,7 +159,6 @@ describe('formatPost', () => {
 describe('formatComment', () => {
     test('کامنتی بدون likes/replies را با مقادیر پیش‌فرض صفر فرمت می‌کند', () => {
         const comment = buildComment();
-
         const result = formatComment(comment);
 
         expect(result.likesCount).toBe(0);
@@ -163,17 +169,14 @@ describe('formatComment', () => {
 
     test('فیلدهای اصلی کامنت را حفظ می‌کند (spread)', () => {
         const comment = buildComment({ id: 'c1', text: 'متن کامنت' });
-
         const result = formatComment(comment);
 
         expect(result.id).toBe('c1');
         expect(result.text).toBe('متن کامنت');
     });
 
-    // ✅ تست جدید: تبدیل createdAt و updatedAt به ISO
     test('createdAt و updatedAt را به رشته ISO تبدیل می‌کند', () => {
         const comment = buildComment();
-
         const result = formatComment(comment);
 
         expect(result.createdAt).toBe(ISO_DATE);
@@ -181,30 +184,21 @@ describe('formatComment', () => {
     });
 
     test('likesCount را طبق طول آرایه likes محاسبه می‌کند', () => {
-        const comment = buildComment({
-            likes: [{ userId: 'a' }, { userId: 'b' }],
-        });
-
+        const comment = buildComment({ likes: [{ userId: 'a' }, { userId: 'b' }] });
         const result = formatComment(comment);
 
         expect(result.likesCount).toBe(2);
     });
 
     test('اگر userId در بین لایک‌های کامنت باشد، isLiked برابر true است', () => {
-        const comment = buildComment({
-            likes: [{ userId: 'me' }],
-        });
-
+        const comment = buildComment({ likes: [{ userId: 'me' }] });
         const result = formatComment(comment, 'me');
 
         expect(result.isLiked).toBe(true);
     });
 
     test('اگر userId ارسال نشود، isLiked همیشه false است', () => {
-        const comment = buildComment({
-            likes: [{ userId: 'me' }],
-        });
-
+        const comment = buildComment({ likes: [{ userId: 'me' }] });
         const result = formatComment(comment);
 
         expect(result.isLiked).toBe(false);
@@ -231,9 +225,7 @@ describe('formatComment', () => {
                 buildComment({
                     id: 'r1',
                     user: {},
-                    replies: [
-                        buildComment({ id: 'r1-1', user: {}, likes: [{ userId: 'me' }] }),
-                    ],
+                    replies: [buildComment({ id: 'r1-1', user: {}, likes: [{ userId: 'me' }] })],
                 }),
             ],
         });
@@ -246,7 +238,6 @@ describe('formatComment', () => {
 
     test('likes یا replies برابر null هم به آرایه خالی تبدیل می‌شود', () => {
         const comment = buildComment({ likes: null, replies: null });
-
         const result = formatComment(comment);
 
         expect(result.likesCount).toBe(0);

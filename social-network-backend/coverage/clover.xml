@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1794336369846" clover="3.2.0">
-  <project timestamp="1794336369846" name="All files">
-    <metrics statements="895" coveredstatements="16" conditionals="450" coveredconditionals="2" methods="149" coveredmethods="3" elements="1494" coveredelements="21" complexity="0" loc="895" ncloc="895" packages="17" files="45" classes="45"/>
+<coverage generated="1794337067971" clover="3.2.0">
+  <project timestamp="1794337067972" name="All files">
+    <metrics statements="895" coveredstatements="25" conditionals="450" coveredconditionals="22" methods="149" coveredmethods="6" elements="1494" coveredelements="53" complexity="0" loc="895" ncloc="895" packages="17" files="45" classes="45"/>
     <package name="src">
       <metrics statements="28" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="env.ts" path="E:\project-code\social_network\social-network-backend\src\env.ts">
@@ -72,7 +72,7 @@
       </file>
     </package>
     <package name="src.graphql.resolvers.helpers">
-      <metrics statements="73" coveredstatements="4" conditionals="71" coveredconditionals="0" methods="16" coveredmethods="0"/>
+      <metrics statements="73" coveredstatements="0" conditionals="71" coveredconditionals="0" methods="16" coveredmethods="0"/>
       <file name="checkProfileAccess.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\checkProfileAccess.ts">
         <metrics statements="7" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="1" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
@@ -99,9 +99,9 @@
         <line num="40" count="0" type="stmt"/>
       </file>
       <file name="formatPost.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\formatPost.ts">
-        <metrics statements="15" coveredstatements="3" conditionals="19" coveredconditionals="0" methods="6" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
+        <metrics statements="15" coveredstatements="0" conditionals="19" coveredconditionals="0" methods="6" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
         <line num="4" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="5" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="6" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -109,7 +109,7 @@
         <line num="9" count="0" type="stmt"/>
         <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="17" count="0" type="stmt"/>
-        <line num="22" count="1" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
         <line num="23" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="26" count="0" type="stmt"/>
@@ -117,8 +117,8 @@
         <line num="33" count="0" type="stmt"/>
       </file>
       <file name="mapUser.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\mapUser.ts">
-        <metrics statements="2" coveredstatements="1" conditionals="10" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="10" count="1" type="stmt"/>
+        <metrics statements="2" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="10" count="0" type="stmt"/>
         <line num="23" count="0" type="stmt"/>
       </file>
       <file name="notify.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\helpers\notify.ts">
@@ -202,7 +202,7 @@
       </file>
     </package>
     <package name="src.graphql.resolvers.post">
-      <metrics statements="126" coveredstatements="11" conditionals="52" coveredconditionals="2" methods="19" coveredmethods="3"/>
+      <metrics statements="126" coveredstatements="25" conditionals="52" coveredconditionals="22" methods="19" coveredmethods="6"/>
       <file name="comment.resolvers.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\post\comment.resolvers.ts">
         <metrics statements="29" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="4" count="0" type="stmt"/>
@@ -303,46 +303,46 @@
         <line num="77" count="0" type="stmt"/>
       </file>
       <file name="post.queries.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\post\post.queries.ts">
-        <metrics statements="25" coveredstatements="0" conditionals="22" coveredconditionals="0" methods="6" coveredmethods="0"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="33" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="40" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="52" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="60" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="65" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="66" count="0" type="stmt"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="87" count="0" type="stmt"/>
-        <line num="95" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="98" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="105" count="0" type="stmt"/>
-        <line num="130" count="0" type="stmt"/>
-      </file>
-      <file name="saved-post.resolvers.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\post\saved-post.resolvers.ts">
-        <metrics statements="11" coveredstatements="11" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
+        <metrics statements="25" coveredstatements="25" conditionals="22" coveredconditionals="22" methods="6" coveredmethods="6"/>
         <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
         <line num="6" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
-        <line num="11" count="4" type="stmt"/>
-        <line num="12" count="3" type="stmt"/>
-        <line num="14" count="3" type="stmt"/>
-        <line num="16" count="1" type="stmt"/>
-        <line num="22" count="2" type="stmt"/>
-        <line num="23" count="1" type="stmt"/>
+        <line num="10" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="33" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="40" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="44" count="2" type="stmt"/>
+        <line num="52" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="6" type="stmt"/>
+        <line num="60" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="64" count="5" type="stmt"/>
+        <line num="65" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="69" count="4" type="stmt"/>
+        <line num="87" count="4" type="stmt"/>
+        <line num="95" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="98" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="102" count="2" type="stmt"/>
+        <line num="105" count="4" type="stmt"/>
+        <line num="130" count="4" type="stmt"/>
+      </file>
+      <file name="saved-post.resolvers.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\post\saved-post.resolvers.ts">
+        <metrics statements="11" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
       </file>
     </package>
     <package name="src.graphql.resolvers.story">
@@ -456,10 +456,10 @@
       </file>
     </package>
     <package name="src.graphql.resolvers.try-catch">
-      <metrics statements="4" coveredstatements="1" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <metrics statements="4" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
       <file name="requireAuth.ts" path="E:\project-code\social_network\social-network-backend\src\graphql\resolvers\try-catch\requireAuth.ts">
-        <metrics statements="4" coveredstatements="1" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="4" count="1" type="stmt"/>
+        <metrics statements="4" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="4" count="0" type="stmt"/>
         <line num="8" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="9" count="0" type="stmt"/>
         <line num="11" count="0" type="stmt"/>

@@ -517,6 +517,8 @@ Future Features
 □ Direct Messages
 □ Groups
 ## Last Updated
-2026-11-10 — Added tests for Saved Posts (Backend):
+2026-11-10 — Completed Saved Posts tests (Backend):
   - `saved-post.service.test.ts` (4 tests, 100% coverage): toggle on/off, post not found, getSavedPosts with `_count`.
   - `saved-post.resolvers.test.ts` (6 tests): auth guard, default limit/offset, formatting, mutation args.
+  - Updated `post.queries.test.ts` (14 tests): added `savedBy` to `getPost`, `getUserPosts`, `getFeed` includes.
+  - Updated `formatPost.test.ts`: added tests for `isSaved`.

@@ -39,14 +39,12 @@ const mockedCanViewPrivateProfile = canViewPrivateProfile as jest.Mock;
 beforeEach(() => {
     jest.clearAllMocks();
 
-    // ✅ پیش‌فرض: formatPost
     mockedFormatPost.mockImplementation((post: any, userId?: string) => ({
         formatted: true,
         id: post.id,
         userId: userId ?? null,
     }));
 
-    // ✅ پیش‌فرض: canViewPrivateProfile
     mockedCanViewPrivateProfile.mockResolvedValue(true);
 });
 
@@ -54,10 +52,7 @@ beforeEach(() => {
 // getPost
 // ===================================================================
 describe('postQueries.getPost', () => {
-    const mockPost = {
-        id: 'post-1',
-        user: { id: 'owner-1', isPrivate: false },
-    };
+    const mockPost = { id: 'post-1', user: { id: 'owner-1', isPrivate: false } };
 
     test('1. پست را می‌خواند و با userId کاربر فرمت می‌کند', async () => {
         mockedFindUnique.mockResolvedValue(mockPost);
@@ -70,6 +65,7 @@ describe('postQueries.getPost', () => {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: 'user-1' } }, // ✅ این خط اضافه شد
                 comments: {
                     include: {
                         user: true,
@@ -107,9 +103,9 @@ describe('postQueries.getPost', () => {
     test('3. اگر پست پیدا نشود، خطا پرتاب می‌کند', async () => {
         mockedFindUnique.mockResolvedValue(null);
 
-        await expect(
-            postQueries.getPost(null, { postId: 'missing' }, {})
-        ).rejects.toThrow('پست یافت نشد.');
+        await expect(postQueries.getPost(null, { postId: 'missing' }, {})).rejects.toThrow(
+            'پست یافت نشد.'
+        );
 
         expect(mockedFormatPost).not.toHaveBeenCalled();
         expect(mockedCanViewPrivateProfile).not.toHaveBeenCalled();
@@ -122,9 +118,9 @@ describe('postQueries.getPost', () => {
         });
         mockedCanViewPrivateProfile.mockResolvedValue(false);
 
-        await expect(
-            postQueries.getPost(null, { postId: 'post-1' }, {})
-        ).rejects.toThrow('این پست متعلق به یک حساب خصوصی است.');
+        await expect(postQueries.getPost(null, { postId: 'post-1' }, {})).rejects.toThrow(
+            'این پست متعلق به یک حساب خصوصی است.'
+        );
 
         expect(mockedFormatPost).not.toHaveBeenCalled();
     });
@@ -157,6 +153,7 @@ describe('postQueries.getUserPosts', () => {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: 'user-logged-in' } }, // ✅ این خط اضافه شد
                 comments: {
                     include: {
                         user: true,
@@ -184,10 +181,7 @@ describe('postQueries.getUserPosts', () => {
     });
 
     test('7. اگر کاربر دسترسی نداشته باشد، آرایه خالی برمی‌گرداند', async () => {
-        mockedUserFindUnique.mockResolvedValue({
-            id: 'user-1',
-            isPrivate: true,
-        });
+        mockedUserFindUnique.mockResolvedValue({ id: 'user-1', isPrivate: true });
         mockedCanViewPrivateProfile.mockResolvedValue(false);
 
         const result = await postQueries.getUserPosts(
@@ -204,11 +198,7 @@ describe('postQueries.getUserPosts', () => {
         mockedUserFindUnique.mockResolvedValue(mockProfileOwner);
         mockedFindMany.mockResolvedValue([{ id: 'p1' }]);
 
-        await postQueries.getUserPosts(
-            null,
-            { userId: 'user-1', limit: 10, offset: 0 },
-            {}
-        );
+        await postQueries.getUserPosts(null, { userId: 'user-1', limit: 10, offset: 0 }, {});
 
         expect(mockedFormatPost).toHaveBeenCalledWith({ id: 'p1' }, null);
     });
@@ -269,6 +259,7 @@ describe('postQueries.getFeed', () => {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: 'user-9' } }, // ✅ این خط اضافه شد
                 comments: {
                     include: {
                         user: true,
@@ -289,14 +280,12 @@ describe('postQueries.getFeed', () => {
 
         await postQueries.getFeed(null, { limit: 10, offset: 0 }, context);
 
-        // ✅ follow.findMany صدا زده نمی‌شه (چون userId نیست)
         expect(mockedFollowFindMany).not.toHaveBeenCalled();
 
         const args = mockedFindMany.mock.calls[0][0];
         expect(args.where.OR).toEqual([
             { user: { isPrivate: false } },
             { userId: { in: [] } },
-            // ✅ userId در OR نیست
         ]);
     });
 
