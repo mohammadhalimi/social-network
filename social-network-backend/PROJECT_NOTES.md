@@ -326,6 +326,12 @@ Instagram-like social network backend API, built with **Layered Architecture**.
 
 ## Tests Written
 
+### Services
+- [x] `saved-post.service.test.ts` (4 tests, 100% coverage)
+
+### Post Resolvers
+- [x] `saved-post.resolvers.test.ts` (6 tests)
+
 ### Helpers
 - [x] `checkStoryAccess.test.ts`
 - [x] `formatPost.test.ts`
@@ -511,10 +517,6 @@ Future Features
 □ Direct Messages
 □ Groups
 ## Last Updated
-2026-11-06 — Completed Saved Posts feature:
-  - Added `SavedPost` model and migration.
-  - Added `isSaved` to `Post` type.
-  - Added `getSavedPosts` query and `toggleSavePost` mutation.
-  - Updated `getPost`, `getUserPosts`, `getFeed` to include `savedBy`.
-  - Updated `formatPost` to compute `isSaved` and `commentsCount` (using `_count`).
-  - Updated `SavedPostService` to include `_count` for comments and likes.
+2026-11-10 — Added tests for Saved Posts (Backend):
+  - `saved-post.service.test.ts` (4 tests, 100% coverage): toggle on/off, post not found, getSavedPosts with `_count`.
+  - `saved-post.resolvers.test.ts` (6 tests): auth guard, default limit/offset, formatting, mutation args.
