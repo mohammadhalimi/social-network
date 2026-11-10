@@ -58,6 +58,7 @@ describe('postMutations.createPost', () => {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: 'user-1' } },
                 comments: { include: { user: true, likes: true } },
             },
         });
@@ -102,6 +103,7 @@ describe('postMutations.updatePost', () => {
             include: {
                 user: true,
                 likes: true,
+                savedBy: { where: { userId: 'user-1' } },
                 comments: { include: { user: true, likes: true } },
             },
         });
