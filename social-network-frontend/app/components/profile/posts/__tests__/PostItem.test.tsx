@@ -1,6 +1,7 @@
+// components/profile/posts/__tests__/PostItem.test.tsx
 import '@testing-library/jest-dom';
 import { PostItem } from '../PostItem';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 // ماک‌ها
 jest.mock('next/image', () => ({
@@ -15,10 +16,7 @@ jest.mock('@/app/lib/formatDate', () => ({
     formatPersianDate: jest.fn(() => '۱۰ مهر ۱۴۰۵'),
 }));
 
-jest.mock('@apollo/client/react', () => ({
-    useLazyQuery: jest.fn(),
-}));
-
+// ✅ ماک کردن ConfirmModal
 jest.mock('../ConfirmModal', () => ({
     ConfirmModal: ({ isOpen, onConfirm, onCancel, message }: any) =>
         isOpen ? (
@@ -30,13 +28,10 @@ jest.mock('../ConfirmModal', () => ({
         ) : null,
 }));
 
-import { useLazyQuery } from '@apollo/client/react';
-
 describe('PostItem', () => {
     const mockOnDelete = jest.fn();
     const mockOnEdit = jest.fn();
     const mockOnView = jest.fn();
-    const mockFetchComments = jest.fn();
 
     const basePost = {
         id: 'post-1',
@@ -56,21 +51,10 @@ describe('PostItem', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useLazyQuery as jest.Mock).mockReturnValue([
-            mockFetchComments,
-            { data: null, loading: false },
-        ]);
     });
 
     it('1. عنوان، متن و تاریخ را نمایش می‌دهد', () => {
-        render(
-            <PostItem
-                post={basePost}
-                onDelete={mockOnDelete}
-                onEdit={mockOnEdit}
-                onView={mockOnView}
-            />
-        );
+        render(<PostItem post={basePost} onDelete={mockOnDelete} onEdit={mockOnEdit} onView={mockOnView} />);
 
         expect(screen.getByText('عنوان تست')).toBeInTheDocument();
         expect(screen.getByText('متن تست برای پیش‌نمایش')).toBeInTheDocument();
@@ -78,28 +62,14 @@ describe('PostItem', () => {
     });
 
     it('2. پیش‌نمایش عکس را نمایش می‌دهد و ویدیو را مخفی می‌کند', () => {
-        render(
-            <PostItem
-                post={basePost}
-                onDelete={mockOnDelete}
-                onEdit={mockOnEdit}
-                onView={mockOnView}
-            />
-        );
+        render(<PostItem post={basePost} onDelete={mockOnDelete} onEdit={mockOnEdit} onView={mockOnView} />);
 
         expect(screen.getByAltText('پیش‌نمایش')).toBeInTheDocument();
         expect(document.querySelector('video')).not.toBeInTheDocument();
     });
 
     it('3. دکمه مشاهده، ویرایش و حذف را صدا می‌زند', () => {
-        render(
-            <PostItem
-                post={basePost}
-                onDelete={mockOnDelete}
-                onEdit={mockOnEdit}
-                onView={mockOnView}
-            />
-        );
+        render(<PostItem post={basePost} onDelete={mockOnDelete} onEdit={mockOnEdit} onView={mockOnView} />);
 
         fireEvent.click(screen.getByTitle('مشاهده کامل'));
         expect(mockOnView).toHaveBeenCalledWith(basePost);
@@ -112,14 +82,7 @@ describe('PostItem', () => {
     });
 
     it('4. با تایید حذف در مودال، onDelete صدا زده می‌شود', () => {
-        render(
-            <PostItem
-                post={basePost}
-                onDelete={mockOnDelete}
-                onEdit={mockOnEdit}
-                onView={mockOnView}
-            />
-        );
+        render(<PostItem post={basePost} onDelete={mockOnDelete} onEdit={mockOnEdit} onView={mockOnView} />);
 
         fireEvent.click(screen.getByTitle('حذف'));
         fireEvent.click(screen.getByText('تایید حذف'));

@@ -280,6 +280,7 @@ story/
 - [x] `PostModalRenderer.test.tsx` (8 tests, 100% coverage)
 - [x] `useNotifications.test.tsx` (10 tests, 100% coverage)
 - [x] `ViewPostModal.test.tsx` (16 tests, 80.59% coverage)
+- [x] `SavedPostsList.test.tsx` (4 tests)
 
 ### GraphQL
 - [x] `post.queries.test.ts`

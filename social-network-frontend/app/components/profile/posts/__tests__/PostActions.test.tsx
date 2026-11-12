@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { PostActions } from '../PostActions';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { LIKE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
+import { LIKE_POST, TOGGLE_SAVE_POST, UNLIKE_POST } from '@/app/graphql/post.queries';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // ✅ Mock کردن toast تا فراخوانی‌هاش رو بررسی کنیم
@@ -19,6 +19,7 @@ const defaultProps = {
     likesCount: 5,
     commentsCount: 3,
     onCommentClick: jest.fn(),
+    isSaved: false,
 };
 
 // ✅ کمک‌کننده برای رندر با MockedProvider (چون useMutation نیاز به Apollo context داره)
@@ -233,5 +234,48 @@ describe('PostActions', () => {
 
         expect(writeTextMock).toHaveBeenCalledWith(window.location.href);
         expect(toast.success).toHaveBeenCalledWith('لینک کپی شد!');
+    });
+});
+
+// ==========================================================
+//  ✅ تست‌های جدید: دکمه ذخیره (Bookmark)
+// ==========================================================
+describe('Save (Bookmark)', () => {
+    it('وقتی isSaved=false است، دکمه بوکمارک توپر نیست', () => {
+        renderWithMocks({ isSaved: false });
+
+        // دکمه بوکمارک آخرین دکمه است
+        const saveButton = screen.getAllByRole('button')[3];
+        const icon = saveButton.querySelector('svg');
+
+        // ✅ استفاده از getAttribute به جای className
+        expect(icon?.getAttribute('class')).not.toContain('fill-primary');
+    });
+
+    it('وقتی isSaved=true است، دکمه بوکمارک توپر است', () => {
+        renderWithMocks({ isSaved: true });
+
+        const saveButton = screen.getAllByRole('button')[3];
+        const icon = saveButton.querySelector('svg');
+
+        // ✅ استفاده از getAttribute به جای className
+        expect(icon?.getAttribute('class')).toContain('fill-primary');
+    });
+
+    it('با کلیک روی دکمه بوکمارک، toggleSavePost صدا زده می‌شود', async () => {
+        const mocks = [
+            {
+                request: { query: TOGGLE_SAVE_POST, variables: { postId: 'post-1' } },
+                result: { data: { toggleSavePost: { success: true, message: 'ذخیره شد', isSaved: true } } },
+            },
+        ];
+        renderWithMocks({ isSaved: false }, mocks);
+
+        const saveButton = screen.getAllByRole('button')[3];
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith('ذخیره شد');
+        });
     });
 });

@@ -14,10 +14,10 @@ jest.mock('@/app/lib/formatDate', () => ({
     formatPersianDate: jest.fn(() => '۱۰ مهر ۱۴۰۵'),
 }));
 
-// ماک کردن PostActions
+// ✅ ماک کردن PostActions (حالا isSaved رو هم می‌گیره)
 jest.mock('../../profile/posts/PostActions', () => ({
-    PostActions: ({ postId, onCommentClick }: any) => (
-        <div data-testid="post-actions">
+    PostActions: ({ postId, onCommentClick, isSaved }: any) => (
+        <div data-testid="post-actions" data-saved={String(isSaved)}>
             <button onClick={onCommentClick}>کامنت</button>
             <span>{postId}</span>
         </div>
@@ -45,6 +45,7 @@ describe('ProfilePostCard', () => {
         likesCount: 5,
         commentsCount: 3,
         isLiked: false,
+        isSaved: false, // ✅ پیش‌فرض اضافه شد
     };
 
     // ==========================================
@@ -110,44 +111,52 @@ describe('ProfilePostCard', () => {
     });
 
     // ==========================================
+    //  ✅ تست‌های جدید برای isSaved
+    // ==========================================
+    it('6. isSaved=true را به PostActions پاس می‌دهد', () => {
+        const savedPost = { ...basePost, isSaved: true };
+        render(<ProfilePostCard post={savedPost} />);
+
+        const actions = screen.getByTestId('post-actions');
+        expect(actions).toHaveAttribute('data-saved', 'true');
+    });
+
+    it('7. isSaved=false را به PostActions پاس می‌دهد', () => {
+        const unsavedPost = { ...basePost, isSaved: false };
+        render(<ProfilePostCard post={unsavedPost} />);
+
+        const actions = screen.getByTestId('post-actions');
+        expect(actions).toHaveAttribute('data-saved', 'false');
+    });
+
+    // ==========================================
     //  تست‌های تعامل با مودال
     // ==========================================
-    it('6. با کلیک روی کارت، ViewPostModal باز می‌شود', () => {
+    it('8. با کلیک روی کارت، ViewPostModal باز می‌شود', () => {
         render(<ProfilePostCard post={basePost} />);
 
-        // در ابتدا مودال بسته است
         expect(screen.queryByTestId('view-post-modal')).not.toBeInTheDocument();
 
-        // کلیک روی کارت
         fireEvent.click(screen.getByText('عنوان تست').closest('div')!.parentElement!);
 
-        // حالا مودال باز است
         expect(screen.getByTestId('view-post-modal')).toBeInTheDocument();
         expect(screen.getByText(/مودال باز شد: post-1/)).toBeInTheDocument();
     });
 
-    it('7. با کلیک روی دکمه کامنت در PostActions، مودال باز می‌شود', () => {
+    it('9. با کلیک روی دکمه کامنت در PostActions، مودال باز می‌شود', () => {
         render(<ProfilePostCard post={basePost} />);
 
-        // کلیک روی دکمه کامنت داخل PostActions
         fireEvent.click(screen.getByText('کامنت'));
 
-        // مودال باید باز شود
         expect(screen.getByTestId('view-post-modal')).toBeInTheDocument();
     });
 
-    it('8. کلیک روی PostActions باعث باز شدن مودال نمی‌شود (stopPropagation)', () => {
+    it('10. کلیک روی PostActions باعث باز شدن مودال نمی‌شود (stopPropagation)', () => {
         render(<ProfilePostCard post={basePost} />);
 
-        // کلیک روی دکمه کامنت که در PostActions است
         fireEvent.click(screen.getByText('کامنت'));
 
-        // مودال باز می‌شود (چون خود دکمه onCommentClick را صدا می‌زند)
-        // اما اگر روی خود کانتینر PostActions کلیک کنیم، نباید باز شود
         const postActionsContainer = screen.getByTestId('post-actions');
-        
-        // مودال باید بسته بماند اگر روی کانتینر کلیک کنیم (نه دکمه)
-        // این تست بررسی می‌کند که stopPropagation کار می‌کند
         expect(postActionsContainer).toBeInTheDocument();
     });
 });
