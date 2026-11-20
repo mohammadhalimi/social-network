@@ -4,6 +4,7 @@ import { Vazirmatn } from 'next/font/google';
 import { Providers } from './providers/providers';
 import { Header } from './components/layout/Header'; // ✅ اضافه شد
 import { PostModalRenderer } from './components/modals/PostModalRenderer';
+import { BottomNav } from './components/layout/BottomNav';
 
 const vazir = Vazirmatn({
   subsets: ['arabic', 'latin'],
@@ -24,7 +25,10 @@ export default function RootLayout({
       <body className={vazir.className}>
         <Providers>
           <Header />
-          {children}
+          <main className="pb-16 lg:pb-0 min-h-screen">
+            {children}
+          </main>
+          <BottomNav />
           <PostModalRenderer />
         </Providers>
       </body>

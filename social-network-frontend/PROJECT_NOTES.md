@@ -21,7 +21,7 @@ Instagram-like social network frontend, built with **Next.js 16 (App Router)** u
 ```text
 src/app/
 ├── (routing pages)
-│ ├── layout.tsx # Root layout (Providers + Header + PostModalRenderer)
+│ ├── layout.tsx # Root layout (Providers + Header + BottomNav + PostModalRenderer)
 │ ├── page.tsx # Home page
 │ ├── profile/ # Own user profile
 │ ├── user/[username]/ # Public user profile
@@ -32,6 +32,7 @@ src/app/
 ├── components/
 │ ├── layout/ # Shared layout components
 │ │ └── Header.tsx
+  │ └── BottomNav.tsx
 │ ├── modals/ # Global modals
 │ │ └── PostModalRenderer.tsx
 │ ├── notification/ # Notification feature
@@ -212,7 +213,7 @@ story/
 - [x] SearchResultItem
 
 ### UI
-- [x] Shared Header
+- [x] Shared Header , BottomNav
 - [x] Mobile Menu (only on /profile)
 - [x] Sidebar
 - [x] Theme (Dark/Light)
@@ -258,6 +259,7 @@ story/
 - [x] `Settings.test.tsx`
 - [x] `MobileMenu.test.tsx` (14 tests, 100% coverage)
 - [x] `Header.test.tsx` (15 tests, 100% coverage)
+- [x] `BottomNav.tsx` 
 - [x] `NotificationBell.test.tsx`
 - [x] `NotificationDropdown.test.tsx`
 - [x] `NotificationItem` tests:
@@ -422,10 +424,10 @@ Future Features
 □ Groups
 
 ## Last Updated
-2026-11-20 — Redesigned `Header` (Desktop) with navigation & auth buttons:
-  - Added Home and Search navigation links (desktop only).
-  - Added "ورود / ثبت‌نام" button for guests (redirects to `/auth/login`).
-  - Removed welcome message for cleaner UI.
-  - Hidden header entirely on `/auth/*` routes.
-  - Added `aria-label` to icon links for accessibility & testing.
-  - Updated `Header.test.tsx` (17 tests) with `aria-label` and auth logic.
+2026-11-20 — Added tests for `BottomNav` (Mobile):
+  - Added `BottomNav.test.tsx` (25 tests).
+  - Covered render conditions: hidden on `/auth/*` routes and for guests.
+  - Covered active tab state for each route (exact path matching).
+  - Covered unread notifications badge, including boundary values (9 ← `9`, 10 ← `9+`).
+  - Covered avatar rendering: image, first-letter fallback, and `👤` fallback.
+  - Used typed mocks (`jest.mocked`) for `usePathname`, `useAppSelector`, and `useNotifications`.
