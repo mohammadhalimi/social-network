@@ -2,14 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Home, Search, LogIn } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { getAvatarUrl } from '@/app/lib/utils/avatar';
 import { toggleMobileMenu } from '@/app/redux/uiSlice';
 import { useAppSelector, useAppDispatch } from '@/app/redux/hooks';
 import { NotificationBell } from '../notification/NotificationBell';
-
-
 
 export const Header = () => {
     const pathname = usePathname();
@@ -19,6 +17,10 @@ export const Header = () => {
     const avatarUrl = user?.avatar ? getAvatarUrl(user.avatar) : null;
 
     const showMobileMenuButton = user && pathname === '/profile';
+    const isActive = (path: string) => pathname === path;
+
+    // ✅ تو صفحات Auth هدر نمایش داده نشه
+    if (pathname.startsWith('/auth')) return null;
 
     return (
         <header
@@ -37,8 +39,14 @@ export const Header = () => {
             top-0
             z-40
             ">
-            <div className="flex items-center gap-3">
-                {/* ✅ دکمه منوی موبایل */}
+            
+            {/* سمت راست: دکمه منو موبایل + لوگو */}
+            <div
+                className="
+                flex
+                items-center
+                gap-3
+                ">
                 {showMobileMenuButton && (
                     <button
                         onClick={() => dispatch(toggleMobileMenu())}
@@ -66,7 +74,7 @@ export const Header = () => {
                         text-lg
                         lg:text-xl
                         font-bold
-                        bg-gradient-to-r
+                        bg-linear-to-r
                         from-primary
                         to-secondary
                         bg-clip-text
@@ -74,15 +82,64 @@ export const Header = () => {
                         ">
                         پنل کاربری
                     </h1>
-                    <p className="text-sm text-secondary hidden sm:block">
-                        خوش آمدید {user?.fullName || 'کاربر عزیز'} 👋
-                    </p>
                 </Link>
             </div>
 
-            {user && (
-                <div className="flex items-center gap-3">
+            {/* سمت چپ: آیکون‌ها (فقط دسکتاپ) و اعلان و آواتار */}
+            {user ? (
+                <div
+                    className="
+                    flex
+                    items-center
+                    gap-2
+                    sm:gap-3
+                    ">
+                    
+                    {/* آیکون‌های ناوبری (فقط تو سایز دسکتاپ) */}
+                    <div
+                        className="
+                        hidden
+                        lg:flex
+                        items-center
+                        gap-1
+                        mr-4
+                        ">
+                        <Link
+                            href="/"
+                            aria-label="خانه"
+                            className={`
+                            p-2
+                            rounded-xl
+                            transition-colors
+                            ${isActive('/') 
+                                ? 'text-primary bg-primary/10' 
+                                : 'text-secondary hover:text-primary hover:bg-border/50'
+                            }
+                            `}
+                            title="خانه"
+                        >
+                            <Home size={22} className={isActive('/') ? 'fill-primary/20' : ''} />
+                        </Link>
+                        <Link
+                            aria-label="جستجو"
+                            href="/search"
+                            className={`
+                            p-2
+                            rounded-xl
+                            transition-colors
+                            ${isActive('/search') 
+                                ? 'text-primary bg-primary/10' 
+                                : 'text-secondary hover:text-primary hover:bg-border/50'
+                            }
+                            `}
+                            title="جستجو"
+                        >
+                            <Search size={22} className={isActive('/search') ? 'fill-primary/20' : ''} />
+                        </Link>
+                    </div>
+
                     <NotificationBell />
+                    
                     <Link
                         href="/profile"
                         className="
@@ -115,6 +172,27 @@ export const Header = () => {
                         )}
                     </Link>
                 </div>
+            ) : (
+                // ✅ دکمه ورود / ثبت‌نام برای کاربر مهمان
+                <Link
+                    href="/auth/login"
+                    className="
+                    flex
+                    items-center
+                    gap-2
+                    px-4
+                    py-2
+                    bg-primary
+                    text-white
+                    text-sm
+                    font-medium
+                    rounded-xl
+                    hover:bg-secondary
+                    transition-colors
+                    ">
+                    <LogIn size={16} />
+                    ورود / ثبت‌نام
+                </Link>
             )}
         </header>
     );

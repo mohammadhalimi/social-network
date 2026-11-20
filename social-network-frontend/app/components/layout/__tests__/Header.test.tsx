@@ -38,7 +38,11 @@ jest.mock('next/image', () => ({
 // ✅ mock next/link
 jest.mock('next/link', () => ({
     __esModule: true,
-    default: ({ children, href }: any) => <a href={href}>{children}</a>,
+    default: ({ children, href, ...props }: any) => (
+        <a href={href} {...props}>
+            {children}
+        </a>
+    ),
 }));
 
 // ✅ mock NotificationBell
@@ -46,9 +50,6 @@ jest.mock('../../notification/NotificationBell', () => ({
     NotificationBell: () => <div data-testid="notification-bell">Bell</div>,
 }));
 
-// ===================================================================
-// Tests
-// ===================================================================
 describe('Header', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -58,13 +59,31 @@ describe('Header', () => {
     });
 
     // ===============================================================
+    // Auth pages
+    // ===============================================================
+    describe('when on auth pages', () => {
+        it('does NOT render header on /auth/login', () => {
+            mockUsePathname.mockReturnValue('/auth/login');
+            const { container } = render(<Header />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('does NOT render header on /auth/register', () => {
+            mockUsePathname.mockReturnValue('/auth/register');
+            const { container } = render(<Header />);
+            expect(container.firstChild).toBeNull();
+        });
+    });
+
+    // ===============================================================
     // Guest (no user)
     // ===============================================================
     describe('when user is not logged in', () => {
-        it('renders welcome message with fallback name', () => {
+        it('renders login/register button', () => {
             render(<Header />);
 
-            expect(screen.getByText(/خوش آمدید کاربر عزیز/)).toBeInTheDocument();
+            const loginLink = screen.getByRole('link', { name: /ورود \/ ثبت‌نام/ });
+            expect(loginLink).toHaveAttribute('href', '/auth/login');
         });
 
         it('does NOT render NotificationBell', () => {
@@ -100,12 +119,6 @@ describe('Header', () => {
             };
         });
 
-        it('renders user fullName in welcome message', () => {
-            render(<Header />);
-
-            expect(screen.getByText(/خوش آمدید علی رضایی/)).toBeInTheDocument();
-        });
-
         it('renders NotificationBell', () => {
             render(<Header />);
 
@@ -115,7 +128,6 @@ describe('Header', () => {
         it('renders profile link with first letter when no avatar', () => {
             render(<Header />);
 
-            // ✅ دقیق‌تر: با name دقیق 'ع' (نه regex)
             const profileLink = screen.getByRole('link', { name: 'ع' });
             expect(profileLink).toHaveAttribute('href', '/profile');
             expect(profileLink).toHaveTextContent('ع');
@@ -133,6 +145,30 @@ describe('Header', () => {
             render(<Header />);
 
             expect(screen.getByAltText('علی رضایی')).toHaveAttribute('src', '/uploads/avatar.jpg');
+        });
+
+        it('renders Home and Search navigation links', () => {
+            render(<Header />);
+
+            // ✅ حالا با aria-label پیدا می‌شن
+            expect(screen.getByRole('link', { name: 'خانه' })).toHaveAttribute('href', '/');
+            expect(screen.getByRole('link', { name: 'جستجو' })).toHaveAttribute('href', '/search');
+        });
+
+        it('highlights active Home link', () => {
+            mockUsePathname.mockReturnValue('/');
+            render(<Header />);
+
+            const homeLink = screen.getByRole('link', { name: 'خانه' });
+            expect(homeLink.className).toContain('text-primary');
+        });
+
+        it('highlights active Search link', () => {
+            mockUsePathname.mockReturnValue('/search');
+            render(<Header />);
+
+            const searchLink = screen.getByRole('link', { name: 'جستجو' });
+            expect(searchLink.className).toContain('text-primary');
         });
     });
 
@@ -152,7 +188,6 @@ describe('Header', () => {
 
         it('renders mobile menu button when on /profile', () => {
             mockUsePathname.mockReturnValue('/profile');
-
             render(<Header />);
 
             expect(screen.getByLabelText(/منوی موبایل/i)).toBeInTheDocument();
@@ -160,7 +195,6 @@ describe('Header', () => {
 
         it('does NOT render mobile menu button when NOT on /profile', () => {
             mockUsePathname.mockReturnValue('/');
-
             render(<Header />);
 
             expect(screen.queryByLabelText(/منوی موبایل/i)).not.toBeInTheDocument();
@@ -169,7 +203,6 @@ describe('Header', () => {
         it('does NOT render mobile menu button when user is null', () => {
             mockAuthState = { user: null };
             mockUsePathname.mockReturnValue('/profile');
-
             render(<Header />);
 
             expect(screen.queryByLabelText(/منوی موبایل/i)).not.toBeInTheDocument();
@@ -178,10 +211,8 @@ describe('Header', () => {
         it('shows Menu icon when mobile menu is closed', () => {
             mockUsePathname.mockReturnValue('/profile');
             mockUiState = { isMobileMenuOpen: false };
-
             render(<Header />);
 
-            // ✅ بررسی SVG classes
             const svg = screen.getByLabelText(/منوی موبایل/i).querySelector('svg');
             expect(svg).toHaveClass('lucide-menu');
         });
@@ -189,29 +220,25 @@ describe('Header', () => {
         it('shows X icon when mobile menu is open', () => {
             mockUsePathname.mockReturnValue('/profile');
             mockUiState = { isMobileMenuOpen: true };
-
             render(<Header />);
 
-            // ✅ بررسی SVG classes
             const svg = screen.getByLabelText(/منوی موبایل/i).querySelector('svg');
             expect(svg).toHaveClass('lucide-x');
         });
 
         it('dispatches toggleMobileMenu on click', () => {
             mockUsePathname.mockReturnValue('/profile');
-
             render(<Header />);
 
             fireEvent.click(screen.getByLabelText(/منوی موبایل/i));
-
             expect(mockDispatch).toHaveBeenCalledWith({ type: 'TOGGLE_MOBILE_MENU' });
         });
     });
 
     // ===============================================================
-    // Home link
+    // Home link (logo)
     // ===============================================================
-    describe('home link', () => {
+    describe('home link (logo)', () => {
         it('links to /', () => {
             render(<Header />);
 

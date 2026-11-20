@@ -422,12 +422,10 @@ Future Features
 □ Groups
 
 ## Last Updated
-2026-11-06 — Completed Saved Posts feature:
-  - Added `isSaved` to `IPost` and all post queries.
-  - Added `TOGGLE_SAVE_POST` mutation and `GET_SAVED_POSTS` query.
-  - Added Bookmark button to `PostActions` (used in `ProfilePostCard` and `ViewPostModal`).
-  - Updated `ProfilePostCard` to pass `isSaved`.
-  - Created `SavedPostsList` using `ProfilePostCard` (with `_count` for comments).
-  - Added "ذخیره‌شده‌ها" tab to Sidebar and MobileMenu.
-  - Apollo Cache updates on save (via `cache.modify`) for instant UI.
-  - SavedPostsList filters out `isSaved: false` for instant removal from list.
+2026-11-20 — Redesigned `Header` (Desktop) with navigation & auth buttons:
+  - Added Home and Search navigation links (desktop only).
+  - Added "ورود / ثبت‌نام" button for guests (redirects to `/auth/login`).
+  - Removed welcome message for cleaner UI.
+  - Hidden header entirely on `/auth/*` routes.
+  - Added `aria-label` to icon links for accessibility & testing.
+  - Updated `Header.test.tsx` (17 tests) with `aria-label` and auth logic.
